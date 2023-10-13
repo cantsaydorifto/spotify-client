@@ -1,11 +1,7 @@
-<script>
+<script lang="ts">
   import { invalidateAll } from '$app/navigation';
-</script>
-
-<form
-  method="post"
-  action="/api/auth/logout"
-  on:submit|preventDefault={async () => {
+  import Button from './Button.svelte';
+  async function logout() {
     const response = await fetch('/api/auth/logout', {
       method: 'POST',
       headers: {
@@ -15,7 +11,15 @@
     if (response.ok) {
       invalidateAll();
     }
-  }}
->
-  <button type="submit">Logout</button>
+  }
+</script>
+
+<form method="post" action="/api/auth/logout" on:submit|preventDefault={logout}>
+  <Button element="button" style="danger" type="submit">Logout</Button>
 </form>
+
+<style>
+  form {
+    display: inline-block;
+  }
+</style>
