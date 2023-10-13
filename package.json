@@ -31,6 +31,7 @@
   },
   "type": "module",
   "dependencies": {
+    "@fontsource/metropolis": "^5.0.7",
     "crypto-js": "^4.1.1",
     "secure-random": "^1.1.2"
   }
