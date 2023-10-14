@@ -28,7 +28,7 @@
     cursor: pointer;
     text-decoration: none;
     padding: 7px 15px;
-    transition: all 0.3s;
+    transition: filter 0.3s;
   }
   .solid {
     background-color: var(--accent-color);
