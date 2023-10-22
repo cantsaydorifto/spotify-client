@@ -1,9 +1,10 @@
 :root {
-  --bg-color: #191414;
+  --bg-color: #121212;
   --sidebar-color: #000;
   --header-color: #000;
   --text-color: #fff;
   --accent-color: #1db954;
+  --accent-color-darker: #2a9850;
   --menu-background-color: #2e2e2e;
   --light-gray: #a7a7a7;
   --medium-gray: #2e2e2e;
@@ -76,8 +77,6 @@ h6 {
 p {
   font-size: 1rem;
   line-height: 1.7;
-  margin-top: 1em;
-  margin-bottom: 1em;
 }
 
 select:focus-visible,

@@ -1,5 +1,6 @@
 <script>
   import './globals.css';
+  import './tippy-styles.css';
   import '@fontsource/metropolis';
   import '@fontsource/metropolis/300.css';
   import '@fontsource/metropolis/400.css';
