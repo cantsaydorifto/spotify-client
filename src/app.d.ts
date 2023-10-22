@@ -168,6 +168,62 @@ declare global {
     type: 'track';
     uri: string;
   }
+  type SaavnApiAlbumResponse = {
+    status: string;
+    message: string | null;
+    data: SaavnAlbumData;
+  };
+
+  type SaavnAlbumData = {
+    id: string;
+    name: string;
+    year: string;
+    releaseDate: string;
+    songCount: string;
+    url: string;
+    primaryArtistsId: string;
+    primaryArtists: string;
+    featuredArtists: string[];
+    artists: string[];
+    image: SaavnAlbumImage[];
+    songs: SaavnSong[];
+  };
+
+  type SaavnAlbumImage = {
+    quality: string;
+    link: string;
+  };
+
+  type SaavnSong = {
+    id: string;
+    name: string;
+    album: {
+      id: string;
+      name: string;
+      url: string;
+    };
+    year: string;
+    releaseDate: string;
+    duration: string;
+    label: string;
+    primaryArtists: string;
+    primaryArtistsId: string;
+    featuredArtists: string;
+    featuredArtistsId: string;
+    explicitContent: number;
+    playCount: string;
+    language: string;
+    hasLyrics: string;
+    url: string;
+    copyright: string;
+    image: SaavnAlbumImage[];
+    downloadUrl: SaavnDownloadUrl[];
+  };
+
+  type SaavnDownloadUrl = {
+    quality: string;
+    link: string;
+  };
 }
 
 export {};

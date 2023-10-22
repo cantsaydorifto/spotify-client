@@ -1,4 +1,4 @@
-import { error, json, redirect } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import { BASE_URL, CLIENT_ID } from '$env/static/private';
 
 export async function GET({ url, cookies, fetch }) {
