@@ -10,12 +10,14 @@ export async function load({ cookies, fetch, url }) {
   });
   if (response.ok) {
     const userData: UserProfile = await response.json();
-    console.log(userData);
+    console.log('userData');
     return {
       user: userData
     };
   }
+  console.log('refreshing token outside block');
   if (response.status === 401 && refreshToken) {
+    console.log('refreshing token');
     const res = await fetch('/api/auth/refresh');
     if (res.ok) {
       throw redirect(307, url.pathname);
