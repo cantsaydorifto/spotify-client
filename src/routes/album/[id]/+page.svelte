@@ -54,7 +54,7 @@
     <button class="heart"><Heart width="36px" height="36px" /></button>
     <button class="heart"><ThreeHorizontalDots /></button>
   </div>
-  <TrackDetails tracks={data.album.tracks.items} />
+  <TrackDetails tracks={data.album.tracks.items} trackLinks={data.tracks} />
   <p>
     Release Date : {new Date(album.release_date).toLocaleDateString('en', {
       dateStyle: 'long'
