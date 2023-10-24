@@ -19,7 +19,8 @@ export const load: PageLoad = async ({ fetch, params }) => {
     }
   }
   const res2 = await fetch(
-    '/api/album?query=' + `${album.name} ${album.artists[0].name}&count=${album.total_tracks}`
+    '/api/album?query=' +
+      `${encodeURIComponent(`${album.name} ${album.artists[0].name}`)}&count=${album.total_tracks}`
   );
   if (res2.ok) {
     const res2Json = (await res2.json()) as { album: SaavnApiAlbumResponse };

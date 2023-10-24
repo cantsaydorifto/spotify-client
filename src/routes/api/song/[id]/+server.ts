@@ -30,7 +30,9 @@ export async function GET({ url, fetch, params }) {
   if (!trackCount) throw error(400, { message: 'Invalid Track Count' });
   if (!searchQuery) throw error(400, { message: 'Invalid Search Parameter' });
   searchQuery = searchQuery.replace('•', '·');
-  const res1 = await fetch(`${SAAVN_API_URL}/search/albums?query=${searchQuery}`);
+  const res1 = await fetch(
+    `${SAAVN_API_URL}/search/albums?query=${encodeURIComponent(searchQuery)}`
+  );
   const res1Json = (await res1.json()) as SearchResponse;
 
   if (!res1.ok) {

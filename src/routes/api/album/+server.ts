@@ -27,7 +27,10 @@ export async function GET({ url, fetch }) {
   if (!trackCount) throw error(400, { message: 'Invalid Track Count' });
   if (!searchQuery) throw error(400, { message: 'Invalid Search Parameter' });
   searchQuery = searchQuery.replace('•', '·');
-  const res1 = await fetch(`${SAAVN_API_URL}/search/albums?query=${searchQuery}`);
+  const res1 = await fetch(
+    `${SAAVN_API_URL}/search/albums?query=${encodeURIComponent(searchQuery)}`
+  );
+  console.log(`${SAAVN_API_URL}/search/albums?query=${searchQuery}`);
   const res1Json = (await res1.json()) as SearchResponse;
 
   if (!res1.ok) {
@@ -36,9 +39,6 @@ export async function GET({ url, fetch }) {
   if (res1Json.data.results.length === 0) {
     throw error(400, { message: 'Not Found' });
   }
-  res1Json.data.results.forEach((el) => {
-    Number(el.songCount) === Number(trackCount);
-  });
   const results: Results[] = [];
   for (let i = 0; i < res1Json.data.results.length; i++) {
     if (Number(res1Json.data.results[i].songCount) === Number(trackCount)) {
@@ -47,6 +47,7 @@ export async function GET({ url, fetch }) {
     }
   }
   if (results.length === 0) throw error(400, { message: 'Not Found' });
+  console.log(res1Json);
   const albumUrl = results[0].url;
   const res = await fetch(`${SAAVN_API_URL}/albums?link=${albumUrl}`);
   const data = (await res.json()) as SaavnApiAlbumResponse;

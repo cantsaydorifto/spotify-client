@@ -63,18 +63,30 @@
               if (!trackLinks) {
                 console.log(track.album.name + ' ' + track.album.artists[0].name);
                 const songRes = await fetch(
-                  `/api/song/${track.track_number}?query=` +
-                    track.album.name +
-                    ' ' +
-                    track.album.artists[0].name +
-                    `&count=${track.album.total_tracks}`
+                  `/api/song/${track.track_number}?query=${encodeURIComponent(
+                    `${track.album.name} ${track.album.artists[0].name}`
+                  )}&count=${track.album.total_tracks}`
                 );
-                if (!songRes.ok) throw error(albumRes.status, 'Song not found');
-                const song = await songRes.json();
-                console.log(song.song);
+                let [songLink, songName] = ['', ''];
+                if (!songRes.ok) {
+                  console.log('not ok');
+                  songLink = track.preview_url || '';
+                  songName = track.name || '';
+                  console.log(songLink);
+                } else {
+                  const song = await songRes.json();
+                  songLink = song.song.downloadUrl[song.song.downloadUrl.length - 1].link;
+                  songName = song.song.name;
+                }
+                console.log({
+                  name: songName,
+                  link: songLink,
+                  artist: track.album.artists[0].name,
+                  img: track.album.images[0].url
+                });
                 $currentSong.trackLink = {
-                  name: song.song.name,
-                  link: song.song.downloadUrl[song.song.downloadUrl.length - 1].link,
+                  name: songName,
+                  link: songLink,
                   artist: track.album.artists[0].name,
                   img: track.album.images[0].url
                 };

@@ -8,34 +8,41 @@
     if (!audio) return;
     audio.addEventListener('timeupdate', (event) => {
       const el = event.target as HTMLAudioElement;
+      volumeSlider.max = `${audio!.duration}`;
       volumeSlider.value = `${el.currentTime}`;
-      currentVolumeBar.style.left = `calc(-${
-        100 - (Number(volumeSlider.value) / 165) * 100
-      }% + 12px - ${Number(volumeSlider.value) / (165 / 12)}px)`;
+      console.log(el.currentTime);
+      // currentTimeElement.innerText = msToTime(el.currentTime * 1000);
+      // durationTimeElement.innerText = msToTime(el.duration * 1000);
+      if (currentVolumeBar) {
+        currentVolumeBar.style.left = `calc(-${
+          100 - (Number(volumeSlider.value) / audio!.duration) * 100
+        }% + 12px - ${Number(volumeSlider.value) / (audio!.duration / 12)}px)`;
+      }
     });
     volumeSlider.addEventListener('input', (event) => {
       const inp = event.target as HTMLInputElement;
-      currentVolumeBar.style.left = `calc(-${100 - (Number(inp.value) / 165) * 100}% + 12px - ${
-        Number(inp.value) / (165 / 12)
-      }px)`;
+      currentVolumeBar.style.left = `calc(-${
+        100 - (Number(inp.value) / audio!.duration) * 100
+      }% + 12px - ${Number(inp.value) / (audio!.duration / 12)}px)`;
       audio!.currentTime = Number(inp.value);
     });
   });
 </script>
 
 <div class="sliderContainer">
-  <div bind:this={currentVolumeBar} class="current-volume-bar" />
-  <!-- <span style:text-align="left" class="time">0:00</span> -->
+  {#if audio && audio.currentTime > 0}<div
+      bind:this={currentVolumeBar}
+      class="current-volume-bar"
+    />{/if}
   <input
     class="volume-slider"
     bind:this={volumeSlider}
     min="0"
-    max="165"
+    max="100"
     value="0"
     type="range"
     name="duration"
   />
-  <!-- <span style:text-align="right" class="time">0:00</span> -->
 </div>
 
 <style>
@@ -60,12 +67,6 @@
     transform: translateY(-50%);
     pointer-events: none;
   }
-  /* .time {
-    font-size: 0.75rem;
-    width: 50px;
-    z-index: 2;
-    background-color: var(--sidebar-color);
-  } */
   input[type='range'] {
     -webkit-appearance: none; /* Hides the slider so that custom slider can be made */
     appearance: none;
