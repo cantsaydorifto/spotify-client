@@ -12,28 +12,28 @@
     if (data.newReleases) {
       sections.push({
         title: 'New Releases',
-        path: '/new-releases',
+        path: '/album',
         items: data.newReleases.albums.items
       });
     }
     if (data.featuredPlaylists) {
       sections.push({
         title: 'Featured Playlists',
-        path: '/featured-playlists',
+        path: '/playlist',
         items: data.featuredPlaylists.playlists.items
       });
     }
     if (data.userCreatedPlaylists) {
       sections.push({
         title: 'Created Playlists',
-        path: '/playlists',
+        path: '/playlist',
         items: data.userCreatedPlaylists.items
       });
     }
     data.randomCategories.forEach((el) => {
       sections.push({
         title: el.name,
-        path: `/category/${el.name}`,
+        path: `/playlist`,
         items: el.playlists.items
       });
     });
@@ -53,7 +53,7 @@
     </div>
     <div class="grid-container">
       {#each section.items as playlist}
-        <div class="playlistContainer">
+        <a href={`${section.path}/${playlist.id}`} class="playlistContainer">
           <div class="playlist">
             {#if playlist.images.length > 0}
               <div class="playlistImg">
@@ -76,7 +76,7 @@
               <!-- <p>{playlist.}</p> -->
             </div>
           </div>
-        </div>
+        </a>
       {/each}
     </div>
   </section>
@@ -102,6 +102,8 @@
   .playlistContainer {
     padding: 16px;
     border-radius: 8px;
+    text-decoration: none;
+    color: var(--text-color);
     background-color: #181818;
     transition: background-color 0.3s ease;
     cursor: pointer;
