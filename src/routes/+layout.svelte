@@ -9,6 +9,7 @@
   import '@fontsource/metropolis/700.css';
   import Sidebar from '$lib/components/Sidebar.svelte';
   import Navbar from '$lib/components/Navbar.svelte';
+  import FooterPlayer from '$lib/components/FooterPlayer.svelte';
 </script>
 
 <div class="main">
@@ -21,6 +22,7 @@
       <slot />
     </main>
   </div>
+  <FooterPlayer />
 </div>
 
 <style>
