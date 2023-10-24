@@ -232,6 +232,18 @@ declare global {
     };
     tracks: PagingObject<PlaylistTrackObject>;
   }
+  interface PlaylistTrackObject {
+    added_at: string;
+    added_by: UserObjectPublic;
+    is_local: boolean;
+    track: TrackObjectFull | null;
+  }
+  interface TrackObjectFull extends TrackObjectSimplified {
+    album: AlbumObjectSimplified;
+    external_ids: ExternalIdObject;
+    popularity: number;
+    is_local?: boolean | undefined;
+  }
 }
 
 export {};
