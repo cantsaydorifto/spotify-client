@@ -1,27 +1,41 @@
 <script lang="ts">
   import Player from './Player.svelte';
   import Heart from './icons/Heart.svelte';
-  // export let track: TrackObjectSimplified;
-  const trackLink = {
-    name: 'Subliminal',
-    album: 'Subliminal',
-    link: 'https://aac.saavncdn.com/624/45dfa2361588635387e4d363ea517e8a_320.mp4'
-  };
+  import Music from './icons/Music.svelte';
+  import { currentSong } from './store/currentPlaying';
 </script>
 
-<footer>
-  <div class="current-song">
-    <img src="https://i.scdn.co/image/ab67616d00004851f812179ed2b99e4ae771d3d1" alt="" />
-    <div class="song-details">
-      <span>Subliminal</span>
-      <span><a href="/">half•alive</a></span>
+{#if !$currentSong.trackLink}
+  <footer>
+    <div class="current-song">
+      <div class="albumArtContainer">
+        <Music width="20" />
+      </div>
+      <div class="song-details">
+        <span>Nothings Playing</span>
+        <span><a href="/">No Artist</a></span>
+      </div>
+      <Heart width="18px" height="18px" />
     </div>
-    <Heart width="18px" height="18px" />
-  </div>
-  <div class="player-controls">
-    <Player track={trackLink} />
-  </div>
-</footer>
+    <div class="player-controls">
+      <Player track={null} />
+    </div>
+  </footer>
+{:else}
+  <footer>
+    <div class="current-song">
+      <img src={$currentSong.trackLink.img} alt="" />
+      <div class="song-details">
+        <span>{$currentSong.trackLink.name}</span>
+        <span><a href="/">{$currentSong.trackLink.artist}</a></span>
+      </div>
+      <Heart width="18px" height="18px" />
+    </div>
+    <div class="player-controls">
+      <Player track={$currentSong.trackLink} />
+    </div>
+  </footer>
+{/if}
 
 <style>
   footer {
@@ -61,10 +75,15 @@
   .song-details > span:nth-child(2) > a:hover {
     text-decoration: underline;
   }
-  .current-song > img {
+  .current-song > img,
+  .albumArtContainer {
     width: 56px;
     height: 56px;
     border-radius: 4px;
+    background-color: var(--dark-gray);
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
   .player-controls {
     flex: 7;

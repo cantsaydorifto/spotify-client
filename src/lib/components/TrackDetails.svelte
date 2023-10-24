@@ -1,6 +1,14 @@
 <script lang="ts">
   import Clock3 from './icons/Clock3.svelte';
+  import Play from './icons/Play.svelte';
+  import { currentSong } from './store/currentPlaying';
   export let tracks: TrackObjectSimplified[];
+  export let trackLinks: {
+    name: string;
+    album: string;
+    img: string;
+    link: string;
+  }[];
   function msToTime(duration: number) {
     const seconds = Math.floor((duration / 1000) % 60);
     const minutes = Math.floor((duration / (1000 * 60)) % 60);
@@ -47,11 +55,18 @@
           </p>
         </div>
         <div class="duration-column">
+          <button
+            on:click={() => {
+              $currentSong.trackLink = {
+                name: track.name,
+                link: trackLinks[idx].link,
+                artist: track.artists[0].name,
+                img: trackLinks[idx].img
+              };
+            }}><Play width="15px" height="15px" stroke="white" /></button
+          >
           <span class="duration">{msToTime(track.duration_ms)}</span>
         </div>
-        <!-- <div class="actions-column">
-          <Heart width="20px" height="20px" />
-        </div> -->
       </div>
     {/each}
   </div>
@@ -158,5 +173,15 @@
   }
   .duration-column {
     padding-right: 30px;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+  }
+  .duration-column > button {
+    border: none;
+    background-color: #5d5d5d24;
+    border-radius: 50%;
+    padding: 4px;
+    cursor: pointer;
   }
 </style>

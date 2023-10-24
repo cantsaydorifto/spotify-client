@@ -20,10 +20,7 @@
   export let data;
   $: album = data.album;
   $: color = data.color;
-  $: tracks = data.tracks;
-  $: {
-    console.log(tracks);
-  }
+  $: tracks = data.tracks.map((el) => ({ ...el, img: album.images[0].url }));
 </script>
 
 <div class="container">
@@ -53,7 +50,7 @@
     <button class="heart"><Heart width="36px" height="36px" /></button>
     <button class="heart"><ThreeHorizontalDots /></button>
   </div>
-  <TrackDetails tracks={data.album.tracks.items} trackLinks={data.tracks} />
+  <TrackDetails tracks={album.tracks.items} trackLinks={tracks} />
   <p>
     Release Date : {new Date(album.release_date).toLocaleDateString('en', {
       dateStyle: 'long'

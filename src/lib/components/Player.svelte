@@ -5,10 +5,8 @@
   import Play from './icons/Play.svelte';
 
   export let track: {
-    name: string;
-    album: string;
     link: string;
-  };
+  } | null;
   let audio: HTMLAudioElement;
   let paused = true;
 
@@ -23,8 +21,8 @@
 </script>
 
 <div class="player">
-  <audio bind:this={audio} src={track.link} bind:paused preload="none" />
-  <button class="play-song" on:click={togglePlay}>
+  <audio autoplay bind:this={audio} src={track ? track.link : ''} bind:paused preload="none" />
+  <button disabled={!track} class="play-song" on:click={togglePlay}>
     {#if !paused}
       <Pause width="18" height="18" />
     {:else}
