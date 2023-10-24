@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { error } from '@sveltejs/kit';
   import Clock3 from './icons/Clock3.svelte';
   import Play from './icons/Play.svelte';
   import { currentSong } from './store/currentPlaying';
@@ -43,19 +42,24 @@
         <div class="number-column">
           <span class="number">{idx + 1}</span>
         </div>
-        <div class="info-column">
-          <div class="track-title">
-            <h4>{track.name}</h4>
-            {#if track.explicit}
-              <span class="explicit">E</span>
-            {/if}
+        <div class="trackInfoContainer">
+          {#if track.album.images.length > 0}
+            <img src={track.album.images[0].url} alt="" />
+          {/if}
+          <div class="info-column">
+            <div class="track-title">
+              <h4>{track.name}</h4>
+              {#if track.explicit}
+                <span class="explicit">E</span>
+              {/if}
+            </div>
+            <p class="artists">
+              {#each track.artists as artist, artistIndex}
+                <a href="/artist/{artist.id}">{artist.name}</a
+                >{#if artistIndex < track.artists.length - 1}{', '}{/if}
+              {/each}
+            </p>
           </div>
-          <p class="artists">
-            {#each track.artists as artist, artistIndex}
-              <a href="/artist/{artist.id}">{artist.name}</a
-              >{#if artistIndex < track.artists.length - 1}{', '}{/if}
-            {/each}
-          </p>
         </div>
         <div class="duration-column">
           <button
@@ -141,12 +145,24 @@
     width: 30px;
     display: flex;
     justify-content: flex-end;
-    margin-right: 42px;
+    margin-right: 25px;
   }
 
   .number {
     color: var(--light-gray);
     font-size: 0.875rem;
+  }
+
+  .trackInfoContainer {
+    flex: 1;
+    display: flex;
+    gap: 20px;
+  }
+
+  .trackInfoContainer > img {
+    width: 40px;
+    height: 40px;
+    border-radius: 2px;
   }
 
   .info-column {
