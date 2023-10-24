@@ -1,12 +1,6 @@
 <script lang="ts">
-  import Player from './Player.svelte';
   import Clock3 from './icons/Clock3.svelte';
   export let tracks: TrackObjectSimplified[];
-  export let trackLinks: {
-    name: string;
-    album: string;
-    link: string;
-  }[];
   function msToTime(duration: number) {
     const seconds = Math.floor((duration / 1000) % 60);
     const minutes = Math.floor((duration / (1000 * 60)) % 60);
@@ -52,7 +46,6 @@
             {/each}
           </p>
         </div>
-        <Player track={trackLinks[idx]} />
         <div class="duration-column">
           <span class="duration">{msToTime(track.duration_ms)}</span>
         </div>
