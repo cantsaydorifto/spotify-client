@@ -168,13 +168,13 @@ declare global {
     type: 'track';
     uri: string;
   }
-  type SaavnApiAlbumResponse = {
+  interface SaavnApiAlbumResponse {
     status: string;
     message: string | null;
     data: SaavnAlbumData;
-  };
+  }
 
-  type SaavnAlbumData = {
+  interface SaavnAlbumData {
     id: string;
     name: string;
     year: string;
@@ -187,14 +187,14 @@ declare global {
     artists: string[];
     image: SaavnAlbumImage[];
     songs: SaavnSong[];
-  };
+  }
 
-  type SaavnAlbumImage = {
+  interface SaavnAlbumImage {
     quality: string;
     link: string;
-  };
+  }
 
-  type SaavnSong = {
+  interface SaavnSong {
     id: string;
     name: string;
     album: {
@@ -218,12 +218,20 @@ declare global {
     copyright: string;
     image: SaavnAlbumImage[];
     downloadUrl: SaavnDownloadUrl[];
-  };
+  }
 
-  type SaavnDownloadUrl = {
+  interface SaavnDownloadUrl {
     quality: string;
     link: string;
-  };
+  }
+  interface SinglePlaylistResponse extends PlaylistObjectFull {}
+  interface PlaylistObjectFull extends PlaylistBaseObject {
+    followers: {
+      href: null;
+      total: number;
+    };
+    tracks: PagingObject<PlaylistTrackObject>;
+  }
 }
 
 export {};
