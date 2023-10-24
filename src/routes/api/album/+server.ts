@@ -24,10 +24,8 @@ interface Results {
 export async function GET({ url, fetch }) {
   let searchQuery = url.searchParams.get('query');
   const trackCount = url.searchParams.get('count');
-  const releaseYear = url.searchParams.get('year');
   if (!trackCount) throw error(400, { message: 'Invalid Track Count' });
   if (!searchQuery) throw error(400, { message: 'Invalid Search Parameter' });
-  if (!releaseYear) throw error(400, { message: 'Invalid Year Parameter' });
   searchQuery = searchQuery.replace('•', '·');
   const res1 = await fetch(`${SAAVN_API_URL}/search/albums?query=${searchQuery}`);
   const res1Json = (await res1.json()) as SearchResponse;
@@ -43,10 +41,7 @@ export async function GET({ url, fetch }) {
   });
   const results: Results[] = [];
   for (let i = 0; i < res1Json.data.results.length; i++) {
-    if (
-      Number(res1Json.data.results[i].songCount) === Number(trackCount) &&
-      res1Json.data.results[i].year === releaseYear
-    ) {
+    if (Number(res1Json.data.results[i].songCount) === Number(trackCount)) {
       results.push(res1Json.data.results[i]);
       break;
     }
