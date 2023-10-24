@@ -1,5 +1,4 @@
 <script lang="ts">
-  import Player from '$lib/components/Player.svelte';
   import Heart from '$lib/components/icons/Heart.svelte';
   import ThreeHorizontalDots from '$lib/components/icons/ThreeHorizontalDots.svelte';
   import Play from '$lib/components/icons/Play.svelte';
@@ -50,7 +49,7 @@
 </div>
 <div class="content">
   <div class="play">
-    <button class="playBtn"><Play /></button>
+    <button class="playBtn"><Play width="25" height="25" /></button>
     <button class="heart"><Heart width="36px" height="36px" /></button>
     <button class="heart"><ThreeHorizontalDots /></button>
   </div>
