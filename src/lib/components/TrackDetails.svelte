@@ -1,14 +1,17 @@
 <script lang="ts">
+  import { error } from '@sveltejs/kit';
   import Clock3 from './icons/Clock3.svelte';
   import Play from './icons/Play.svelte';
   import { currentSong } from './store/currentPlaying';
-  export let tracks: TrackObjectSimplified[];
-  export let trackLinks: {
-    name: string;
-    album: string;
-    img: string;
-    link: string;
-  }[];
+  export let tracks: TrackObjectSimplified[] | TrackObjectFull[];
+  export let trackLinks:
+    | {
+        name: string;
+        album: string;
+        img: string;
+        link: string;
+      }[]
+    | null;
   function msToTime(duration: number) {
     const seconds = Math.floor((duration / 1000) % 60);
     const minutes = Math.floor((duration / (1000 * 60)) % 60);
@@ -56,7 +59,28 @@
         </div>
         <div class="duration-column">
           <button
-            on:click={() => {
+            on:click={async () => {
+              if (!trackLinks) {
+                console.log(track.album.name + ' ' + track.album.artists[0].name);
+                const songRes = await fetch(
+                  `/api/song/${track.track_number}?query=` +
+                    track.album.name +
+                    ' ' +
+                    track.album.artists[0].name +
+                    `&count=${track.album.total_tracks}`
+                );
+                if (!songRes.ok) throw error(albumRes.status, 'Song not found');
+                const song = await songRes.json();
+                console.log(song.song);
+                $currentSong.trackLink = {
+                  name: song.song.name,
+                  link: song.song.downloadUrl[song.song.downloadUrl.length - 1].link,
+                  artist: track.album.artists[0].name,
+                  img: track.album.images[0].url
+                };
+                // const res = await fetch('/api/song/' + track.id);
+                return;
+              }
               $currentSong.trackLink = {
                 name: track.name,
                 link: trackLinks[idx].link,
