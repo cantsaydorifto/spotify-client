@@ -43,7 +43,7 @@
           <span class="number">{idx + 1}</span>
         </div>
         <div class="trackInfoContainer">
-          {#if track.album.images.length > 0}
+          {#if track.album && track.album.images.length > 0}
             <img src={track.album.images[0].url} alt="" />
           {/if}
           <div class="info-column">
@@ -130,6 +130,7 @@
   .tracks-container {
     display: flex;
     flex-direction: column;
+    padding-bottom: 30px;
     gap: 10px;
   }
 
@@ -160,14 +161,15 @@
   }
 
   .trackInfoContainer > img {
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
     border-radius: 2px;
   }
 
   .info-column {
     flex: 1;
     display: flex;
+    justify-content: center;
     flex-direction: column;
     gap: 7px;
   }

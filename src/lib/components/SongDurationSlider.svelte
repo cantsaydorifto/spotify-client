@@ -10,7 +10,6 @@
       const el = event.target as HTMLAudioElement;
       volumeSlider.max = `${audio!.duration}`;
       volumeSlider.value = `${el.currentTime}`;
-      console.log(el.currentTime);
       // currentTimeElement.innerText = msToTime(el.currentTime * 1000);
       // durationTimeElement.innerText = msToTime(el.duration * 1000);
       if (currentVolumeBar) {
