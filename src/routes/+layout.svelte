@@ -10,6 +10,18 @@
   import Sidebar from '$lib/components/Sidebar.svelte';
   import Navbar from '$lib/components/Navbar.svelte';
   import FooterPlayer from '$lib/components/FooterPlayer.svelte';
+  import NProgress from 'nprogress';
+  import 'nprogress/nprogress.css';
+  import { afterNavigate, beforeNavigate } from '$app/navigation';
+
+  NProgress.configure({ showSpinner: false });
+
+  afterNavigate(() => {
+    NProgress.done();
+  });
+  beforeNavigate(() => {
+    NProgress.start();
+  });
 </script>
 
 <div class="main">
