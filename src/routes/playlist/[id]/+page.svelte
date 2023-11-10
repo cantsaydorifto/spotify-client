@@ -1,8 +1,8 @@
 <script lang="ts">
   import Heart from '$lib/components/icons/Heart.svelte';
   import ThreeHorizontalDots from '$lib/components/icons/ThreeHorizontalDots.svelte';
-  import Play from '$lib/components/icons/Play.svelte';
   import TrackDetails from '$lib/components/TrackDetails.svelte';
+  import PlayBtn from '$lib/components/PlayBtn.svelte';
 
   export let data;
   $: playlist = data.playlist;
@@ -29,7 +29,7 @@
 
 <div class="content">
   <div class="play">
-    <button class="playBtn"><Play width="25" height="25" /></button>
+    <PlayBtn innerSize={25} />
     <button class="heart"><Heart width="36px" height="36px" /></button>
     <button class="heart"><ThreeHorizontalDots /></button>
   </div>
@@ -104,18 +104,6 @@
     align-items: center;
     height: 100px;
   }
-  .playBtn {
-    width: 56px;
-    height: 56px;
-    border: none;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    border-radius: 50%;
-    background-color: var(--accent-color);
-    transition: all 0.3s;
-  }
   .heart {
     background: none;
     border: none;
@@ -124,7 +112,6 @@
     height: 34px;
     cursor: pointer;
   }
-  .playBtn:hover,
   .heart:hover {
     transform: scale(1.05);
   }

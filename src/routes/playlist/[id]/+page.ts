@@ -5,7 +5,6 @@ export const load: PageLoad = async ({ fetch, params }) => {
   const res = await fetch('/api/spotify/playlists/' + params.id);
   if (!res.ok) throw error(res.status, 'Playlist not found');
   const playlist = (await res.json()) as SinglePlaylistResponse;
-  console.log(playlist);
   let color: string | null = null;
   if (playlist.images.length > 0) {
     const colorRes = await fetch('/api/color?image=' + playlist.images[0].url);

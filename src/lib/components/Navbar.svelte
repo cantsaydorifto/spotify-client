@@ -3,6 +3,7 @@
   import { page } from '$app/stores';
   import tippy from '$lib/actions/tippy';
   import LogoutButton from './LogoutButton.svelte';
+  import PlayBtn from './PlayBtn.svelte';
   import Sidebar from './Sidebar.svelte';
   import DownArrow from './icons/DownArrow.svelte';
   import ExternalLink from './icons/ExternalLink.svelte';
@@ -12,25 +13,29 @@
   let navbar: HTMLDivElement;
   let opacity = 0;
   $: color = $page.data.color;
+  $: album = $page.data.album as SingleAlbumResponse | undefined;
+  $: playlist = $page.data.playlist as SinglePlaylistResponse | undefined;
   $: navbar &&
     (yScroll / (color ? 276 : navbar.offsetHeight) < 1
       ? (opacity = color ? 0 : yScroll / navbar.offsetHeight)
       : (opacity = 1));
   $: user = $page.data.user;
-
-  // $: navbar &&
-  //   (yScroll / (color ? 276 : navbar.offsetHeight) < 1
-  //     ? (opacity = color
-  //         ? yScroll > 212
-  //           ? (yScroll - 212) / navbar.offsetHeight
-  //           : 0
-  //         : yScroll / navbar.offsetHeight)
-  //     : (opacity = 1));
 </script>
 
 <svelte:window bind:scrollY={yScroll} />
 <div bind:this={navbar} class="navbar">
   <div class="content">
+    {#if album}
+      <div class="playlistInfo" style:opacity={`${opacity}`}>
+        <PlayBtn innerSize={24} outerSize={45} />
+        <span>{album.name}</span>
+      </div>
+    {:else if playlist}
+      <div class="playlistInfo" style:opacity={`${opacity}`}>
+        <PlayBtn innerSize={24} outerSize={43} />
+        <span>{playlist.name}</span>
+      </div>
+    {/if}
     <div class="sidebarToggle">
       {#if browser}
         <Sidebar desktop={false} />
@@ -91,11 +96,13 @@
   .content {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     width: 100%;
+    height: 100%;
+    padding: 3px 16px;
   }
   .navbar {
     height: var(--navbar-height);
-    padding: 16px;
     width: calc(100% - var(--sidebar-width)); /* prevent overflow ===> 100% - 250px */
     position: fixed;
     display: flex;
@@ -173,5 +180,16 @@
     text-align: left;
     line-height: 1;
     font-size: 0.875rem;
+  }
+  .playlistInfo {
+    transition: opacity 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 4px;
+  }
+  .playlistInfo > span {
+    font-size: 1.25rem;
+    font-weight: 800;
   }
 </style>

@@ -22,6 +22,7 @@ interface Results {
 }
 
 export async function GET({ url, fetch, params }) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   if (isNaN(params.id as any)) {
     throw { status: 400, message: 'Id Is A Number' };
   }
@@ -34,7 +35,6 @@ export async function GET({ url, fetch, params }) {
     `${SAAVN_API_URL}/search/albums?query=${encodeURIComponent(searchQuery)}`
   );
   const res1Json = (await res1.json()) as SearchResponse;
-
   if (!res1.ok) {
     throw error(400, { message: res1Json.message });
   }
@@ -48,6 +48,8 @@ export async function GET({ url, fetch, params }) {
       break;
     }
   }
+  console.log('---------------------------');
+  console.log(results);
   if (results.length === 0) throw error(400, { message: 'Not Found' });
   const albumUrl = results[0].url;
   const res = await fetch(`${SAAVN_API_URL}/albums?link=${albumUrl}`);

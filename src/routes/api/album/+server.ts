@@ -19,6 +19,14 @@ interface Results {
   language: string;
   explicitContent: string;
   songCount: string;
+  primaryArtists: {
+    id: string;
+    name: string;
+    url: string;
+    image: string;
+    type: string;
+    role: string;
+  }[];
 }
 
 export async function GET({ url, fetch }) {
@@ -30,7 +38,7 @@ export async function GET({ url, fetch }) {
   const res1 = await fetch(
     `${SAAVN_API_URL}/search/albums?query=${encodeURIComponent(searchQuery)}`
   );
-  console.log(`${SAAVN_API_URL}/search/albums?query=${searchQuery}`);
+  // console.log(`${SAAVN_API_URL}/search/albums?query=${searchQuery}`);
   const res1Json = (await res1.json()) as SearchResponse;
 
   if (!res1.ok) {
@@ -41,13 +49,22 @@ export async function GET({ url, fetch }) {
   }
   const results: Results[] = [];
   for (let i = 0; i < res1Json.data.results.length; i++) {
-    if (Number(res1Json.data.results[i].songCount) === Number(trackCount)) {
+    if (results.length > 0) {
+      if (Number(results[0].explicitContent) === 1) break;
+      if (
+        res1Json.data.results[i].primaryArtists[0].id === results[0].primaryArtists[0].id &&
+        res1Json.data.results[i].name === results[0].name &&
+        Number(res1Json.data.results[i].explicitContent) === 1
+      ) {
+        results.unshift(res1Json.data.results[i]);
+        break;
+      }
+    }
+    if (Number(res1Json.data.results[i].songCount) === Number(trackCount) && results.length === 0) {
       results.push(res1Json.data.results[i]);
-      break;
     }
   }
   if (results.length === 0) throw error(400, { message: 'Not Found' });
-  console.log(res1Json);
   const albumUrl = results[0].url;
   const res = await fetch(`${SAAVN_API_URL}/albums?link=${albumUrl}`);
   const data = (await res.json()) as SaavnApiAlbumResponse;
