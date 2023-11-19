@@ -1,6 +1,7 @@
-import { SHA256 } from 'crypto-js';
-import { enc } from 'crypto-js';
-import { randomBuffer } from 'secure-random';
+import cryptojs from 'crypto-js';
+const { enc, SHA256 } = cryptojs;
+import secureRandom from 'secure-random';
+const { randomBuffer } = secureRandom;
 
 const mask = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~';
 
