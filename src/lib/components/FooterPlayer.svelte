@@ -27,7 +27,7 @@
     z-index: 2;
     width: 100%;
     position: fixed;
-    bottom: 0;
+    bottom: -1px;
     background-color: var(--sidebar-color);
     animation: player 0.2s ease-in-out;
   }
