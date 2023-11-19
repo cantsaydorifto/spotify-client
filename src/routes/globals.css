@@ -83,7 +83,7 @@ select:focus-visible,
 input:focus-visible,
 button:focus-visible,
 a:focus-visible {
-  outline: 2px solid var(--accent-color);
+  outline: 2px solid var(--text-color);
   outline-offset: 2px;
 }
 
@@ -98,4 +98,24 @@ a:focus-visible {
   clip-path: inset(100%);
   clip: rect(0 0 0 0);
   overflow: hidden;
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 7px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: var(--bg-color);
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #3e3e3e;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(112, 112, 112, 0.652);
 }

@@ -11,7 +11,7 @@
   import Navbar from '$lib/components/Navbar.svelte';
   import FooterPlayer from '$lib/components/FooterPlayer.svelte';
   import NProgress from 'nprogress';
-  import 'nprogress/nprogress.css';
+  import './nprogress.css';
   import { afterNavigate, beforeNavigate } from '$app/navigation';
 
   NProgress.configure({ showSpinner: false });
@@ -47,7 +47,7 @@
   .main-content {
     padding: var(--navbar-height) 15px 60px 15px;
   }
-  @media (min-width: 768px) {
+  @media (min-width: 800px) {
     .main-content {
       padding-left: 30px;
       padding-right: 30px;
