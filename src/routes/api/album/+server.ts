@@ -64,6 +64,7 @@ export async function GET({ url, fetch }) {
       results.push(res1Json.data.results[i]);
     }
   }
+  // console.log(results);
   if (results.length === 0) throw error(400, { message: 'Not Found' });
   const albumUrl = results[0].url;
   const res = await fetch(`${SAAVN_API_URL}/albums?link=${albumUrl}`);

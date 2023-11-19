@@ -31,7 +31,7 @@
   <img src={album.images.length > 0 ? album.images[0].url : ''} alt="" />
   <div class="details">
     <span>{album.type[0].toUpperCase() + album.type.slice(1)}</span>
-    <h1>{album.name}</h1>
+    <h1 title={album.name}>{album.name}</h1>
     <div class="albumInfo">
       <!-- <img src={album.artists[0].} alt=""> -->
       <a href={'/artist/' + album.artists[0].id}>{album.artists[0].name}</a>
@@ -94,7 +94,13 @@
     font-size: 0.875rem;
   }
   .details > h1 {
-    font-size: 4rem;
+    font-size: 3rem;
+    max-height: 150px;
+    max-width: 500px;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    -webkit-line-clamp: 3;
     margin: 8px 0;
     line-height: normal;
     font-weight: 700;
@@ -136,5 +142,24 @@
   }
   .heart:hover {
     transform: scale(1.05);
+  }
+  @media only screen and (max-width: 800px) {
+    .container {
+      /* gap: 20px; */
+      margin: calc(-1 * var(--navbar-height)) -15px 0 -15px;
+    }
+    .details > h1 {
+      font-size: 2rem;
+    }
+    .content {
+      margin: 0 -15px;
+    }
+  }
+  @media only screen and (max-width: 600px) {
+    .container {
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
   }
 </style>

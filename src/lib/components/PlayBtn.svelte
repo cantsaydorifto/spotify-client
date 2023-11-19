@@ -2,15 +2,21 @@
   import Play from './icons/Play.svelte';
   export let innerSize: number;
   export let outerSize: number = 56;
+  export let onclick: () => void = () => {};
 </script>
 
-<button class="playBtn" style:width={outerSize + 'px'} style:height={outerSize + 'px'}
+<button
+  on:click={onclick}
+  class="playBtn"
+  style:width={outerSize + 'px'}
+  style:height={outerSize + 'px'}
   ><Play width={innerSize + 'px'} height={innerSize + 'px'} /></button
 >
 
 <style>
   .playBtn {
     border: none;
+    flex-shrink: 0;
     display: flex;
     justify-content: center;
     align-items: center;

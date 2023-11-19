@@ -1,9 +1,15 @@
+import { BASE_SPOTIFY_API_URL } from '$env/static/private';
 import { redirect } from '@sveltejs/kit';
 
 export async function load({ cookies, fetch, url }) {
   const accessToken = cookies.get('spotify_access_token');
   const refreshToken = cookies.get('spotify_refresh_token');
-  const response = await fetch('https://api.spotify.com/v1/me', {
+  if (!accessToken) {
+    return {
+      user: null
+    };
+  }
+  const response = await fetch(`${BASE_SPOTIFY_API_URL}/me`, {
     headers: {
       Authorization: 'Bearer ' + (accessToken || 'token')
     }

@@ -2,7 +2,11 @@
   import Clock3 from './icons/Clock3.svelte';
   import Play from './icons/Play.svelte';
   import { currentSong } from './store/currentPlaying';
-  export let tracks: TrackObjectSimplified[] | TrackObjectFull[];
+  export let tracks:
+    | (TrackObjectSimplified & { album?: AlbumObjectSimplified })[]
+    | TrackObjectFull[];
+  tracks = tracks.filter((track) => !!track);
+  // tracks = [tracks[0]];
   export let trackLinks:
     | {
         name: string;
@@ -11,6 +15,8 @@
         link: string;
       }[]
     | null;
+
+  export let noRowHeader = false;
   function msToTime(duration: number) {
     const seconds = Math.floor((duration / 1000) % 60);
     const minutes = Math.floor((duration / (1000 * 60)) % 60);
@@ -24,31 +30,34 @@
 </script>
 
 <div class="tracks">
-  <div class="row header">
-    <div class="number-column">
-      <span class="number">#</span>
+  {#if !noRowHeader}
+    <div class="row header">
+      <div class="number-column">
+        <span class="number">#</span>
+      </div>
+      <div class="info-column">
+        <span class="track-title">Title</span>
+      </div>
+      <div class="duration-column">
+        <Clock3 />
+      </div>
+      <div class="actions-column" />
     </div>
-    <div class="info-column">
-      <span class="track-title">Title</span>
-    </div>
-    <div class="duration-column">
-      <Clock3 />
-    </div>
-    <div class="actions-column" />
-  </div>
+  {/if}
   <div class="tracks-container">
     {#each tracks as track, idx}
+      <!-- {console.log(track)} -->
       <div class="row">
         <div class="number-column">
           <span class="number">{idx + 1}</span>
         </div>
         <div class="trackInfoContainer">
           {#if track.album && track.album.images.length > 0}
-            <img src={track.album.images[0].url} alt="" />
+            <img src={track.album.images[track.album.images.length - 1].url} alt="" />
           {/if}
           <div class="info-column">
             <div class="track-title">
-              <h4>{track.name}</h4>
+              <h4 title={track.name}>{track.name}</h4>
               {#if track.explicit}
                 <span class="explicit">E</span>
               {/if}
@@ -64,8 +73,8 @@
         <div class="duration-column">
           <button
             on:click={async () => {
-              if (!trackLinks) {
-                console.log(track.album.name + ' ' + track.album.artists[0].name);
+              if (!trackLinks && track.album) {
+                // console.log(track.album.name + ' ' + track.album.artists[0].name);
                 const songRes = await fetch(
                   `/api/song/${track.track_number}?query=${encodeURIComponent(
                     `${track.album.name} ${track.album.artists[0].name}`
@@ -73,21 +82,21 @@
                 );
                 let [songLink, songName] = ['', ''];
                 if (!songRes.ok) {
-                  console.log('not ok');
+                  // console.log('not ok');
                   songLink = track.preview_url || '';
                   songName = track.name || '';
-                  console.log(songLink);
+                  // console.log(songLink);
                 } else {
                   const song = await songRes.json();
                   songLink = song.song.downloadUrl[song.song.downloadUrl.length - 1].link;
                   songName = song.song.name;
                 }
-                console.log({
-                  name: songName,
-                  link: songLink,
-                  artist: track.album.artists[0].name,
-                  img: track.album.images[0].url
-                });
+                // console.log({
+                //   name: songName,
+                //   link: songLink,
+                //   artist: track.album.artists[0].name,
+                //   img: track.album.images[0].url
+                // });
                 $currentSong.trackLink = {
                   name: songName,
                   link: songLink,
@@ -99,9 +108,9 @@
               }
               $currentSong.trackLink = {
                 name: track.name,
-                link: trackLinks[idx].link,
+                link: trackLinks ? trackLinks[idx].link : '',
                 artist: track.artists[0].name,
-                img: trackLinks[idx].img
+                img: trackLinks ? trackLinks[idx].img : ''
               };
             }}><Play width="15px" height="15px" stroke="white" /></button
           >
@@ -187,6 +196,11 @@
     margin: 0;
     font-size: 0.9375rem;
     line-height: 1;
+    max-width: 300px;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    -webkit-line-clamp: 1;
   }
 
   .explicit {
@@ -206,6 +220,11 @@
     font-size: 0.875rem;
     font-weight: 500;
     line-height: 1;
+    max-width: 350px;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    -webkit-line-clamp: 2;
   }
 
   .artists a {
@@ -237,5 +256,29 @@
     border-radius: 50%;
     padding: 4px;
     cursor: pointer;
+  }
+  @media only screen and (max-width: 600px) {
+    .row {
+      padding-left: 0;
+    }
+    .number-column {
+      width: 15px;
+      margin-right: 10px;
+    }
+    .duration {
+      display: none;
+    }
+    .duration-column {
+      padding-right: 0;
+      padding-left: 5px;
+    }
+    .trackInfoContainer {
+      gap: 10px;
+    }
+  }
+  @media only screen and (max-width: 520px) {
+    /* .track-title h4 {
+      max-width: 200px;
+    } */
   }
 </style>

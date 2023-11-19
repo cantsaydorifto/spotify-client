@@ -223,7 +223,7 @@
     width: 25px;
     height: 25px;
   }
-  @media only screen and (min-width: 756px) {
+  @media only screen and (min-width: 1000px) {
     .desktop .sidebar-inner-content {
       display: block;
     }
@@ -244,7 +244,7 @@
   .mobile .hide-sidebar {
     transform: translateX(-100%);
   }
-  @media only screen and (max-width: 756px) {
+  @media only screen and (max-width: 1000px) {
     .mobile .sidebar-inner-content {
       display: block;
     }

@@ -30,7 +30,7 @@ export async function GET({ url, cookies, fetch }) {
   if (!response.ok) {
     throw error(400, { message: resJson.error_description || 'Error' });
   }
-  console.log(resJson);
+  // console.log(resJson);
   cookies.delete('spotify_auth_state');
   cookies.delete('spotify_auth_challengeVerifier');
   cookies.set('spotify_refresh_token', resJson.refresh_token, {

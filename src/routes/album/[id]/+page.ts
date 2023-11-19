@@ -1,7 +1,9 @@
 import { error } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
+import interceptFetch from '$lib/interceptor/interceptFetch';
 
-export const load: PageLoad = async ({ fetch, params }) => {
+export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, params }) => {
+  const fetch = (path: string) => interceptFetch(fetchWithNoInterceptor, path);
   const saavnAlbumTracks: {
     name: string;
     album: string;
@@ -24,7 +26,7 @@ export const load: PageLoad = async ({ fetch, params }) => {
   );
   if (res2.ok) {
     const res2Json = (await res2.json()) as { album: SaavnApiAlbumResponse };
-    console.log(res2Json);
+    // console.log(res2Json);
     saavnAlbumTracks.push(
       ...res2Json.album.data.songs.map((el) => ({
         name: el.name,

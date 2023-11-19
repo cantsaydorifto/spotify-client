@@ -55,6 +55,13 @@
     width: 100%;
     /* background-color: red; */
   }
+  @media only screen and (max-width: 900px) {
+    .sliderContainer {
+      position: absolute;
+      top: -8px;
+      left: 0;
+    }
+  }
   .current-volume-bar {
     position: absolute;
     width: calc(100% - 12px);

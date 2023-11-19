@@ -1,7 +1,9 @@
 import { error } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
+import interceptFetch from '$lib/interceptor/interceptFetch';
 
-export const load: PageLoad = async ({ fetch, params }) => {
+export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, params }) => {
+  const fetch = (path: string) => interceptFetch(fetchWithNoInterceptor, path);
   const res = await fetch('/api/spotify/playlists/' + params.id);
   if (!res.ok) throw error(res.status, 'Playlist not found');
   const playlist = (await res.json()) as SinglePlaylistResponse;

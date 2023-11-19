@@ -10,17 +10,19 @@ export async function GET({ cookies }) {
   const state = generateRandomString(16);
   cookies.set('spotify_auth_state', state);
   cookies.set('spotify_auth_challengeVerifier', codeVerifier);
-  const args = new URLSearchParams({
-    response_type: 'code',
-    client_id: CLIENT_ID,
-    scope,
-    redirect_uri: `${BASE_URL}/api/auth/callback`,
-    state,
-    code_challenge_method: 'S256',
-    code_challenge: codeChallenge
-  });
 
-  throw redirect(307, `https://accounts.spotify.com/authorize?${args}`);
+  throw redirect(
+    307,
+    `https://accounts.spotify.com/authorize?${new URLSearchParams({
+      response_type: 'code',
+      client_id: CLIENT_ID,
+      scope,
+      redirect_uri: `${BASE_URL}/api/auth/callback`,
+      state,
+      code_challenge_method: 'S256',
+      code_challenge: codeChallenge
+    })}`
+  );
 }
 
 function generateRandomString(length: number) {

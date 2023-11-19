@@ -1,26 +1,22 @@
 <script lang="ts">
-  import Heart from '$lib/components/icons/Heart.svelte';
   import ThreeHorizontalDots from '$lib/components/icons/ThreeHorizontalDots.svelte';
   import TrackDetails from '$lib/components/TrackDetails.svelte';
   import PlayBtn from '$lib/components/PlayBtn.svelte';
+  import Button from '$lib/components/Button.svelte';
+  import CatergorySection from '$lib/components/CatergorySection.svelte';
 
-  function getTrackDuration(items: PlaylistTrackObject[]) {
-    let duration = 0;
-    items.forEach((el) => {
-      duration += el.track?.duration_ms || 0;
-    });
-    const minutes = Math.floor(duration / 60000);
-    const seconds = Math.floor((duration / 1000) % 60);
-    return {
-      minutes: minutes !== 0 ? `${minutes} min` : '',
-      seconds: seconds !== 0 ? `${seconds} sec` : ''
-    };
+  function numberToCommaString(num: number) {
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
 
   export let data;
-  $: playlist = data.playlist;
+  $: artist = data.artist;
   $: color = data.color;
-  $: tracks = data.playlist.tracks.items.map((item) => item.track!);
+  $: tracks = data.artistTracks;
+  $: albums = data.artistAlbums;
+  $: singles = data.artistSingles;
+  $: appearsOn = data.artistAppearsOn;
+  $: relatedArtists = data.relatedArtists;
 </script>
 
 <div class="container">
@@ -28,21 +24,14 @@
     class="color-gradient"
     style:background-image="linear-gradient(0deg,transparent,{color || 'var(--light-gray)'})"
   />
-  <img src={playlist.images.length > 0 ? playlist.images[0].url : ''} alt="" />
+  <img src={artist.images.length > 0 ? artist.images[0].url : ''} alt="" />
   <div class="details">
-    <span>{playlist.type[0].toUpperCase() + playlist.type.slice(1)}</span>
-    <h1>{playlist.name}</h1>
+    <span>{artist.type[0].toUpperCase() + artist.type.slice(1)}</span>
+    <h1>{artist.name}</h1>
     <div class="albumInfo">
-      <!-- {#if playlist.owner.images && playlist.owner.images.length > 0}
-        <img src={playlist.owner.images[0].url} alt="" />
-      {/if} -->
-      <p class="description">{playlist.description}</p>
-      <a href={'/user/' + playlist.owner.display_name}>{playlist.owner.display_name}</a>
-      <span>&middot; {playlist.tracks.total} songs &middot;</span>
-      <span class="duration"
-        >{getTrackDuration(playlist.tracks.items).minutes}
-        {getTrackDuration(playlist.tracks.items).seconds}</span
-      >
+      <!-- <img src={album.artists[0].} alt=""> -->
+      <!-- <a href={'/user/' + playlist.owner.display_name}>{playlist.owner.display_name}</a> -->
+      <span>{numberToCommaString(artist.followers.total)} followers</span>
     </div>
   </div>
 </div>
@@ -50,24 +39,34 @@
 <div class="content">
   <div class="play">
     <PlayBtn innerSize={25} />
-    <button class="heart"><Heart width="36px" height="36px" /></button>
+    <!-- <button class="heart"><Heart width="36px" height="36px" /></button> -->
+    <Button element="button" style="outline">Follow</Button>
     <button class="heart"><ThreeHorizontalDots /></button>
   </div>
-  <TrackDetails {tracks} trackLinks={null} />
+  <h2>Popular</h2>
+  <TrackDetails noRowHeader {tracks} trackLinks={null} />
+  <!-- <h2>Discography</h2> -->
+  <CatergorySection section={{ items: albums, title: 'Albums', path: '/album' }} />
+  <CatergorySection section={{ items: singles, title: 'Singles', path: '/album' }} />
+  <CatergorySection section={{ items: appearsOn, title: 'Appears On', path: '/album' }} />
+  <CatergorySection artistSearchResults={{ title: 'Related Artists', items: relatedArtists }} />
 </div>
 
 <style>
   .container {
     position: relative;
+    /* z-index: -1; */
     margin: calc(-1 * var(--navbar-height)) -30px 0 -30px;
     padding: 80px 30px 30px 30px;
     display: flex;
     gap: 50px;
   }
   .container > img {
-    width: 230px;
-    height: 230px;
+    width: 300px;
+    height: 300px;
+    object-fit: cover;
     transition: transform 0.5s;
+    /* border-radius: 12px; */
     box-shadow: 0 4px 60px rgba(0, 0, 0, 0.5);
   }
   .container > img:hover {
@@ -91,35 +90,17 @@
     font-size: 0.875rem;
   }
   .details > h1 {
-    font-size: 2rem;
-    max-height: 150px;
-    max-width: 500px;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    -webkit-line-clamp: 3;
+    font-size: 4rem;
     margin: 8px 0;
     line-height: normal;
     font-weight: 700;
   }
+  h2 {
+    font-size: 1.5rem;
+    padding-left: 20px;
+  }
   .albumInfo {
     font-size: 0.875rem;
-  }
-  .albumInfo > a {
-    color: var(--text-color);
-    text-decoration: none;
-    font-weight: 700;
-  }
-  .albumInfo > a:hover {
-    text-decoration: underline;
-  }
-  .duration,
-  .description {
-    font-size: 0.875rem;
-    color: var(--light-gray);
-  }
-  .description {
-    margin-bottom: 10px;
   }
   .content {
     min-height: 300px;
@@ -150,7 +131,11 @@
       /* gap: 20px; */
       margin: calc(-1 * var(--navbar-height)) -15px 0 -15px;
     }
+    .details > h1 {
+      font-size: 2rem;
+    }
     .content {
+      padding: 0 15px;
       margin: 0 -15px;
     }
   }
@@ -158,7 +143,13 @@
     .container {
       flex-direction: column;
       align-items: center;
-      gap: 30px;
+      gap: 10px;
+    }
+    .details > span {
+      display: none;
+    }
+    .details > h1 {
+      text-align: center;
     }
   }
 </style>

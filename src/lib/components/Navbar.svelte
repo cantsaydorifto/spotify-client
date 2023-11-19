@@ -13,6 +13,7 @@
   let navbar: HTMLDivElement;
   let opacity = 0;
   $: color = $page.data.color;
+  $: artist = $page.data.artist as SingleArtistResponse | undefined;
   $: album = $page.data.album as SingleAlbumResponse | undefined;
   $: playlist = $page.data.playlist as SinglePlaylistResponse | undefined;
   $: navbar &&
@@ -25,21 +26,22 @@
 <svelte:window bind:scrollY={yScroll} />
 <div bind:this={navbar} class="navbar">
   <div class="content">
-    {#if album}
-      <div class="playlistInfo" style:opacity={`${opacity}`}>
-        <PlayBtn innerSize={24} outerSize={45} />
-        <span>{album.name}</span>
-      </div>
-    {:else if playlist}
-      <div class="playlistInfo" style:opacity={`${opacity}`}>
-        <PlayBtn innerSize={24} outerSize={43} />
-        <span>{playlist.name}</span>
-      </div>
-    {/if}
     <div class="sidebarToggle">
       {#if browser}
         <Sidebar desktop={false} />
       {/if}
+      <div class="playlistInfo" style:opacity={`${opacity}`}>
+        {#if album}
+          <PlayBtn innerSize={24} outerSize={45} />
+          <span>{album.name}</span>
+        {:else if playlist}
+          <PlayBtn innerSize={24} outerSize={45} />
+          <span>{playlist.name}</span>
+        {:else if artist}
+          <PlayBtn innerSize={24} outerSize={45} />
+          <span>{artist.name}</span>
+        {/if}
+      </div>
     </div>
     <div class="profileInfo">
       <button
@@ -63,7 +65,7 @@
         {:else}
           <UserProfileIcon />
         {/if}
-        {user?.display_name}
+        <!-- {user?.display_name} -->
         <span class="visually-hidden">Profile Menu</span>
         <DownArrow />
       </button>
@@ -109,6 +111,11 @@
     justify-content: space-between;
     z-index: 1;
   }
+  .sidebarToggle {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
   .navbar-color {
     position: absolute;
     z-index: -1;
@@ -123,7 +130,7 @@
     height: 100%;
     background-color: rgba(0, 0, 0, 0.6);
   }
-  @media only screen and (max-width: 756px) {
+  @media only screen and (max-width: 1000px) {
     .navbar {
       width: 100%;
     }
@@ -191,5 +198,10 @@
   .playlistInfo > span {
     font-size: 1.25rem;
     font-weight: 800;
+    max-width: 1000px;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    -webkit-line-clamp: 2;
   }
 </style>

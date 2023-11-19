@@ -1,7 +1,7 @@
 <script lang="ts">
   import LogoutButton from '$lib/components/LogoutButton.svelte';
   import Button from '$lib/components/Button.svelte';
-  import MusicIcon from '$lib/components/icons/Music.svelte';
+  import CatergorySection from '$lib/components/CatergorySection.svelte';
   export let data;
   const sections: {
     title: string;
@@ -46,110 +46,8 @@
 <LogoutButton />
 <Button element="a" style="solid" href="/api/auth/login">Login</Button>
 {#each sections as section}
-  <section>
-    <div class="info">
-      <h2>{section.title}</h2>
-      <Button element="a" style="outline" href="/">Show all</Button>
-    </div>
-    <div class="grid-container">
-      {#each section.items as playlist}
-        <a href={`${section.path}/${playlist.id}`} class="playlistContainer">
-          <div class="playlist">
-            {#if playlist.images.length > 0}
-              <div class="playlistImg">
-                <img src={playlist.images[0].url} alt="" />
-              </div>
-            {:else}
-              <div class="no-image-container">
-                <MusicIcon width="100" height="100" />
-              </div>
-            {/if}
-            <div class="playlistInfo">
-              <p title={playlist.name}>{playlist.name}</p>
-              {#if playlist.type === 'album' && playlist.artists}
-                <span title={playlist.artists.map((el) => el.name).join(', ')}
-                  >{playlist.artists.map((el) => el.name).join(', ')}</span
-                >
-              {:else if playlist.type === 'playlist' && playlist.description}
-                <span title={playlist.description}>{playlist.description}</span>
-              {/if}
-              <!-- <p>{playlist.}</p> -->
-            </div>
-          </div>
-        </a>
-      {/each}
-    </div>
-  </section>
+  <CatergorySection {section} />
 {/each}
 
 <style>
-  .info {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 16px;
-  }
-  section {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    margin-bottom: 40px;
-  }
-  .grid-container {
-    display: flex;
-    gap: 30px;
-  }
-  .playlistContainer {
-    padding: 16px;
-    border-radius: 8px;
-    text-decoration: none;
-    color: var(--text-color);
-    background-color: #181818;
-    transition: background-color 0.3s ease;
-    cursor: pointer;
-    width: 200px;
-    height: 270px;
-  }
-  .playlistContainer:hover {
-    background-color: #282828;
-  }
-  .playlist {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    gap: 10px;
-    height: 100%;
-  }
-  .playlistInfo {
-    width: 100%;
-  }
-  .playlistImg > img {
-    width: 100%;
-    object-fit: cover;
-    border-radius: 8px;
-  }
-  .playlistInfo > p {
-    font-weight: 700;
-    width: 100%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .playlistInfo > span {
-    display: inline-block;
-    width: 100%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .no-image-container {
-    width: 100%;
-    height: 100%;
-    background-color: #181818;
-    border-radius: 8px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
 </style>

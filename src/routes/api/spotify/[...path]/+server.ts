@@ -12,7 +12,7 @@ export const GET: RequestHandler = async ({ fetch, cookies, params, url }) => {
   });
   const responseJSON = await response.json();
   if (!response.ok) {
-    console.log(responseJSON);
+    // console.log(responseJSON);
     throw error(responseJSON.error.status, responseJSON.error.message);
   }
   return json(responseJSON);
