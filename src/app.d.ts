@@ -1,6 +1,9 @@
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
 declare global {
+  interface Window {
+    refreshPromise: Promise<Response> | null;
+  }
   namespace App {
     // interface Error {}
     // interface Locals {}
@@ -119,6 +122,8 @@ declare global {
     playlists: PagingObject<PlaylistObjectSimplified>;
   }
   interface SingleAlbumResponse extends AlbumObjectFull {}
+  interface SingleArtistResponse extends ArtistObjectFull {}
+
   interface AlbumObjectFull extends AlbumObjectSimplified {
     copyrights: {
       text: string;
@@ -168,6 +173,40 @@ declare global {
     type: 'track';
     uri: string;
   }
+  interface ArtistObjectFull extends ArtistObjectSimplified {
+    followers: {
+      href: null;
+      total: number;
+    };
+    genres: string[];
+    images: ImageObject[];
+    popularity: number;
+  }
+  interface ArtistsAlbumsResponse extends PagingObject<AlbumObjectSimplified> {}
+  interface ArtistsTopTracksResponse {
+    tracks: TrackObjectFull[];
+  }
+  interface ArtistsRelatedArtistsResponse {
+    artists: ArtistObjectFull[];
+  }
+  interface AlbumSearchResponse {
+    albums: PagingObject<AlbumObjectSimplified>;
+  }
+  interface ArtistSearchResponse {
+    artists: PagingObject<ArtistObjectFull>;
+  }
+  interface PlaylistSearchResponse {
+    playlists: PagingObject<PlaylistObjectSimplified>;
+  }
+  interface TrackSearchResponse {
+    tracks: PagingObject<TrackObjectFull>;
+  }
+  interface SearchResponse
+    extends Partial<ArtistSearchResponse>,
+      Partial<AlbumSearchResponse>,
+      Partial<TrackSearchResponse>,
+      Partial<PlaylistSearchResponse> {}
+
   interface SaavnApiAlbumResponse {
     status: string;
     message: string | null;
