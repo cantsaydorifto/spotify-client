@@ -152,6 +152,7 @@
     }
     .content {
       margin: 0 -15px;
+      padding: 0 8px;
     }
   }
   @media only screen and (max-width: 600px) {

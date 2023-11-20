@@ -266,8 +266,13 @@
   }
   .playlistInfo > a:nth-child(2) {
     color: var(--light-gray);
+    display: inline-block;
     text-decoration: none;
     font-weight: 300;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .playlistInfo > a:nth-child(2):hover {
     text-decoration: underline;

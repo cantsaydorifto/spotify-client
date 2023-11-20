@@ -116,14 +116,15 @@
   .albumInfo > a:hover {
     text-decoration: underline;
   }
-  .duration {
+  .duration,
+  .content > p {
     color: var(--light-gray);
   }
   .content {
     min-height: 300px;
     background-image: linear-gradient(0deg, var(--bg-color), rgba(0, 0, 0, 0.2));
     margin: 0 -30px;
-    padding: 0 30px;
+    padding: 0 30px 50px 30px;
   }
   .play {
     padding: 20px 0;
@@ -153,6 +154,7 @@
     }
     .content {
       margin: 0 -15px;
+      padding: 0 8px 50px 8px;
     }
   }
   @media only screen and (max-width: 600px) {
