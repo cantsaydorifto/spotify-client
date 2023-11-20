@@ -299,10 +299,6 @@
     }
   }
   @media only screen and (max-width: 600px) {
-    .playlistContainer {
-      width: 130px;
-      height: 180px;
-    }
     .info > h2 {
       padding-left: 0;
     }
