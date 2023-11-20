@@ -203,6 +203,7 @@
     color: var(--text-color);
     background-color: #181818;
     transition: background-color 0.3s ease;
+    -webkit-tap-highlight-color: transparent;
     cursor: pointer;
     width: 180px;
     height: 250px;
