@@ -302,6 +302,10 @@
     section {
       width: calc(100vw - 36px);
     }
+    .track > :global(button) {
+      transform: translateY(0);
+      opacity: 1;
+    }
   }
   @media only screen and (max-width: 600px) {
     .info > h2 {
