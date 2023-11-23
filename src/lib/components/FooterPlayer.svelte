@@ -1,6 +1,5 @@
 <script lang="ts">
   import Player from './Player.svelte';
-  import Music from './icons/Music.svelte';
   import { currentSong } from './store/currentPlaying';
 </script>
 
@@ -11,7 +10,11 @@
         <img src={$currentSong.trackLink.img} alt="" />
         <div class="song-details">
           <span title={$currentSong.trackLink.name}>{$currentSong.trackLink.name}</span>
-          <span><a href="/">{$currentSong.trackLink.artist}</a></span>
+          <span
+            ><a href={`/artist/${$currentSong.trackLink.artist.id}`}
+              >{$currentSong.trackLink.artist.name}</a
+            ></span
+          >
         </div>
         <!-- <Heart width="18px" height="18px" /> -->
       </div>

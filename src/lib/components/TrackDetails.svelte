@@ -3,8 +3,8 @@
   import Play from './icons/Play.svelte';
   import {
     addFetchedSongsToQueue,
-    addSongToQueue,
     clearQueue,
+    currentSong,
     playSong
   } from './store/currentPlaying';
   export let tracks:
@@ -50,8 +50,10 @@
   {/if}
   <div class="tracks-container">
     {#each tracks as track, idx}
-      <!-- {console.log(track)} -->
-      <div class="row">
+      <div
+        class="row"
+        class:playing={$currentSong.trackLink ? $currentSong.trackLink.id === track.id : false}
+      >
         <div class="number-column">
           <span class="number">{idx + 1}</span>
         </div>
@@ -79,24 +81,39 @@
             on:click={async () => {
               clearQueue();
               if (!trackLinks && track.album) {
-                await addSongToQueue({
-                  trackNumber: track.track_number,
-                  albumName: track.album.name,
-                  artistName: track.artists[0].name,
-                  albumTotalTracks: track.album.total_tracks,
-                  preview_url: track.preview_url,
-                  name: track.name,
-                  albumImage: track.album.images[0].url
-                });
+                const tracksToQueue = tracks
+                  ? tracks.slice(idx).map((el) => ({
+                      name: el.name,
+                      id: el.id,
+                      artist: { name: el.artists[0].name, id: el.artists[0].id },
+                      img: el.album ? el.album.images[0].url : '',
+                      link: '',
+                      album: {
+                        name: el.album ? el.album.name : '',
+                        totalTracks: el.album ? el.album.total_tracks : 0
+                      },
+                      trackNumber: el.track_number,
+                      preview_url: el.preview_url || '',
+                      needsFetch: true
+                    }))
+                  : null;
+                addFetchedSongsToQueue(tracksToQueue);
                 playSong();
                 return;
               }
               const tracksToQueue = trackLinks
                 ? trackLinks.slice(idx).map((trackLink) => ({
-                    name: trackLink.name,
+                    name: track.name,
+                    id: track.id,
+                    artist: { name: track.artists[0].name, id: track.artists[0].id },
+                    img: trackLink.img,
                     link: trackLink.link,
-                    artist: track.artists[0].name,
-                    img: trackLink.img
+                    album: {
+                      name: track.album ? track.album.name : '',
+                      totalTracks: track.album ? track.album.total_tracks : 0
+                    },
+                    trackNumber: track.track_number,
+                    preview_url: track.preview_url || ''
                   }))
                 : null;
               addFetchedSongsToQueue(tracksToQueue);
@@ -136,7 +153,8 @@
     font-size: 0.875rem;
   }
 
-  .row:not(.header):hover {
+  .row:not(.header):hover,
+  .playing {
     background-color: rgba(255, 255, 255, 0.05);
   }
 

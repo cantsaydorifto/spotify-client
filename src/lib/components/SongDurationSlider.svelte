@@ -19,10 +19,8 @@
         }% + 12px - ${Number(volumeSlider.value) / (audio!.duration / 12)}px)`;
       }
     });
-
-    audio.addEventListener('ended', () => {
-      playSong();
-    });
+    audio.addEventListener('error', () => playSong()); // preview_url is null or starts with null
+    audio.addEventListener('ended', () => playSong());
 
     volumeSlider.addEventListener('input', (event) => {
       const inp = event.target as HTMLInputElement;
