@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { playSong } from './store/currentPlaying';
 
   let volumeSlider: HTMLInputElement;
   let currentVolumeBar: HTMLDivElement;
@@ -18,6 +19,11 @@
         }% + 12px - ${Number(volumeSlider.value) / (audio!.duration / 12)}px)`;
       }
     });
+
+    audio.addEventListener('ended', () => {
+      playSong();
+    });
+
     volumeSlider.addEventListener('input', (event) => {
       const inp = event.target as HTMLInputElement;
       currentVolumeBar.style.left = `calc(-${

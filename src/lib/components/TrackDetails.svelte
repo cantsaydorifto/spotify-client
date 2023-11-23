@@ -1,12 +1,16 @@
 <script lang="ts">
   import Clock3 from './icons/Clock3.svelte';
   import Play from './icons/Play.svelte';
-  import { currentSong } from './store/currentPlaying';
+  import {
+    addFetchedSongsToQueue,
+    addSongToQueue,
+    clearQueue,
+    playSong
+  } from './store/currentPlaying';
   export let tracks:
     | (TrackObjectSimplified & { album?: AlbumObjectSimplified })[]
     | TrackObjectFull[];
   tracks = tracks.filter((track) => !!track);
-  // tracks = [tracks[0]];
   export let trackLinks:
     | {
         name: string;
@@ -73,45 +77,30 @@
         <div class="duration-column">
           <button
             on:click={async () => {
+              clearQueue();
               if (!trackLinks && track.album) {
-                // console.log(track.album.name + ' ' + track.album.artists[0].name);
-                const songRes = await fetch(
-                  `/api/song/${track.track_number}?query=${encodeURIComponent(
-                    `${track.album.name} ${track.album.artists[0].name}`
-                  )}&count=${track.album.total_tracks}`
-                );
-                let [songLink, songName] = ['', ''];
-                if (!songRes.ok) {
-                  // console.log('not ok');
-                  songLink = track.preview_url || '';
-                  songName = track.name || '';
-                  // console.log(songLink);
-                } else {
-                  const song = await songRes.json();
-                  songLink = song.song.downloadUrl[song.song.downloadUrl.length - 1].link;
-                  songName = song.song.name;
-                }
-                // console.log({
-                //   name: songName,
-                //   link: songLink,
-                //   artist: track.album.artists[0].name,
-                //   img: track.album.images[0].url
-                // });
-                $currentSong.trackLink = {
-                  name: songName,
-                  link: songLink,
-                  artist: track.album.artists[0].name,
-                  img: track.album.images[0].url
-                };
-                // const res = await fetch('/api/song/' + track.id);
+                await addSongToQueue({
+                  trackNumber: track.track_number,
+                  albumName: track.album.name,
+                  artistName: track.artists[0].name,
+                  albumTotalTracks: track.album.total_tracks,
+                  preview_url: track.preview_url,
+                  name: track.name,
+                  albumImage: track.album.images[0].url
+                });
+                playSong();
                 return;
               }
-              $currentSong.trackLink = {
-                name: track.name,
-                link: trackLinks ? trackLinks[idx].link : '',
-                artist: track.artists[0].name,
-                img: trackLinks ? trackLinks[idx].img : ''
-              };
+              const tracksToQueue = trackLinks
+                ? trackLinks.slice(idx).map((trackLink) => ({
+                    name: trackLink.name,
+                    link: trackLink.link,
+                    artist: track.artists[0].name,
+                    img: trackLink.img
+                  }))
+                : null;
+              addFetchedSongsToQueue(tracksToQueue);
+              playSong();
             }}><Play width="15px" height="15px" stroke="white" /></button
           >
           <span class="duration">{msToTime(track.duration_ms)}</span>
