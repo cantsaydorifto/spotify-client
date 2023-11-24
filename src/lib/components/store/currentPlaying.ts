@@ -1,22 +1,4 @@
-import { writable } from 'svelte/store';
-
-interface Song {
-  name: string;
-  id: string;
-  artist: {
-    name: string;
-    id: string;
-  };
-  img: string;
-  link: string;
-  album: {
-    name: string;
-    totalTracks: number;
-  };
-  trackNumber: number;
-  preview_url: string;
-  needsFetch?: boolean;
-}
+import { get, writable } from 'svelte/store';
 
 export const currentSong = writable<{
   trackLink: Song | null;
@@ -41,26 +23,19 @@ export const addFetchedSongsToQueue = (trackLink: Song[] | null) => {
   });
 };
 
-export const addSongToQueue = async (track: {
-  trackNumber: number;
-  albumName: string;
-  artistName: string;
-  artistId: string;
-  songId: string;
-  albumTotalTracks: number;
-  preview_url: string | null;
-  name: string;
-  albumImage: string;
-}) => {
+export const addSongToQueue = async (track: Song | null) => {
+  if (!track) {
+    return false;
+  }
   const songRes = await fetch(
     `/api/song/${track.trackNumber}?query=${encodeURIComponent(
-      `${track.albumName} ${track.artistName}`
-    )}&count=${track.albumTotalTracks}`
+      `${track.album.name} ${track.artist.id}`
+    )}&count=${track.album.totalTracks}`
   );
   let [songLink, songName, songId] = ['', '', ''];
-  songId = track.songId;
+  songId = track.id;
   if (!songRes.ok) {
-    console.log('not ok');
+    // console.log('not ok');
     songLink = track.preview_url || '';
     songName = track.name || '';
   } else {
@@ -68,93 +43,84 @@ export const addSongToQueue = async (track: {
     songLink = song.song.downloadUrl[song.song.downloadUrl.length - 1].link;
     songName = song.song.name;
   }
-  if (songLink.startsWith('null')) {
-    return;
+  if (songLink.startsWith('null') || songLink === '') {
+    return false;
   }
   currentSong.update((current) => {
     current.songQueue.unshift({
       name: songName,
       id: songId,
       artist: {
-        id: track.artistId,
-        name: track.artistName
+        id: track.artist.id,
+        name: track.artist.name
       },
-      img: track.albumImage,
+      img: track.img,
       link: songLink,
       album: {
-        name: track.albumName,
-        totalTracks: track.albumTotalTracks
+        name: track.album.name,
+        totalTracks: track.album.totalTracks
       },
       trackNumber: track.trackNumber,
       preview_url: track.preview_url || ''
     });
     return current;
   });
+  return true;
 };
 
 export const playSong = () => {
   currentSong.update((current) => {
+    // console.log([...current.songQueue]);
     if (current.songQueue.length <= 0) {
       return current;
     }
     const curTrack = current.songQueue.shift() || null;
-    if (!curTrack || !curTrack.needsFetch || current.songQueue.length < 0) {
+    if (!curTrack || !curTrack.needsFetch) {
+      // console.log(curTrack);
+      current.trackLink = curTrack || null;
       return current;
     }
     const song = curTrack;
-    playNextSong({
-      albumImage: song.img,
-      albumName: song.album.name,
-      albumTotalTracks: song.album.totalTracks,
-      artist: song.artist,
-      name: song.name,
-      songId: song.id,
-      preview_url: song.preview_url,
-      trackNumber: song.trackNumber
-    });
+    // console.log(curTrack);
+    playNextSong(song);
     return current;
   });
 };
 
-const playNextSong = async ({
-  albumImage,
-  albumName,
-  albumTotalTracks,
-  artist,
-  name,
-  songId,
-  preview_url,
-  trackNumber
-}: {
-  albumImage: string;
-  albumName: string;
-  albumTotalTracks: number;
-  artist: {
-    name: string;
-    id: string;
-  };
-  name: string;
-  songId: string;
-  preview_url: string;
-  trackNumber: number;
-}) => {
-  await addSongToQueue({
-    songId,
-    albumImage,
-    albumName,
-    albumTotalTracks,
-    artistName: artist.name,
-    artistId: artist.id,
-    name,
-    preview_url,
-    trackNumber
-  });
+const playNextSong = async (track: Song | null) => {
+  const res = await addSongToQueue(track);
+  if (!res) {
+    const t = get(currentSong).songQueue[0] || null;
+    currentSong.update((el) => {
+      el.songQueue.shift();
+      return el;
+    });
+    playNextSong(t);
+    return;
+  }
   currentSong.update((current) => {
     if (current.songQueue.length > 0 && current.songQueue[0].link === '') {
       current.songQueue[0].link = current.songQueue[0].preview_url;
     }
     current.trackLink = current.songQueue.shift() || null;
-    console.log(current.trackLink);
     return current;
   });
 };
+
+interface Song {
+  name: string;
+  id: string;
+  artist: {
+    name: string;
+    id: string;
+  };
+  img: string;
+  link: string;
+  album: {
+    name: string;
+    totalTracks: number;
+  };
+  trackNumber: number;
+  preview_url: string;
+  needsFetch?: boolean;
+}

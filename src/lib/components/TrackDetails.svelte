@@ -101,13 +101,14 @@
                 playSong();
                 return;
               }
+              console.log('aaas');
               const tracksToQueue = trackLinks
-                ? trackLinks.slice(idx).map((trackLink) => ({
-                    name: track.name,
-                    id: track.id,
-                    artist: { name: track.artists[0].name, id: track.artists[0].id },
-                    img: trackLink.img,
-                    link: trackLink.link,
+                ? tracks.slice(idx).map((trackLink, idx2) => ({
+                    name: trackLink.name,
+                    id: trackLink.id,
+                    artist: { name: trackLink.artists[0].name, id: trackLink.artists[0].id },
+                    img: trackLinks ? trackLinks[0].img : '',
+                    link: trackLinks ? trackLinks[idx2].link : '',
                     album: {
                       name: track.album ? track.album.name : '',
                       totalTracks: track.album ? track.album.total_tracks : 0
