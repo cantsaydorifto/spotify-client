@@ -28,7 +28,7 @@
     bind:this={volumeSlider}
     min="0"
     max="100"
-    value="20"
+    value="100"
     type="range"
     name="volume"
   />

@@ -20,7 +20,7 @@
       }[]
     | null;
 
-  if (trackLinks) {
+  if (trackLinks && trackLinks.length === tracks.length) {
     let t = trackLinks; // typescript error
     tracks.forEach((track, idx) => {
       track.link = t[idx].link;
