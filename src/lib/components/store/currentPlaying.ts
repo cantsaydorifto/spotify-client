@@ -29,7 +29,7 @@ export const addSongToQueue = async (track: Song | null) => {
   }
   const songRes = await fetch(
     `/api/song/${track.trackNumber}?query=${encodeURIComponent(
-      `${track.album.name} ${track.artist.id}`
+      `${track.album.name} ${track.artist.name}`
     )}&count=${track.album.totalTracks}`
   );
   let [songLink, songName, songId] = ['', '', ''];
