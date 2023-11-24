@@ -103,12 +103,12 @@
               }
               console.log('aaas');
               const tracksToQueue = trackLinks
-                ? tracks.slice(idx).map((trackLink, idx2) => ({
+                ? tracks.slice(idx).map((trackLink) => ({
                     name: trackLink.name,
                     id: trackLink.id,
                     artist: { name: trackLink.artists[0].name, id: trackLink.artists[0].id },
                     img: trackLinks ? trackLinks[0].img : '',
-                    link: trackLinks ? trackLinks[idx2].link : '',
+                    link: trackLinks ? trackLinks[idx].link : '',
                     album: {
                       name: track.album ? track.album.name : '',
                       totalTracks: track.album ? track.album.total_tracks : 0
