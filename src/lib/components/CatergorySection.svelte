@@ -45,9 +45,16 @@
     //   img: track.album.images[0].url
     // });
     $currentSong.trackLink = {
+      id: track.id,
+      album: { name: track.album.name, totalTracks: track.album.total_tracks },
+      trackNumber: track.track_number,
+      preview_url: track.preview_url || '',
       name: songName,
       link: songLink,
-      artist: track.album.artists[0].name,
+      artist: {
+        id: track.album.artists[0].id,
+        name: track.album.artists[0].name
+      },
       img: track.album.images[0].url
     };
   }
