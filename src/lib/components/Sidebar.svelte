@@ -179,12 +179,17 @@
     padding-right: 20px;
     padding-left: 5px;
   }
+  .sidebar-content {
+    position: fixed;
+    top: 0;
+    left: 0;
+  }
   .logo {
     max-width: 100%;
     width: 130px;
   }
   .sidebar-inner-content {
-    min-width: var(--sidebar-width);
+    width: var(--sidebar-width);
     background-color: var(--sidebar-color);
     height: 100vh;
     overflow: auto;
@@ -247,6 +252,9 @@
   @media only screen and (max-width: 1000px) {
     .mobile .sidebar-inner-content {
       display: block;
+    }
+    .sidebar-content {
+      position: static;
     }
   }
 </style>

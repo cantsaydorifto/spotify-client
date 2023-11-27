@@ -45,6 +45,10 @@
   .main {
     display: flex;
   }
+  .sidebar {
+    position: relative;
+    width: var(--sidebar-width);
+  }
   .content {
     flex: 1;
   }
