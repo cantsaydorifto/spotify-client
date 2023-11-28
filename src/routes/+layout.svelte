@@ -47,13 +47,17 @@
   }
   .sidebar {
     position: relative;
-    width: var(--sidebar-width);
   }
   .content {
     flex: 1;
   }
   .main-content {
     padding: var(--navbar-height) 15px 60px 15px;
+  }
+  @media (min-width: 1000px) {
+    .sidebar {
+      width: var(--sidebar-width);
+    }
   }
   @media (min-width: 800px) {
     .main-content {
