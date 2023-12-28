@@ -1,10 +1,14 @@
 import interceptFetch from '$lib/interceptor/interceptFetch';
+import { redirect } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
 
 export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, parent }) => {
   const fetch = (path: string) => interceptFetch(fetchWithNoInterceptor, path);
   const problemIds = ['0JQ5DAqbMKFIRybaNTYXXy', '0JQ5DAqbMKFy0OenPG51Av', '0JQ5DAqbMKFDTEtSaS4R92'];
   const parentData = await parent();
+  if (!parentData.user) {
+    throw redirect(307, '/svn');
+  }
   const res1 = await fetch('/api/spotify/browse/new-releases?country=US&limit=50');
   const res2 = await fetch('/api/spotify/browse/featured-playlists?country=US');
   const res3 = await fetch(`/api/spotify/users/${parentData.user?.id}/playlists`);

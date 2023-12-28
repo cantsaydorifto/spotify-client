@@ -19,7 +19,7 @@
         link: string;
       }[]
     | null;
-
+  export let svn: boolean = false;
   if (trackLinks && trackLinks.length === tracks.length) {
     let t = trackLinks; // typescript error
     tracks.forEach((track, idx) => {
@@ -77,7 +77,7 @@
             </div>
             <p class="artists">
               {#each track.artists as artist, artistIndex}
-                <a href="/artist/{artist.id}">{artist.name}</a
+                <a href={`/${svn ? 'svn/' : ''}artist/${artist.id}`}>{artist.name}</a
                 >{#if artistIndex < track.artists.length - 1}{', '}{/if}
               {/each}
             </p>
@@ -113,7 +113,12 @@
                     name: trackLink.name,
                     id: trackLink.id,
                     artist: { name: trackLink.artists[0].name, id: trackLink.artists[0].id },
-                    img: trackLinks ? trackLinks[0].img : '',
+                    img:
+                      svn && trackLink.album
+                        ? trackLink.album.images[0].url
+                        : trackLinks
+                        ? trackLinks[0].img
+                        : '',
                     link: trackLink.link || '',
                     album: {
                       name: track.album ? track.album.name : '',

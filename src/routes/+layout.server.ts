@@ -16,7 +16,7 @@ export async function load({ cookies, fetch, url }) {
   });
   if (response.ok) {
     const userData: UserProfile = await response.json();
-    console.log('userData');
+    // console.log('userData');
     return {
       user: userData
     };

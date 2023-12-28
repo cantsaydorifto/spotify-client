@@ -212,7 +212,112 @@ declare global {
     message: string | null;
     data: SaavnAlbumData;
   }
-
+  interface SaavnApiSongResponse {
+    status: string;
+    message: string | null;
+    data: SaavnSong[];
+  }
+  interface SaavnApiPlaylistResponse {
+    status: string;
+    message: string | null;
+    data: SaavnPlaylistData;
+  }
+  interface SaavnApiArtistInfoResponse {
+    status: string;
+    message: string | null;
+    data: SaavnArtistData;
+  }
+  interface SaavnApiArtistSongResponse {
+    status: string;
+    message: string | null;
+    data: {
+      total: number;
+      lastPage: boolean;
+      results: SaavnSong[];
+    };
+  }
+  interface SaavnApiArtistAlbumResponse {
+    status: string;
+    message: string | null;
+    data: {
+      total: number;
+      lastPage: boolean;
+      results: SaavnHomepageALbumData[];
+    };
+  }
+  interface SaavnApiSearchAllResponse {
+    status: string;
+    message: string | null;
+    data: {
+      songs: { results: SaavnSearchSong[] };
+      albums: { results: SaavnSearchAlbums[] };
+      artists: { results: SaavnSearchArtists[] };
+      playlists: { results: SaavnSearchPlaylists[] };
+    };
+  }
+  interface SaavnSearchPlaylists {
+    id: string;
+    title: string;
+    image: SaavnAlbumImage[];
+    url: string;
+    type: string;
+    language: string;
+    description: string;
+    position: number;
+  }
+  interface SaavnSearchArtists {
+    id: string;
+    title: string;
+    image: SaavnAlbumImage[];
+    url: string;
+    type: string;
+    description: string;
+    position: number;
+  }
+  interface SaavnSearchAlbum {
+    id: string;
+    title: string;
+    image: SaavnAlbumImage[];
+    artist: string;
+    url: string;
+    type: string;
+    description: string;
+    position: number;
+    year: string;
+    songIds: string;
+    language: string;
+  }
+  interface SaavnSearchSong {
+    id: string;
+    title: string;
+    image: SaavnAlbumImage[];
+    album: string;
+    url: string;
+    type: string;
+    description: string;
+    position: number;
+    primaryArtists: string;
+    singers: string;
+    language: string;
+  }
+  interface SaavnArtistData {
+    id: string;
+    name: string;
+    url: string;
+    image: SaavnAlbumImage[];
+    followerCount: string;
+    fanCount: string;
+    isVerified: boolean;
+    dominantLanguage: string;
+    dominantType: string;
+    bio: string[];
+    dob: string;
+    fb: string;
+    twitter: string;
+    wiki: string;
+    availableLanguages: string[];
+    isRadioPresent: boolean;
+  }
   interface SaavnAlbumData {
     id: string;
     name: string;
@@ -227,7 +332,21 @@ declare global {
     image: SaavnAlbumImage[];
     songs: SaavnSong[];
   }
-
+  interface SaavnPlaylistData {
+    id: string;
+    userId: string;
+    name: string;
+    followerCount: string;
+    songCount: string;
+    fanCount: string;
+    username: string;
+    firstname: string;
+    lastname: string;
+    shares: string;
+    image: SaavnAlbumImage[];
+    songs: SaavnSong[];
+    url: string;
+  }
   interface SaavnAlbumImage {
     quality: string;
     link: string;
@@ -243,7 +362,7 @@ declare global {
     };
     year: string;
     releaseDate: string;
-    duration: string;
+    duration: number;
     label: string;
     primaryArtists: string;
     primaryArtistsId: string;
@@ -282,6 +401,43 @@ declare global {
     external_ids: ExternalIdObject;
     popularity: number;
     is_local?: boolean | undefined;
+  }
+  interface SaavnHomepageALbumData {
+    id: string;
+    name: string;
+    year: string;
+    type: string;
+    playCount: number;
+    language: string;
+    explicitContent: string;
+    url: string;
+    primaryArtists: SaavnHomepageArtist[];
+    artists: SaavnHomepageArtist[];
+    image: SaavnAlbumImage[];
+  }
+
+  interface SaavnHomepageArtist {
+    id: string;
+    name: string;
+    url: string;
+    type: string;
+    role: string;
+    image: SaavnAlbumImage[];
+  }
+
+  interface SaavnHomepagePlaylistData {
+    id: string;
+    userId: string;
+    title: string;
+    subtitle: string;
+    type: string;
+    image: SaavnAlbumImage[];
+    url: string;
+    songCount: string;
+    firstname: string;
+    followerCount: string;
+    lastUpdated: string;
+    explicitContent: string;
   }
 }
 

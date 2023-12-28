@@ -10,6 +10,7 @@
   import { beforeNavigate } from '$app/navigation';
   export let desktop: boolean;
   $: isSidebarActive = false;
+  $: user = $page.data.user;
   let closeNavbarButton: HTMLButtonElement;
   let openNavbarButton: HTMLButtonElement;
   let navLastFocusElement: HTMLAnchorElement;
@@ -116,7 +117,7 @@
                     closeNavbarButton.focus();
                   }
                 }}
-                href={navItem.path}
+                href={user ? navItem.path : '/svn' + navItem.path}
               >
                 <svelte:component
                   this={navItem.svg}
@@ -133,7 +134,7 @@
             </li>
           {:else}
             <li class:active={navItem.path === $page.url.pathname}>
-              <a href={navItem.path}>
+              <a href={user ? navItem.path : '/svn' + navItem.path}>
                 <svelte:component
                   this={navItem.svg}
                   focusable="false"

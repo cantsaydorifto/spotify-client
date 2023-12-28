@@ -20,6 +20,12 @@
   };
   export let trackSearchResults: TrackObjectFull[] = [];
 
+  export let saavnHomepageData: {
+    playlists: SaavnHomepagePlaylistData[];
+    charts: SaavnHomepagePlaylistData[];
+    albums: SaavnHomepageALbumData[];
+  } | null = null;
+
   async function playSong(track: TrackObjectFull) {
     // console.log(track.album.name + ' ' + track.album.artists[0].name);
     const songRes = await fetch(
@@ -177,6 +183,122 @@
       </Frame>
     </div>
   </section>
+{/if}
+{#if !!saavnHomepageData}
+  {#if saavnHomepageData.albums.length > 0}
+    <section>
+      <div class="info">
+        <h2>New Releases</h2>
+      </div>
+      <div class="grid-container">
+        <Frame>
+          {#each saavnHomepageData.albums as album}
+            <a
+              href={album.type === 'album' ? `/svn/album/${album.id}` : `/svn/song/${album.id}`}
+              class="playlistContainer"
+            >
+              <div class="playlist">
+                {#if album.image.length > 1}
+                  <div class="playlistImg">
+                    <img src={album.image[1].link} alt={album.name} />
+                  </div>
+                {:else if album.image.length > 0}
+                  <div class="playlistImg">
+                    <img src={album.image[album.image.length - 1].link} alt="" />
+                  </div>
+                {:else}
+                  <div class="no-image-container">
+                    <MusicIcon width="100" height="100" />
+                  </div>
+                {/if}
+                <div class="playlistInfo">
+                  <p title={album.name}>{album.name}</p>
+                  <span
+                    title={album.primaryArtists.length > 0
+                      ? album.primaryArtists[0].name
+                      : album.artists.length > 0
+                      ? album.artists[0].name
+                      : ''}
+                    >{album.primaryArtists.length > 0
+                      ? album.primaryArtists[0].name
+                      : album.artists.length > 0
+                      ? album.artists[0].name
+                      : ''}</span
+                  >
+                </div>
+              </div>
+            </a>
+          {/each}
+        </Frame>
+      </div>
+    </section>
+  {/if}
+  {#if saavnHomepageData.playlists.length > 0}
+    <section>
+      <div class="info">
+        <h2>Playlists</h2>
+      </div>
+      <div class="grid-container">
+        <Frame>
+          {#each saavnHomepageData.playlists as playlist}
+            <a href={`/svn/playlist/${playlist.id}`} class="playlistContainer">
+              <div class="playlist">
+                {#if playlist.image.length > 1}
+                  <div class="playlistImg">
+                    <img src={playlist.image[1].link} alt={playlist.title} />
+                  </div>
+                {:else if playlist.image.length > 0}
+                  <div class="playlistImg">
+                    <img src={playlist.image[playlist.image.length - 1].link} alt="" />
+                  </div>
+                {:else}
+                  <div class="no-image-container">
+                    <MusicIcon width="100" height="100" />
+                  </div>
+                {/if}
+                <div class="playlistInfo">
+                  <p title={playlist.title}>{playlist.title}</p>
+                </div>
+              </div>
+            </a>
+          {/each}
+        </Frame>
+      </div>
+    </section>
+  {/if}
+  {#if saavnHomepageData.charts.length > 0}
+    <section>
+      <div class="info">
+        <h2>Charts</h2>
+      </div>
+      <div class="grid-container">
+        <Frame>
+          {#each saavnHomepageData.charts as playlist}
+            <a href={`/svn/playlist/${playlist.id}`} class="playlistContainer">
+              <div class="playlist">
+                {#if playlist.image.length > 1}
+                  <div class="playlistImg">
+                    <img src={playlist.image[1].link} alt={playlist.title} />
+                  </div>
+                {:else if playlist.image.length > 0}
+                  <div class="playlistImg">
+                    <img src={playlist.image[playlist.image.length - 1].link} alt="" />
+                  </div>
+                {:else}
+                  <div class="no-image-container">
+                    <MusicIcon width="100" height="100" />
+                  </div>
+                {/if}
+                <div class="playlistInfo">
+                  <p title={playlist.title}>{playlist.title}</p>
+                </div>
+              </div>
+            </a>
+          {/each}
+        </Frame>
+      </div>
+    </section>
+  {/if}
 {/if}
 
 <style>
