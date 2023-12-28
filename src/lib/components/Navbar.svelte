@@ -81,7 +81,13 @@
           </a>
         </li>
         <li><a href="/profile">View Profile</a></li>
-        <li><LogoutButton /></li>
+        <li>
+          {#if user}
+            <LogoutButton />
+          {:else}
+            <a href="/api/auth/login">Login</a>
+          {/if}
+        </li>
       </ul>
     </div>
   </div>

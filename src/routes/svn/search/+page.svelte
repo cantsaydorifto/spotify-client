@@ -85,7 +85,9 @@
           ],
           artists: [{ id: '', name: el.artist, url: '', type: '', role: '', image: el.image }]
         })),
-        charts: []
+        charts: [],
+        trendingAlbums: [],
+        trendingSongs: []
       }}
     />
   {/if}

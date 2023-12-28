@@ -24,6 +24,8 @@
     playlists: SaavnHomepagePlaylistData[];
     charts: SaavnHomepagePlaylistData[];
     albums: SaavnHomepageALbumData[];
+    trendingSongs: SaavnSong[];
+    trendingAlbums: SaavnHomepageALbumData[];
   } | null = null;
 
   async function playSong(track: TrackObjectFull) {
@@ -213,7 +215,12 @@
                 {/if}
                 <div class="playlistInfo">
                   <p title={album.name}>{album.name}</p>
-                  <span
+                  <a
+                    href="/svn/artist/{album.primaryArtists.length > 0
+                      ? album.primaryArtists[0].id
+                      : album.artists.length > 0
+                      ? album.artists[0].id
+                      : ''}"
                     title={album.primaryArtists.length > 0
                       ? album.primaryArtists[0].name
                       : album.artists.length > 0
@@ -223,7 +230,7 @@
                       ? album.primaryArtists[0].name
                       : album.artists.length > 0
                       ? album.artists[0].name
-                      : ''}</span
+                      : ''}</a
                   >
                 </div>
               </div>
@@ -291,6 +298,87 @@
                 {/if}
                 <div class="playlistInfo">
                   <p title={playlist.title}>{playlist.title}</p>
+                </div>
+              </div>
+            </a>
+          {/each}
+        </Frame>
+      </div>
+    </section>
+  {/if}
+  {#if saavnHomepageData.trendingSongs.length > 0}
+    <section>
+      <div class="info">
+        <h2>Trending Songs</h2>
+      </div>
+      <div class="grid-container">
+        <Frame>
+          {#each saavnHomepageData.trendingSongs as playlist}
+            <a href={`/svn/song/${playlist.id}`} class="playlistContainer">
+              <div class="playlist">
+                {#if playlist.image.length > 1}
+                  <div class="playlistImg">
+                    <img src={playlist.image[1].link} alt={playlist.name} />
+                  </div>
+                {:else if playlist.image.length > 0}
+                  <div class="playlistImg">
+                    <img src={playlist.image[playlist.image.length - 1].link} alt="" />
+                  </div>
+                {:else}
+                  <div class="no-image-container">
+                    <MusicIcon width="100" height="100" />
+                  </div>
+                {/if}
+                <div class="playlistInfo">
+                  <p title={playlist.name}>{playlist.name}</p>
+                  <a href={`/svn/artist/${playlist.primaryArtistsId}`}>{playlist.primaryArtists}</a>
+                </div>
+              </div>
+            </a>
+          {/each}
+        </Frame>
+      </div>
+    </section>
+  {/if}
+  {#if saavnHomepageData.trendingAlbums.length > 0}
+    <section>
+      <div class="info">
+        <h2>Trending Albums</h2>
+      </div>
+      <div class="grid-container">
+        <Frame>
+          {#each saavnHomepageData.trendingAlbums as playlist}
+            <a href={`/svn/album/${playlist.id}`} class="playlistContainer">
+              <div class="playlist">
+                {#if playlist.image.length > 1}
+                  <div class="playlistImg">
+                    <img src={playlist.image[1].link} alt={playlist.name} />
+                  </div>
+                {:else if playlist.image.length > 0}
+                  <div class="playlistImg">
+                    <img src={playlist.image[playlist.image.length - 1].link} alt="" />
+                  </div>
+                {:else}
+                  <div class="no-image-container">
+                    <MusicIcon width="100" height="100" />
+                  </div>
+                {/if}
+                <div class="playlistInfo">
+                  <p title={playlist.name}>{playlist.name}</p>
+                  <a
+                    href={`/svn/artist/${
+                      playlist.primaryArtists.length > 0
+                        ? playlist.primaryArtists[0].id
+                        : playlist.artists.length > 0
+                        ? playlist.artists[0].id
+                        : ''
+                    }`}
+                    >{playlist.primaryArtists.length > 0
+                      ? playlist.primaryArtists[0].name
+                      : playlist.artists.length > 0
+                      ? playlist.artists[0].name
+                      : ''}</a
+                  >
                 </div>
               </div>
             </a>

@@ -115,7 +115,7 @@
                     artist: { name: trackLink.artists[0].name, id: trackLink.artists[0].id },
                     img:
                       svn && trackLink.album
-                        ? trackLink.album.images[0].url
+                        ? trackLink.album.images[1].url
                         : trackLinks
                         ? trackLinks[0].img
                         : '',

@@ -43,7 +43,6 @@
     <span>Album</span>
     <h1 title={album.name}>{album.name}</h1>
     <div class="albumInfo">
-      <!-- <img src={album.artists[0].} alt=""> -->
       <span>{album.songCount} songs &middot;</span>
       <span class="duration"
         >{getTrackDuration(album.songs).minutes}

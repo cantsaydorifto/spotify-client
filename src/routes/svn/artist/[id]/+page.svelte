@@ -46,7 +46,9 @@
   </div>
   <h2>Popular</h2>
   <TrackDetails svn noRowHeader {tracks} {trackLinks} />
-  <CatergorySection saavnHomepageData={{ albums, charts: [], playlists: [] }} />
+  <CatergorySection
+    saavnHomepageData={{ albums, charts: [], playlists: [], trendingAlbums: [], trendingSongs: [] }}
+  />
 </div>
 
 <style>
