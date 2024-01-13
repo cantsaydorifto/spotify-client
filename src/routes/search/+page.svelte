@@ -10,6 +10,7 @@
     items: (AlbumObjectSimplified | PlaylistObjectSimplified)[];
   }[] = [];
 
+  let loading = false;
   let artistSearchResults: ArtistObjectFull[] = [];
   let trackSearchResults: TrackObjectFull[] = [];
 
@@ -24,11 +25,13 @@
   }
 
   const handleInputChange = debounce(async (value) => {
+    loading = true;
     try {
       if (value === '') {
         sections = [];
         artistSearchResults = [];
         trackSearchResults = [];
+        loading = false;
         return;
       }
       // console.log(`/api/spotify/search?market=US&q=${encodeURIComponent(value)}`);
@@ -36,6 +39,10 @@
       const res = await fetch(
         `/api/spotify/search?market=US&q=${encodeURIComponent(value)}&type=${searhType.join(',')}`
       );
+      if (!res.ok) {
+        loading = false;
+        return;
+      }
       const resJson = (await res.json()) as SearchResponse;
       sections = [
         {
@@ -52,6 +59,7 @@
       artistSearchResults = [...(resJson.artists ? resJson.artists.items : [])];
       trackSearchResults = [...(resJson.tracks ? resJson.tracks.items : [])];
       // console.log(sections);
+      loading = false;
     } catch (err) {
       console.log(err);
     }
@@ -64,13 +72,17 @@
   <input type="text" on:input={(ev) => handleInputChange(ev.target.value)} />
 </div>
 
-<CatergorySection
-  artistSearchResults={{ title: 'Artists', items: artistSearchResults }}
-  {trackSearchResults}
-/>
-{#each sections as section}
-  <CatergorySection {section} />
-{/each}
+{#if !loading}
+  <CatergorySection
+    artistSearchResults={{ title: 'Artists', items: artistSearchResults }}
+    {trackSearchResults}
+  />
+  {#each sections as section}
+    <CatergorySection {section} />
+  {/each}
+{:else}
+  <h2 class="loading">Loading...</h2>
+{/if}
 
 <style>
   input {
@@ -91,5 +103,8 @@
     position: absolute;
     top: calc(50% - 10px);
     left: 8px;
+  }
+  .loading {
+    color: var(--medium-gray);
   }
 </style>
