@@ -26,6 +26,8 @@
     albums: SaavnHomepageALbumData[];
     trendingSongs: SaavnSong[];
     trendingAlbums: SaavnHomepageALbumData[];
+    artistSearchResults?: SaavnSearchArtists[];
+    searchResults?: boolean;
   } | null = null;
 
   async function playSong(track: TrackObjectFull) {
@@ -187,10 +189,77 @@
   </section>
 {/if}
 {#if !!saavnHomepageData}
+  {#if saavnHomepageData.trendingSongs.length > 0}
+    <section>
+      <div class="info">
+        <h2>{!saavnHomepageData.searchResults ? 'Trending Tracks' : 'Tracks'}</h2>
+      </div>
+      <div class="grid-container">
+        <Frame>
+          {#each saavnHomepageData.trendingSongs as playlist}
+            <a href={`/svn/song/${playlist.id}`} class="playlistContainer">
+              <div class="playlist">
+                {#if playlist.image.length > 1}
+                  <div class="playlistImg">
+                    <img src={playlist.image[1].link} alt={playlist.name} />
+                  </div>
+                {:else if playlist.image.length > 0}
+                  <div class="playlistImg">
+                    <img src={playlist.image[playlist.image.length - 1].link} alt="" />
+                  </div>
+                {:else}
+                  <div class="no-image-container">
+                    <MusicIcon width="100" height="100" />
+                  </div>
+                {/if}
+                <div class="playlistInfo">
+                  <p title={playlist.name}>{playlist.name}</p>
+                  <a href={`/svn/song/${playlist.id}`}>{playlist.primaryArtists}</a>
+                </div>
+              </div>
+            </a>
+          {/each}
+        </Frame>
+      </div>
+    </section>
+  {/if}
+  {#if saavnHomepageData.artistSearchResults && saavnHomepageData.artistSearchResults.length > 0}
+    <section>
+      <div class="info">
+        <h2>Artists</h2>
+      </div>
+      <div class="grid-container">
+        <Frame>
+          {#each saavnHomepageData.artistSearchResults as artist}
+            <a href={`/svn/artist/${artist.id}`} class="playlistContainer">
+              <div class="playlist">
+                {#if artist.image.length > 1}
+                  <div class="playlistImg artistImg">
+                    <img src={artist.image[1].link} alt="" />
+                  </div>
+                {:else if artist.image.length > 0}
+                  <div class="playlistImg artistImg">
+                    <img src={artist.image[artist.image.length - 1].link} alt="" />
+                  </div>
+                {:else}
+                  <div class="no-image-container">
+                    <MusicIcon width="100" height="100" />
+                  </div>
+                {/if}
+                <div class="playlistInfo">
+                  <p title={artist.title}>{artist.title}</p>
+                </div>
+              </div>
+            </a>
+          {/each}
+        </Frame>
+      </div>
+    </section>
+  {/if}
   {#if saavnHomepageData.albums.length > 0}
     <section>
       <div class="info">
-        <h2>New Releases</h2>
+        <h2>{!saavnHomepageData.searchResults ? 'New Releases' : 'Albums'}</h2>
       </div>
       <div class="grid-container">
         <Frame>
@@ -216,11 +285,7 @@
                 <div class="playlistInfo">
                   <p title={album.name}>{album.name}</p>
                   <a
-                    href="/svn/artist/{album.primaryArtists.length > 0
-                      ? album.primaryArtists[0].id
-                      : album.artists.length > 0
-                      ? album.artists[0].id
-                      : ''}"
+                    href="/svn/album/{album.id}"
                     title={album.primaryArtists.length > 0
                       ? album.primaryArtists[0].name
                       : album.artists.length > 0
@@ -298,40 +363,6 @@
                 {/if}
                 <div class="playlistInfo">
                   <p title={playlist.title}>{playlist.title}</p>
-                </div>
-              </div>
-            </a>
-          {/each}
-        </Frame>
-      </div>
-    </section>
-  {/if}
-  {#if saavnHomepageData.trendingSongs.length > 0}
-    <section>
-      <div class="info">
-        <h2>Trending Songs</h2>
-      </div>
-      <div class="grid-container">
-        <Frame>
-          {#each saavnHomepageData.trendingSongs as playlist}
-            <a href={`/svn/song/${playlist.id}`} class="playlistContainer">
-              <div class="playlist">
-                {#if playlist.image.length > 1}
-                  <div class="playlistImg">
-                    <img src={playlist.image[1].link} alt={playlist.name} />
-                  </div>
-                {:else if playlist.image.length > 0}
-                  <div class="playlistImg">
-                    <img src={playlist.image[playlist.image.length - 1].link} alt="" />
-                  </div>
-                {:else}
-                  <div class="no-image-container">
-                    <MusicIcon width="100" height="100" />
-                  </div>
-                {/if}
-                <div class="playlistInfo">
-                  <p title={playlist.name}>{playlist.name}</p>
-                  <a href={`/svn/artist/${playlist.primaryArtistsId}`}>{playlist.primaryArtists}</a>
                 </div>
               </div>
             </a>

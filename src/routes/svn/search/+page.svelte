@@ -5,7 +5,7 @@
   type DebounceFunction = (...p: any[]) => any;
 
   let artistSearchResults: SaavnSearchArtists[] = [];
-  let trackSearchResults: SaavnSong[] = [];
+  let trackSearchResults: SaavnSearchSong[] = [];
   let playlistSeachResults: SaavnSearchPlaylists[] = [];
   let albumSearchResults: SaavnSearchAlbum[] = [];
 
@@ -40,6 +40,8 @@
       const resJson = (await res.json()) as SaavnApiSearchAllResponse;
       playlistSeachResults = resJson.data.playlists.results;
       albumSearchResults = resJson.data.albums.results;
+      artistSearchResults = resJson.data.artists.results;
+      trackSearchResults = resJson.data.songs.results;
       console.log(resJson);
       loading = false;
     } catch (err) {
@@ -60,6 +62,7 @@
   {:else}
     <CatergorySection
       saavnHomepageData={{
+        searchResults: true,
         playlists: playlistSeachResults.map((el) => ({
           ...el,
           userId: el.id,
@@ -87,7 +90,37 @@
         })),
         charts: [],
         trendingAlbums: [],
-        trendingSongs: []
+        artistSearchResults,
+        trendingSongs: trackSearchResults.map((el) => ({
+          ...el,
+          name: el.title,
+          year: '',
+          releaseDate: '',
+          duration: 0,
+          label: '',
+          primaryArtistsId: '',
+          primaryArtists: el.primaryArtists,
+          featuredArtists: el.singers,
+          featuredArtistsId: '',
+          explicitContent: 0,
+          playCount: '',
+          language: el.language,
+          hasLyrics: '',
+          url: el.url,
+          downloadUrl: [
+            {
+              quality: '',
+              link: ''
+            }
+          ],
+          copyright: '',
+          image: el.image,
+          album: {
+            id: el.id,
+            name: el.album,
+            url: el.url
+          }
+        }))
       }}
     />
   {/if}
