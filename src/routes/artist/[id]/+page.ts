@@ -4,26 +4,50 @@ import interceptFetch from '$lib/interceptor/interceptFetch';
 
 export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, params }) => {
   const fetch = (path: string) => interceptFetch(fetchWithNoInterceptor, path);
-  const res = await fetch('/api/spotify/artists/' + params.id);
-  const resTracks = await fetch('/api/spotify/artists/' + params.id + '/top-tracks?market=US');
-  const resAlbums = await fetch('/api/spotify/artists/' + params.id + '/albums?limit=50');
-  const resRelatedArtists = await fetch('/api/spotify/artists/' + params.id + '/related-artists');
-  if (!res.ok) throw error(res.status, 'Artist not found');
-  if (!resTracks.ok) throw error(resTracks.status, 'Artist Tracks not found');
-  if (!resAlbums.ok) throw error(resAlbums.status, 'Artist Albums not found');
-  if (!resRelatedArtists.ok) throw error(resRelatedArtists.status, 'Related Artists not found');
-  const artist = (await res.json()) as SingleArtistResponse;
-  const artistTracks = (await resTracks.json()) as ArtistsTopTracksResponse;
-  const artistAlbumsRes = (await resAlbums.json()) as ArtistsAlbumsResponse;
-  const relatedArtists = (await resRelatedArtists.json()) as ArtistsRelatedArtistsResponse;
+  const [artistRes, tracksRes, albumsRes, relatedArtistsRes] = await Promise.all([
+    fetch('/api/spotify/artists/' + params.id),
+    fetch('/api/spotify/artists/' + params.id + '/top-tracks?market=US'),
+    fetch('/api/spotify/artists/' + params.id + '/albums?limit=50'),
+    fetch('/api/spotify/artists/' + params.id + '/related-artists')
+  ]);
+
+  if (!artistRes.ok) throw error(artistRes.status, 'Artist not found');
+  if (!tracksRes.ok) throw error(tracksRes.status, 'Artist Tracks not found');
+  if (!albumsRes.ok) throw error(albumsRes.status, 'Artist Albums not found');
+  if (!relatedArtistsRes.ok) throw error(relatedArtistsRes.status, 'Related Artists not found');
+
+  const [artist, artistTracks, artistAlbumsRes, relatedArtists] = (await Promise.all([
+    artistRes.json(),
+    tracksRes.json(),
+    albumsRes.json(),
+    relatedArtistsRes.json()
+  ])) as [
+    SingleArtistResponse,
+    ArtistsTopTracksResponse,
+    ArtistsAlbumsResponse,
+    ArtistsRelatedArtistsResponse
+  ];
+
   let color: string | null = null;
-  if (artist.images.length > 0) {
-    const colorRes = await fetch('/api/color?image=' + artist.images[0].url);
-    if (colorRes.ok) {
-      const { dominantColor } = (await colorRes.json()) as { dominantColor: string };
-      color = dominantColor;
-    }
+  const [artistPlaylistsRes, colorRes] = await Promise.all([
+    fetch(`/api/spotify/search?market=US&q=${encodeURIComponent(artist.name)}&type=playlist`),
+    artist.images.length > 0
+      ? fetch('/api/color?image=' + artist.images[0].url)
+      : Promise.resolve(null)
+  ]);
+
+  if (!artistPlaylistsRes.ok)
+    throw error(artistPlaylistsRes.status, 'Could Not Search Artist Playlist');
+
+  const [{ playlists: artistPlaylists }, colorData] = await Promise.all([
+    artistPlaylistsRes.json() as SearchResponse,
+    colorRes ? (colorRes.json() as Promise<{ dominantColor: string }>) : Promise.resolve(null)
+  ]);
+
+  if (colorData && colorRes && colorRes.ok) {
+    color = colorData.dominantColor;
   }
+
   const artistAlbums = artistAlbumsRes.items.filter((album) => album.album_group === 'album');
   const artistSingles = artistAlbumsRes.items.filter((album) => album.album_group === 'single');
   const artistAppearsOn = artistAlbumsRes.items.filter(
@@ -35,6 +59,7 @@ export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, params }) 
     artistAlbums,
     artistAppearsOn,
     artistSingles,
+    artistPlaylists: artistPlaylists ? artistPlaylists.items : [],
     relatedArtists: relatedArtists.artists,
     color
   };

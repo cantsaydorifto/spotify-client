@@ -3,6 +3,7 @@
   import ThreeHorizontalDots from '$lib/components/icons/ThreeHorizontalDots.svelte';
   import TrackDetails from '$lib/components/TrackDetails.svelte';
   import PlayBtn from '$lib/components/PlayBtn.svelte';
+  import { currentSong } from '$lib/components/store/currentPlaying';
 
   function getTrackDuration(items: PlaylistTrackObject[]) {
     let duration = 0;
@@ -21,7 +22,14 @@
   $: playlist = data.playlist;
   $: color = data.color;
   $: tracks = data.playlist.tracks.items.map((item) => item.track!);
+  $: pageTitle = $currentSong.trackLink
+    ? $currentSong.trackLink.name
+    : `${playlist.name} - Playlist by ${playlist.owner.display_name}`;
 </script>
+
+<svelte:head>
+  <title>{pageTitle}</title>
+</svelte:head>
 
 <div class="container">
   <div

@@ -1,6 +1,7 @@
 <script lang="ts">
   import CatergorySection from '$lib/components/CatergorySection.svelte';
   import Search from '$lib/components/icons/Search.svelte';
+  import { currentSong } from '$lib/components/store/currentPlaying';
 
   type DebounceFunction = (...p: any[]) => any;
 
@@ -64,7 +65,12 @@
       console.log(err);
     }
   }, 300);
+  $: pageTitle = $currentSong.trackLink ? $currentSong.trackLink.name : 'Search';
 </script>
+
+<svelte:head>
+  <title>{pageTitle}</title>
+</svelte:head>
 
 <h1>Search</h1>
 <div class="searchContainer">

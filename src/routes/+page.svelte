@@ -2,6 +2,8 @@
   import LogoutButton from '$lib/components/LogoutButton.svelte';
   import Button from '$lib/components/Button.svelte';
   import CatergorySection from '$lib/components/CatergorySection.svelte';
+  import { currentSong } from '$lib/components/store/currentPlaying';
+
   export let data;
   const sections: {
     title: string;
@@ -39,7 +41,12 @@
     });
   }
   // console.log(data.randomCategories);
+  $: pageTitle = $currentSong.trackLink ? $currentSong.trackLink.name : 'Home';
 </script>
+
+<svelte:head>
+  <title>{pageTitle}</title>
+</svelte:head>
 
 <h1>Welcome to SvelteKit</h1>
 <h4>{data.user ? data.user.display_name : 'Not signed in'}</h4>

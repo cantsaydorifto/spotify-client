@@ -1,6 +1,7 @@
 <script lang="ts">
   import Clock3 from './icons/Clock3.svelte';
   import Play from './icons/Play.svelte';
+  import greenEqualiser from '../../assets/equaliser-animated-green.gif';
   import {
     addFetchedSongsToQueue,
     clearQueue,
@@ -62,7 +63,59 @@
         class:playing={$currentSong.trackLink ? $currentSong.trackLink.id === track.id : false}
       >
         <div class="number-column">
-          <span class="number">{idx + 1}</span>
+          {#if $currentSong.trackLink && $currentSong.trackLink.id === track.id}
+            <img width="15" height="15" src={greenEqualiser} alt="equaliser" />
+          {:else}
+            <span class="number">{idx + 1}</span>
+            <button
+              on:click={async () => {
+                clearQueue();
+                if (!trackLinks && track.album && !track.link) {
+                  const tracksToQueue = tracks
+                    ? tracks.slice(idx).map((el) => ({
+                        name: el.name,
+                        id: el.id,
+                        artist: { name: el.artists[0].name, id: el.artists[0].id },
+                        img: el.album ? el.album.images[0].url : '',
+                        link: '',
+                        album: {
+                          name: el.album ? el.album.name : '',
+                          totalTracks: el.album ? el.album.total_tracks : 0
+                        },
+                        trackNumber: el.track_number,
+                        preview_url: el.preview_url || '',
+                        needsFetch: true
+                      }))
+                    : null;
+                  addFetchedSongsToQueue(tracksToQueue);
+                  playSong();
+                  return;
+                }
+                const tracksToQueue = trackLinks
+                  ? tracks.slice(idx).map((trackLink) => ({
+                      name: trackLink.name,
+                      id: trackLink.id,
+                      artist: { name: trackLink.artists[0].name, id: trackLink.artists[0].id },
+                      img:
+                        svn && trackLink.album
+                          ? trackLink.album.images[1].url
+                          : trackLinks
+                          ? trackLinks[0].img
+                          : '',
+                      link: trackLink.link || '',
+                      album: {
+                        name: track.album ? track.album.name : '',
+                        totalTracks: track.album ? track.album.total_tracks : 0
+                      },
+                      trackNumber: track.track_number,
+                      preview_url: track.preview_url || ''
+                    }))
+                  : null;
+                addFetchedSongsToQueue(tracksToQueue);
+                playSong();
+              }}><Play width="20px" height="20px" stroke="white" /></button
+            >
+          {/if}
         </div>
         <div class="trackInfoContainer">
           {#if track.album && track.album.images.length > 0}
@@ -70,7 +123,14 @@
           {/if}
           <div class="info-column">
             <div class="track-title">
-              <h4 title={track.name}>{track.name}</h4>
+              <h4
+                style:color={$currentSong.trackLink && $currentSong.trackLink.id === track.id
+                  ? 'var(--accent-color)'
+                  : 'white'}
+                title={track.name}
+              >
+                {track.name}
+              </h4>
               {#if track.explicit}
                 <span class="explicit">E</span>
               {/if}
@@ -171,12 +231,22 @@
   }
 
   .number-column {
-    width: 30px;
+    width: 55px;
     display: flex;
-    justify-content: flex-end;
-    margin-right: 25px;
+    justify-content: center;
   }
-
+  .row:not(.header):hover .number {
+    display: none;
+  }
+  .number-column > button {
+    display: none;
+    border: none;
+    background: none;
+    cursor: pointer;
+  }
+  .row:not(.header):hover > .number-column > button {
+    display: block;
+  }
   .number {
     color: var(--light-gray);
     font-size: 0.875rem;

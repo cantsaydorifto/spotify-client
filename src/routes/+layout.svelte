@@ -13,6 +13,7 @@
   import NProgress from 'nprogress';
   import './nprogress.css';
   import { afterNavigate, beforeNavigate } from '$app/navigation';
+  import { currentSong } from '$lib/components/store/currentPlaying';
 
   NProgress.configure({ showSpinner: false });
 
@@ -22,10 +23,13 @@
   beforeNavigate(() => {
     NProgress.start();
   });
+
+  $: curTrack = $currentSong.trackLink ? $currentSong.trackLink.name : '';
 </script>
 
 <svelte:head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{curTrack}</title>
 </svelte:head>
 
 <div class="main">

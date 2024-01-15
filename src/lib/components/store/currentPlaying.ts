@@ -8,6 +8,11 @@ export const currentSong = writable<{
   songQueue: []
 });
 
+export const getCurrentPlayingSong = () => {
+  const track = get(currentSong).trackLink;
+  return track ? track.name : null;
+};
+
 export const clearQueue = () => {
   currentSong.update((current) => {
     current.songQueue = [];

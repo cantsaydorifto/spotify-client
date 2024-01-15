@@ -4,6 +4,7 @@
   import PlayBtn from '$lib/components/PlayBtn.svelte';
   import Button from '$lib/components/Button.svelte';
   import CatergorySection from '$lib/components/CatergorySection.svelte';
+  import { currentSong } from '$lib/components/store/currentPlaying.js';
 
   function numberToCommaString(num: number) {
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -16,25 +17,33 @@
   $: albums = data.artistAlbums;
   $: singles = data.artistSingles;
   $: appearsOn = data.artistAppearsOn;
+  $: playlistSearches = data.artistPlaylists;
   $: relatedArtists = data.relatedArtists;
+  $: curTrack = $currentSong.trackLink ? $currentSong.trackLink.name : artist.name;
 </script>
 
-<div class="container">
-  <div
-    class="color-gradient"
-    style:background-image="linear-gradient(0deg,transparent,{color || 'var(--light-gray)'})"
-  />
-  <img src={artist.images.length > 0 ? artist.images[0].url : ''} alt="" />
-  <div class="details">
-    <span>{artist.type[0].toUpperCase() + artist.type.slice(1)}</span>
-    <h1>{artist.name}</h1>
-    <div class="albumInfo">
-      <!-- <img src={album.artists[0].} alt=""> -->
-      <!-- <a href={'/user/' + playlist.owner.display_name}>{playlist.owner.display_name}</a> -->
-      <span>{numberToCommaString(artist.followers.total)} followers</span>
+<svelte:head>
+  <title>{curTrack}</title>
+</svelte:head>
+
+{#key artist.id}
+  <div class="container">
+    <div
+      class="color-gradient"
+      style:background-image="linear-gradient(0deg,transparent,{color || 'var(--light-gray)'})"
+    />
+    <img src={artist.images.length > 0 ? artist.images[0].url : ''} alt="" />
+    <div class="details">
+      <span>{artist.type[0].toUpperCase() + artist.type.slice(1)}</span>
+      <h1>{artist.name}</h1>
+      <div class="albumInfo">
+        <!-- <img src={album.artists[0].} alt=""> -->
+        <!-- <a href={'/user/' + playlist.owner.display_name}>{playlist.owner.display_name}</a> -->
+        <span>{numberToCommaString(artist.followers.total)} followers</span>
+      </div>
     </div>
   </div>
-</div>
+{/key}
 
 <div class="content">
   <div class="play">
@@ -49,6 +58,9 @@
   <CatergorySection section={{ items: albums, title: 'Albums', path: '/album' }} />
   <CatergorySection section={{ items: singles, title: 'Singles', path: '/album' }} />
   <CatergorySection section={{ items: appearsOn, title: 'Appears On', path: '/album' }} />
+  <CatergorySection
+    section={{ items: playlistSearches, title: 'Playlist Searches', path: '/playlist' }}
+  />
   <CatergorySection artistSearchResults={{ title: 'Related Artists', items: relatedArtists }} />
 </div>
 
@@ -59,7 +71,16 @@
     margin: calc(-1 * var(--navbar-height)) -30px 0 -30px;
     padding: 80px 30px 30px 30px;
     display: flex;
+    animation: fadeIn 0.3s ease-in-out;
     gap: 50px;
+  }
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
   .container > img {
     width: 300px;
