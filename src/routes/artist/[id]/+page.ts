@@ -30,13 +30,24 @@ export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, params }) 
 
   let color: string | null = null;
   const artistTopSongIds = artistTracks.tracks.map((el) => el.id);
-  const [artistPlaylistsRes, colorRes, hasLikedRes] = await Promise.all([
+  const [artistPlaylistsRes, colorRes, hasLikedRes, recommendedObjectRes] = await Promise.all([
     fetch(`/api/spotify/search?market=US&q=${encodeURIComponent(artist.name)}&type=playlist`),
     artist.images.length > 0
       ? fetch('/api/color?image=' + artist.images[0].url)
       : Promise.resolve(null),
-    fetch(`/api/spotify/me/tracks/contains?ids=${artistTopSongIds.join(',')}`)
+    fetch(`/api/spotify/me/tracks/contains?ids=${artistTopSongIds.join(',')}`),
+    fetch(
+      `/api/spotify/recommendations?seed_artists=${artist.id}&seed_tracks=${artistTracks.tracks
+        .slice(0, 4)
+        .map((el) => el.id)
+        .join(',')}`
+    )
   ]);
+
+  let recommendedObject: RecommendationsObject = { seeds: [], tracks: [] };
+  if (recommendedObjectRes.ok) {
+    recommendedObject = (await recommendedObjectRes.json()) as RecommendationsObject;
+  }
 
   if (!hasLikedRes.ok) throw error(hasLikedRes.status, 'Could not find liked songs');
 
@@ -72,6 +83,21 @@ export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, params }) 
     artistPlaylists: artistPlaylists ? artistPlaylists.items : [],
     relatedArtists: relatedArtists.artists,
     color,
-    hasliked
+    hasliked,
+    recommendedTracks: convertRecommendedTracksToTrackObjectFull(recommendedObject)
   };
 };
+
+function convertRecommendedTracksToTrackObjectFull(
+  recommendationsObject: RecommendationsObject
+): TrackObjectFull[] {
+  return recommendationsObject.tracks.map((recommendationTrack) => {
+    return {
+      ...recommendationTrack,
+      album: {
+        ...recommendationTrack.album,
+        album_type: 'album'
+      }
+    };
+  });
+}

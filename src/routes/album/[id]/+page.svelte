@@ -26,6 +26,7 @@
     ? $currentSong.trackLink.name
     : `${album.name} - Album by ${album.artists[0].name}`;
   $: hasLiked = data.hasliked;
+  $: recommendations = data.recommendedTracks;
 </script>
 
 <svelte:head>
@@ -40,7 +41,7 @@
   <img src={album.images.length > 0 ? album.images[0].url : ''} alt="" />
   <div class="details">
     <span>{album.type[0].toUpperCase() + album.type.slice(1)}</span>
-    <h1 title={album.name}>{album.name}</h1>
+    <h1 title={album.name}>{@html album.name}</h1>
     <div class="albumInfo">
       <!-- <img src={album.artists[0].} alt=""> -->
       <a href={'/artist/' + album.artists[0].id}>{album.artists[0].name}</a>
@@ -65,6 +66,8 @@
       dateStyle: 'long'
     })}
   </p>
+  <h2>Recommendations Based On {album.name}</h2>
+  <TrackDetails noRowHeader tracks={recommendations || []} trackLinks={null} />
 </div>
 
 <style>
@@ -127,6 +130,11 @@
   }
   .duration,
   .content > p {
+    color: var(--light-gray);
+    font-size: 1rem;
+    margin: 20px 0 60px 0;
+  }
+  .content > h2 {
     color: var(--light-gray);
   }
   .content {

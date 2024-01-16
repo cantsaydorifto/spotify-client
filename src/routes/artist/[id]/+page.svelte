@@ -5,6 +5,7 @@
   import Button from '$lib/components/Button.svelte';
   import CatergorySection from '$lib/components/CatergorySection.svelte';
   import { currentSong } from '$lib/components/store/currentPlaying.js';
+  import Radio from '$lib/components/icons/Radio.svelte';
 
   function numberToCommaString(num: number) {
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -15,12 +16,14 @@
   $: color = data.color;
   $: tracks = data.artistTracks;
   $: hasLiked = data.hasliked;
+  $: recommendedTracks = data.recommendedTracks;
   $: albums = data.artistAlbums;
   $: singles = data.artistSingles;
   $: appearsOn = data.artistAppearsOn;
   $: playlistSearches = data.artistPlaylists;
   $: relatedArtists = data.relatedArtists;
   $: curTrack = $currentSong.trackLink ? $currentSong.trackLink.name : artist.name;
+  $: showRecommendations = false;
 </script>
 
 <svelte:head>
@@ -36,7 +39,7 @@
     <img src={artist.images.length > 0 ? artist.images[0].url : ''} alt="" />
     <div class="details">
       <span>{artist.type[0].toUpperCase() + artist.type.slice(1)}</span>
-      <h1>{artist.name}</h1>
+      <h1>{@html artist.name}</h1>
       <div class="albumInfo">
         <!-- <img src={album.artists[0].} alt=""> -->
         <!-- <a href={'/user/' + playlist.owner.display_name}>{playlist.owner.display_name}</a> -->
@@ -53,8 +56,28 @@
     <Button element="button" style="outline">Follow</Button>
     <button class="heart"><ThreeHorizontalDots /></button>
   </div>
-  <h2>Popular</h2>
-  <TrackDetails {hasLiked} noRowHeader {tracks} trackLinks={null} />
+  <div class="recommendationContainer">
+    {#key showRecommendations}
+      <h2>{!showRecommendations ? 'Popular' : 'Songs You Might Like'}</h2>
+    {/key}
+    <button
+      title="Recommendations"
+      on:click={() => {
+        showRecommendations = !showRecommendations;
+      }}
+    >
+      <Radio
+        width="40"
+        height="40"
+        stroke={showRecommendations ? 'var(--accent-color)' : 'var(--light-gray)'}
+      />
+    </button>
+  </div>
+  {#if !showRecommendations}
+    <TrackDetails {hasLiked} noRowHeader {tracks} trackLinks={null} />
+  {:else}
+    <TrackDetails noRowHeader tracks={recommendedTracks} trackLinks={null} />
+  {/if}
   <!-- <h2>Discography</h2> -->
   <CatergorySection section={{ items: albums, title: 'Albums', path: '/album' }} />
   <CatergorySection section={{ items: singles, title: 'Singles', path: '/album' }} />
@@ -120,6 +143,15 @@
   h2 {
     font-size: 1.5rem;
     padding-left: 20px;
+    animation: fadeIn 0.5s ease-in-out;
+  }
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
   .albumInfo {
     font-size: 0.875rem;
@@ -147,6 +179,27 @@
   }
   .heart:hover {
     transform: scale(1.05);
+  }
+  .recommendationContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .recommendationContainer > button {
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  .recommendationContainer :global(svg) {
+    transition: stroke 0.5s;
+  }
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
   @media only screen and (max-width: 800px) {
     .container {

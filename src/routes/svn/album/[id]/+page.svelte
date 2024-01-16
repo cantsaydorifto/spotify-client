@@ -45,12 +45,12 @@
   <img src={album.image.length > 0 ? album.image[album.image.length - 1].link : ''} alt="" />
   <div class="details">
     <span>Album</span>
-    <h1 title={album.name}>{album.name}</h1>
+    <h1 title={album.name}>{@html album.name}</h1>
     <div class="albumInfo">
       <!-- <img src={album.artists[0].} alt=""> -->
       <!-- <a href={'/svn/artis t/' + album.primaryArtistsId}>{album.primaryArtists}</a> -->
       {#each commaSeparatedArtists as artist, artistIndex}
-        <a href={`/svn/artist/${artist.id}`}>{artist.name}</a
+        <a href={`/svn/artist/${artist.id}`}>{@html artist.name}</a
         >{#if artistIndex < commaSeparatedArtists.length - 1}{', '}{/if}
       {/each}
       <span>&middot; {new Date(album.releaseDate).getFullYear()}</span>

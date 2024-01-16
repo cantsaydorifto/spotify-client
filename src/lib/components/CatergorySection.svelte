@@ -95,10 +95,10 @@
                   </div>
                 {/if}
                 <div class="playlistInfo">
-                  <p title={playlist.name}>{playlist.name}</p>
+                  <p title={playlist.name}>{@html playlist.name}</p>
                   {#if playlist.type === 'album' && playlist.artists}
                     <span title={playlist.artists.map((el) => el.name).join(', ')}
-                      >{playlist.artists.map((el) => el.name).join(', ')}</span
+                      >{@html playlist.artists.map((el) => el.name).join(', ')}</span
                     >
                   {:else if playlist.type === 'playlist' && playlist.description}
                     <span title={playlist.description}>{playlist.description}</span>
@@ -137,7 +137,7 @@
                 </div>
               {/if}
               <div class="playlistInfo">
-                <p title={artist.name}>{artist.name}</p>
+                <p title={artist.name}>{@html artist.name}</p>
               </div>
             </div>
           </a>
@@ -176,9 +176,11 @@
                 </div>
               {/if}
               <div class="playlistInfo">
-                <a href={`/album/${track.album.uri.slice(14)}`} title={track.name}>{track.name}</a>
+                <a href={`/album/${track.album.uri.slice(14)}`} title={track.name}
+                  >{@html track.name}</a
+                >
                 <a href={`/artist/${track.artists[0].id}`} title={track.artists[0].name}
-                  >{track.artists[0].name}</a
+                  >{@html track.artists[0].name}</a
                 >
               </div>
             </div>
@@ -213,8 +215,8 @@
                   </div>
                 {/if}
                 <div class="playlistInfo">
-                  <p title={playlist.name}>{playlist.name}</p>
-                  <a href={`/svn/song/${playlist.id}`}>{playlist.primaryArtists}</a>
+                  <p title={playlist.name}>{@html playlist.name}</p>
+                  <a href={`/svn/song/${playlist.id}`}>{@html playlist.primaryArtists}</a>
                 </div>
               </div>
             </a>
@@ -247,7 +249,7 @@
                   </div>
                 {/if}
                 <div class="playlistInfo">
-                  <p title={artist.title}>{artist.title}</p>
+                  <p title={artist.title}>{@html artist.title}</p>
                 </div>
               </div>
             </a>
@@ -283,7 +285,7 @@
                   </div>
                 {/if}
                 <div class="playlistInfo">
-                  <p title={album.name}>{album.name}</p>
+                  <p title={album.name}>{@html album.name}</p>
                   <a
                     href="/svn/album/{album.id}"
                     title={album.primaryArtists.length > 0
@@ -291,7 +293,7 @@
                       : album.artists.length > 0
                       ? album.artists[0].name
                       : ''}
-                    >{album.primaryArtists.length > 0
+                    >{@html album.primaryArtists.length > 0
                       ? album.primaryArtists[0].name
                       : album.artists.length > 0
                       ? album.artists[0].name
@@ -329,7 +331,7 @@
                   </div>
                 {/if}
                 <div class="playlistInfo">
-                  <p title={playlist.title}>{playlist.title}</p>
+                  <p title={playlist.title}>{@html playlist.title}</p>
                 </div>
               </div>
             </a>
@@ -362,7 +364,7 @@
                   </div>
                 {/if}
                 <div class="playlistInfo">
-                  <p title={playlist.title}>{playlist.title}</p>
+                  <p title={playlist.title}>{@html playlist.title}</p>
                 </div>
               </div>
             </a>
@@ -395,7 +397,7 @@
                   </div>
                 {/if}
                 <div class="playlistInfo">
-                  <p title={playlist.name}>{playlist.name}</p>
+                  <p title={playlist.name}>{@html playlist.name}</p>
                   <a
                     href={`/svn/artist/${
                       playlist.primaryArtists.length > 0
@@ -404,7 +406,7 @@
                         ? playlist.artists[0].id
                         : ''
                     }`}
-                    >{playlist.primaryArtists.length > 0
+                    >{@html playlist.primaryArtists.length > 0
                       ? playlist.primaryArtists[0].name
                       : playlist.artists.length > 0
                       ? playlist.artists[0].name

@@ -71,13 +71,13 @@
   <img src={playlist.images.length > 0 ? playlist.images[0].url : ''} alt="" />
   <div class="details">
     <span>{playlist.type[0].toUpperCase() + playlist.type.slice(1)}</span>
-    <h1>{playlist.name}</h1>
+    <h1 title={playlist.name}>{@html playlist.name}</h1>
     <div class="albumInfo">
       <!-- {#if playlist.owner.images && playlist.owner.images.length > 0}
         <img src={playlist.owner.images[0].url} alt="" />
       {/if} -->
-      <p class="description">{playlist.description}</p>
-      <a href={'/user/' + playlist.owner.display_name}>{playlist.owner.display_name}</a>
+      <p title={playlist.description} class="description">{@html playlist.description}</p>
+      <a href={'/user/' + playlist.owner.display_name}>{@html playlist.owner.display_name}</a>
       <span>&middot; {playlist.tracks.total} songs &middot;</span>
       <span class="duration"
         >{getTrackDuration(playlist.tracks.items).minutes}

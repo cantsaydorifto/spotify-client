@@ -9,10 +9,10 @@
       <div class="current-song">
         <img src={$currentSong.trackLink.img} alt="" />
         <div class="song-details">
-          <span title={$currentSong.trackLink.name}>{$currentSong.trackLink.name}</span>
+          <span title={$currentSong.trackLink.name}>{@html $currentSong.trackLink.name}</span>
           <span
             ><a href={`/artist/${$currentSong.trackLink.artist.id}`}
-              >{$currentSong.trackLink.artist.name}</a
+              >{@html $currentSong.trackLink.artist.name}</a
             ></span
           >
         </div>

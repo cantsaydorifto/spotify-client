@@ -15,7 +15,7 @@ export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, params }) 
 
   let color: string | null = null;
   const albumSongIds = album.tracks.items.map((el) => el.id);
-  const [colorRes, res2, hasLikedRes] = await Promise.all([
+  const [colorRes, res2, hasLikedRes, recommendedObjectRes] = await Promise.all([
     album.images.length > 0
       ? fetch('/api/color?image=' + album.images[0].url)
       : Promise.resolve(null),
@@ -25,15 +25,26 @@ export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, params }) 
           album.total_tracks
         }`
     ),
-    fetch(`/api/spotify/me/tracks/contains?ids=${albumSongIds.join(',')}`)
+    fetch(`/api/spotify/me/tracks/contains?ids=${albumSongIds.join(',')}`),
+    fetch(
+      `/api/spotify/recommendations?seed_artists=${
+        album.artists[0].id
+      }&seed_tracks=${album.tracks.items
+        .slice(0, 4)
+        .map((el) => el.id)
+        .join(',')}`
+    )
   ]);
 
   const [colorData, res2Json, hasliked] = await Promise.all([
     colorRes ? (colorRes.json() as Promise<{ dominantColor: string }>) : Promise.resolve(null),
     res2.ok ? (res2.json() as Promise<{ album: SaavnApiAlbumResponse }>) : Promise.resolve(null),
-    hasLikedRes.json() as Promise<boolean[]>
+    hasLikedRes.ok ? (hasLikedRes.json() as Promise<boolean[]>) : Promise.resolve([])
   ]);
-
+  let recommendedObject: RecommendationsObject = { seeds: [], tracks: [] };
+  if (recommendedObjectRes.ok) {
+    recommendedObject = (await recommendedObjectRes.json()) as RecommendationsObject;
+  }
   if (hasliked.length !== album.tracks.items.length)
     throw error(500, 'Album Songs and Liked Songs Length Dont match');
 
@@ -54,6 +65,21 @@ export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, params }) 
     album,
     color,
     tracks: saavnAlbumTracks,
-    hasliked
+    hasliked,
+    recommendedTracks: convertRecommendedTracksToTrackObjectFull(recommendedObject)
   };
 };
+
+function convertRecommendedTracksToTrackObjectFull(
+  recommendationsObject: RecommendationsObject
+): TrackObjectFull[] {
+  return recommendationsObject.tracks.map((recommendationTrack) => {
+    return {
+      ...recommendationTrack,
+      album: {
+        ...recommendationTrack.album,
+        album_type: 'album'
+      }
+    };
+  });
+}

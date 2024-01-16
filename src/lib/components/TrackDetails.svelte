@@ -135,7 +135,7 @@
                   : 'white'}
                 title={track.name}
               >
-                {track.name}
+                {@html track.name}
               </h4>
               {#if track.explicit}
                 <span class="explicit">E</span>
@@ -143,7 +143,7 @@
             </div>
             <p class="artists">
               {#each track.artists as artist, artistIndex}
-                <a href={`/${svn ? 'svn/' : ''}artist/${artist.id}`}>{artist.name}</a
+                <a href={`/${svn ? 'svn/' : ''}artist/${artist.id}`}>{@html artist.name}</a
                 >{#if artistIndex < track.artists.length - 1}{', '}{/if}
               {/each}
             </p>
@@ -186,6 +186,17 @@
 </div>
 
 <style>
+  .tracks {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
   .row {
     display: flex;
     align-items: center;
