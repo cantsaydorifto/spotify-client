@@ -24,6 +24,7 @@
   $: relatedArtists = data.relatedArtists;
   $: curTrack = $currentSong.trackLink ? $currentSong.trackLink.name : artist.name;
   $: showRecommendations = false;
+  $: hasLikedRecommendations = data.hasLikedRecommendations;
 </script>
 
 <svelte:head>
@@ -75,7 +76,12 @@
   {#if !showRecommendations}
     <TrackDetails {hasLiked} noRowHeader {tracks} trackLinks={null} />
   {:else}
-    <TrackDetails noRowHeader tracks={recommendedTracks} trackLinks={null} />
+    <TrackDetails
+      hasLiked={hasLikedRecommendations}
+      noRowHeader
+      tracks={recommendedTracks}
+      trackLinks={null}
+    />
   {/if}
   <!-- <h2>Discography</h2> -->
   <CatergorySection section={{ items: albums, title: 'Albums', path: '/album' }} />

@@ -51,14 +51,20 @@ export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, params }) 
 
   if (!hasLikedRes.ok) throw error(hasLikedRes.status, 'Could not find liked songs');
 
+  const hasLikedRecommendationsRes = await fetch(
+    `/api/spotify/me/tracks/contains?ids=${recommendedObject.tracks.map((el) => el.id).join(',')}`
+  );
+
   if (!artistPlaylistsRes.ok)
     throw error(artistPlaylistsRes.status, 'Could Not Search Artist Playlist');
 
-  const [{ playlists: artistPlaylists }, colorData, hasliked] = await Promise.all([
-    artistPlaylistsRes.json() as SearchResponse,
-    colorRes ? (colorRes.json() as Promise<{ dominantColor: string }>) : Promise.resolve(null),
-    hasLikedRes.json() as Promise<boolean[]>
-  ]);
+  const [{ playlists: artistPlaylists }, colorData, hasliked, hasLikedRecommendations] =
+    await Promise.all([
+      artistPlaylistsRes.json() as SearchResponse,
+      colorRes ? (colorRes.json() as Promise<{ dominantColor: string }>) : Promise.resolve(null),
+      hasLikedRes.json() as Promise<boolean[]>,
+      hasLikedRecommendationsRes.json() as Promise<boolean[]>
+    ]);
 
   if (hasliked.length !== artistTracks.tracks.length)
     throw error(500, 'Artist Songs and Liked Songs Length Dont match');
@@ -84,6 +90,7 @@ export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, params }) 
     relatedArtists: relatedArtists.artists,
     color,
     hasliked,
+    hasLikedRecommendations,
     recommendedTracks: convertRecommendedTracksToTrackObjectFull(recommendedObject)
   };
 };
