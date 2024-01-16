@@ -390,6 +390,7 @@ declare global {
     };
     tracks: PagingObject<PlaylistTrackObject>;
   }
+  interface PlaylistTrackResponse extends PagingObject<PlaylistTrackObject> {}
   interface PlaylistTrackObject {
     added_at: string;
     added_by: UserObjectPublic;

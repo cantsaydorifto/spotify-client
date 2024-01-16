@@ -3,7 +3,7 @@ import { BASE_URL, CLIENT_ID } from '$env/static/private';
 import { createChallengeAndVerifier } from './codeVerifier';
 
 const scope =
-  'playlist-read-private playlist-read-collaborative user-top-read user-library-read user-read-email';
+  'playlist-read-private playlist-read-collaborative user-top-read user-library-read user-read-email user-library-modify';
 
 export async function GET({ cookies }) {
   const { codeChallenge, codeVerifier } = createChallengeAndVerifier();
