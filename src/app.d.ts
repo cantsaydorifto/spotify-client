@@ -228,7 +228,11 @@ declare global {
      */
     album_type: 'ALBUM' | 'SINGLE' | 'COMPILATION';
   }
-
+  interface UsersSavedTracksResponse extends PagingObject<SavedTrackObject> {}
+  interface SavedTrackObject {
+    added_at: string;
+    track: TrackObjectFull;
+  }
   interface SaavnApiAlbumResponse {
     status: string;
     message: string | null;
