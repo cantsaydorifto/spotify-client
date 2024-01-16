@@ -54,13 +54,8 @@
     <PlayBtn innerSize={25} />
     <!-- <button class="heart"><Heart width="36px" height="36px" /></button> -->
     <Button element="button" style="outline">Follow</Button>
-    <button class="heart"><ThreeHorizontalDots /></button>
-  </div>
-  <div class="recommendationContainer">
-    {#key showRecommendations}
-      <h2>{!showRecommendations ? 'Popular' : 'Songs You Might Like'}</h2>
-    {/key}
     <button
+      class="recommendationBtn"
       title="Recommendations"
       on:click={() => {
         showRecommendations = !showRecommendations;
@@ -72,7 +67,11 @@
         stroke={showRecommendations ? 'var(--accent-color)' : 'var(--light-gray)'}
       />
     </button>
+    <button class="heart"><ThreeHorizontalDots /></button>
   </div>
+  {#key showRecommendations}
+    <h2>{!showRecommendations ? 'Popular' : 'Songs You Might Like'}</h2>
+  {/key}
   {#if !showRecommendations}
     <TrackDetails {hasLiked} noRowHeader {tracks} trackLinks={null} />
   {:else}
@@ -180,17 +179,12 @@
   .heart:hover {
     transform: scale(1.05);
   }
-  .recommendationContainer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .recommendationContainer > button {
+  .recommendationBtn {
     background: none;
     border: none;
     cursor: pointer;
   }
-  .recommendationContainer :global(svg) {
+  .recommendationBtn :global(svg) {
     transition: stroke 0.5s;
   }
   @keyframes fadeIn {
