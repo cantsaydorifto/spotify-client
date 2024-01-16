@@ -94,9 +94,11 @@
     <button class="heart"><ThreeHorizontalDots /></button>
   </div>
   <TrackDetails {hasLiked} {tracks} trackLinks={null} />
-  <div class="showMoreBtn">
-    <button on:click={() => loadMoreTracks()}>Show More</button>
-  </div>
+  {#if pagination.hasMoreTracks}
+    <div class="showMoreBtn">
+      <button on:click={() => loadMoreTracks()}>Show More</button>
+    </div>
+  {/if}
 </div>
 
 <style>
