@@ -4,6 +4,7 @@
   import TrackDetails from '$lib/components/TrackDetails.svelte';
   import PlayBtn from '$lib/components/PlayBtn.svelte';
   import { currentSong } from '$lib/components/store/currentPlaying';
+  import { error } from '@sveltejs/kit';
 
   function getTrackDuration(items: PlaylistTrackObject[]) {
     let duration = 0;
@@ -21,10 +22,41 @@
   export let data;
   $: playlist = data.playlist;
   $: color = data.color;
+  $: pagination = data.pagination;
+  $: hasLiked = data.hasliked;
   $: tracks = data.playlist.tracks.items.map((item) => item.track!);
   $: pageTitle = $currentSong.trackLink
     ? $currentSong.trackLink.name
     : `${playlist.name} - Playlist by ${playlist.owner.display_name}`;
+  $: {
+    console.log(playlist);
+  }
+  async function loadMoreTracks() {
+    if (!pagination.hasMoreTracks) return;
+    const res = await fetch(
+      `/api/spotify/playlists/${playlist.id}/tracks?offset=${pagination.trackOffset}&limit=50`
+    );
+    const playlistTracks = (await res.json()) as PlaylistTrackResponse;
+    pagination.trackOffset += 50;
+    pagination.hasMoreTracks = playlistTracks.total > pagination.trackOffset;
+    console.log(pagination.hasMoreTracks, pagination.trackOffset);
+    console.log(playlistTracks.items.map((el) => el.track?.name));
+    playlistTracks.items = playlistTracks.items.filter(
+      (el) => !!el.track && el.track.type === 'track'
+    );
+
+    const playlistSongIds = playlistTracks.items.map((el) => el.track!.id);
+    const likedByUserRes = await fetch(
+      `/api/spotify/me/tracks/contains?ids=${playlistSongIds.filter((el) => !!el).join(',')}`
+    );
+    const likedByUser = (await likedByUserRes.json()) as boolean[];
+
+    if (likedByUser.length !== playlistTracks.items.length)
+      throw error(500, 'Playlist Songs and Liked Songs Length Dont match');
+    console.log(likedByUser);
+    tracks = [...tracks, ...playlistTracks.items.map((item) => item.track)] as TrackObjectFull[];
+    hasLiked = [...hasLiked, ...likedByUser];
+  }
 </script>
 
 <svelte:head>
@@ -61,7 +93,10 @@
     <button class="heart"><Heart width="36px" height="36px" /></button>
     <button class="heart"><ThreeHorizontalDots /></button>
   </div>
-  <TrackDetails {tracks} trackLinks={null} />
+  <TrackDetails {hasLiked} {tracks} trackLinks={null} />
+  <div class="showMoreBtn">
+    <button on:click={() => loadMoreTracks()}>Show More</button>
+  </div>
 </div>
 
 <style>
@@ -152,6 +187,23 @@
   }
   .heart:hover {
     transform: scale(1.05);
+  }
+  .showMoreBtn {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  .showMoreBtn > button {
+    border: none;
+    font-weight: 600;
+    font-size: 1rem;
+    border-radius: 20px;
+    cursor: pointer;
+    text-decoration: none;
+    padding: 7px 15px;
+    background: none;
+    color: var(--text-color);
+    border: 2px solid;
   }
   @media only screen and (max-width: 800px) {
     .container {

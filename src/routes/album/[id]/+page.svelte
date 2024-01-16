@@ -25,6 +25,7 @@
   $: pageTitle = $currentSong.trackLink
     ? $currentSong.trackLink.name
     : `${album.name} - Album by ${album.artists[0].name}`;
+  $: hasLiked = data.hasliked;
 </script>
 
 <svelte:head>
@@ -58,7 +59,7 @@
     <button class="heart"><Heart width="36px" height="36px" /></button>
     <button class="heart"><ThreeHorizontalDots /></button>
   </div>
-  <TrackDetails tracks={album.tracks.items} trackLinks={tracks} />
+  <TrackDetails {hasLiked} tracks={album.tracks.items} trackLinks={tracks} />
   <p>
     Release Date : {new Date(album.release_date).toLocaleDateString('en', {
       dateStyle: 'long'

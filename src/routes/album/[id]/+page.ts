@@ -14,8 +14,8 @@ export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, params }) 
   const album = (await res.json()) as SingleAlbumResponse;
 
   let color: string | null = null;
-
-  const [colorRes, res2] = await Promise.all([
+  const albumSongIds = album.tracks.items.map((el) => el.id);
+  const [colorRes, res2, hasLikedRes] = await Promise.all([
     album.images.length > 0
       ? fetch('/api/color?image=' + album.images[0].url)
       : Promise.resolve(null),
@@ -24,13 +24,18 @@ export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, params }) 
         `${encodeURIComponent(`${album.name} ${album.artists[0].name}`)}&count=${
           album.total_tracks
         }`
-    )
+    ),
+    fetch(`/api/spotify/me/tracks/contains?ids=${albumSongIds.join(',')}`)
   ]);
 
-  const [colorData, res2Json] = await Promise.all([
+  const [colorData, res2Json, hasliked] = await Promise.all([
     colorRes ? (colorRes.json() as Promise<{ dominantColor: string }>) : Promise.resolve(null),
-    res2.ok ? (res2.json() as Promise<{ album: SaavnApiAlbumResponse }>) : Promise.resolve(null)
+    res2.ok ? (res2.json() as Promise<{ album: SaavnApiAlbumResponse }>) : Promise.resolve(null),
+    hasLikedRes.json() as Promise<boolean[]>
   ]);
+
+  if (hasliked.length !== album.tracks.items.length)
+    throw error(500, 'Album Songs and Liked Songs Length Dont match');
 
   if (colorData) color = colorData.dominantColor;
 
@@ -48,6 +53,7 @@ export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, params }) 
   return {
     album,
     color,
-    tracks: saavnAlbumTracks
+    tracks: saavnAlbumTracks,
+    hasliked
   };
 };

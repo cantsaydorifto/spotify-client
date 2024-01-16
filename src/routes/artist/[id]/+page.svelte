@@ -14,6 +14,7 @@
   $: artist = data.artist;
   $: color = data.color;
   $: tracks = data.artistTracks;
+  $: hasLiked = data.hasliked;
   $: albums = data.artistAlbums;
   $: singles = data.artistSingles;
   $: appearsOn = data.artistAppearsOn;
@@ -53,7 +54,7 @@
     <button class="heart"><ThreeHorizontalDots /></button>
   </div>
   <h2>Popular</h2>
-  <TrackDetails noRowHeader {tracks} trackLinks={null} />
+  <TrackDetails {hasLiked} noRowHeader {tracks} trackLinks={null} />
   <!-- <h2>Discography</h2> -->
   <CatergorySection section={{ items: albums, title: 'Albums', path: '/album' }} />
   <CatergorySection section={{ items: singles, title: 'Singles', path: '/album' }} />

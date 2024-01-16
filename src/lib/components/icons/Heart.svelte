@@ -14,9 +14,17 @@
 
 <style>
   svg {
-    transition: stroke 0.3s;
+    animation: pulse 0.5s;
   }
-  svg:hover {
-    stroke: white;
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.3);
+    }
+    100% {
+      transform: scale(1);
+    }
   }
 </style>

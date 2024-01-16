@@ -1,6 +1,8 @@
 <script lang="ts">
   import Clock3 from './icons/Clock3.svelte';
   import Play from './icons/Play.svelte';
+  import { page } from '$app/stores';
+  import Heart from './icons/Heart.svelte';
   import greenEqualiser from '../../assets/equaliser-animated-green.gif';
   import {
     addFetchedSongsToQueue,
@@ -21,13 +23,16 @@
       }[]
     | null;
   export let svn: boolean = false;
+  export let hasLiked: boolean[] = [];
   if (trackLinks && trackLinks.length === tracks.length) {
     let t = trackLinks; // typescript error
     tracks.forEach((track, idx) => {
       track.link = t[idx].link;
     });
   }
-
+  if (hasLiked.length === 0) {
+    hasLiked = new Array(tracks.length).fill(false);
+  }
   export let noRowHeader = false;
   function msToTime(duration: number) {
     const seconds = Math.floor((duration / 1000) % 60);
@@ -39,6 +44,7 @@
 
     return `${hours > 0 ? `${hours}:` : ''}${paddedMinutes}:${paddedSeconds}`;
   }
+  $: user = $page.data.user;
 </script>
 
 <div class="tracks">
@@ -145,53 +151,33 @@
         </div>
         <div class="duration-column">
           <button
+            disabled={!user}
             on:click={async () => {
-              clearQueue();
-              if (!trackLinks && track.album && !track.link) {
-                const tracksToQueue = tracks
-                  ? tracks.slice(idx).map((el) => ({
-                      name: el.name,
-                      id: el.id,
-                      artist: { name: el.artists[0].name, id: el.artists[0].id },
-                      img: el.album ? el.album.images[0].url : '',
-                      link: '',
-                      album: {
-                        name: el.album ? el.album.name : '',
-                        totalTracks: el.album ? el.album.total_tracks : 0
-                      },
-                      trackNumber: el.track_number,
-                      preview_url: el.preview_url || '',
-                      needsFetch: true
-                    }))
-                  : null;
-                addFetchedSongsToQueue(tracksToQueue);
-                playSong();
-                return;
+              const curState = hasLiked[idx];
+              hasLiked[idx] = !hasLiked[idx];
+              try {
+                const res = await fetch(`/api/spotify/me/tracks?id=${track.id}`, {
+                  method: !curState ? 'PUT' : 'DELETE'
+                });
+                if (!res.ok) {
+                  const err = await res.json();
+                  throw new Error(err);
+                }
+              } catch (err) {
+                console.log(err);
+                hasLiked[idx] = curState;
               }
-              const tracksToQueue = trackLinks
-                ? tracks.slice(idx).map((trackLink) => ({
-                    name: trackLink.name,
-                    id: trackLink.id,
-                    artist: { name: trackLink.artists[0].name, id: trackLink.artists[0].id },
-                    img:
-                      svn && trackLink.album
-                        ? trackLink.album.images[1].url
-                        : trackLinks
-                        ? trackLinks[0].img
-                        : '',
-                    link: trackLink.link || '',
-                    album: {
-                      name: track.album ? track.album.name : '',
-                      totalTracks: track.album ? track.album.total_tracks : 0
-                    },
-                    trackNumber: track.track_number,
-                    preview_url: track.preview_url || ''
-                  }))
-                : null;
-              addFetchedSongsToQueue(tracksToQueue);
-              playSong();
-            }}><Play width="15px" height="15px" stroke="white" /></button
+            }}
           >
+            {#key hasLiked[idx]}
+              <Heart
+                width="16"
+                height="16"
+                stroke={!hasLiked[idx] ? 'var(--light-gray)' : 'var(--accent-color)'}
+                fill={hasLiked[idx] ? 'var(--accent-color)' : 'none'}
+              />
+            {/key}
+          </button>
           <span class="duration">{msToTime(track.duration_ms)}</span>
         </div>
       </div>
@@ -229,7 +215,6 @@
   .playing {
     background-color: rgba(255, 255, 255, 0.05);
   }
-
   .number-column {
     width: 55px;
     display: flex;
@@ -240,6 +225,11 @@
   }
   .number-column > button {
     display: none;
+    border: none;
+    background: none;
+    cursor: pointer;
+  }
+  .duration-column > button {
     border: none;
     background: none;
     cursor: pointer;
@@ -338,13 +328,6 @@
     display: flex;
     align-items: center;
     gap: 30px;
-  }
-  .duration-column > button {
-    border: none;
-    background-color: #5d5d5d24;
-    border-radius: 50%;
-    padding: 4px;
-    cursor: pointer;
   }
   @media only screen and (max-width: 600px) {
     .row {

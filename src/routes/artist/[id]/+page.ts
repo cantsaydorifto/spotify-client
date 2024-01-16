@@ -29,20 +29,30 @@ export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, params }) 
   ];
 
   let color: string | null = null;
-  const [artistPlaylistsRes, colorRes] = await Promise.all([
+  const artistTopSongIds = artistTracks.tracks.map((el) => el.id);
+  const [artistPlaylistsRes, colorRes, hasLikedRes] = await Promise.all([
     fetch(`/api/spotify/search?market=US&q=${encodeURIComponent(artist.name)}&type=playlist`),
     artist.images.length > 0
       ? fetch('/api/color?image=' + artist.images[0].url)
-      : Promise.resolve(null)
+      : Promise.resolve(null),
+    fetch(`/api/spotify/me/tracks/contains?ids=${artistTopSongIds.join(',')}`)
   ]);
+
+  if (!hasLikedRes.ok) throw error(hasLikedRes.status, 'Could not find liked songs');
 
   if (!artistPlaylistsRes.ok)
     throw error(artistPlaylistsRes.status, 'Could Not Search Artist Playlist');
 
-  const [{ playlists: artistPlaylists }, colorData] = await Promise.all([
+  const [{ playlists: artistPlaylists }, colorData, hasliked] = await Promise.all([
     artistPlaylistsRes.json() as SearchResponse,
-    colorRes ? (colorRes.json() as Promise<{ dominantColor: string }>) : Promise.resolve(null)
+    colorRes ? (colorRes.json() as Promise<{ dominantColor: string }>) : Promise.resolve(null),
+    hasLikedRes.json() as Promise<boolean[]>
   ]);
+
+  if (hasliked.length !== artistTracks.tracks.length)
+    throw error(500, 'Artist Songs and Liked Songs Length Dont match');
+
+  console.log(hasliked.length, artistTracks.tracks.length);
 
   if (colorData && colorRes && colorRes.ok) {
     color = colorData.dominantColor;
@@ -61,6 +71,7 @@ export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, params }) 
     artistSingles,
     artistPlaylists: artistPlaylists ? artistPlaylists.items : [],
     relatedArtists: relatedArtists.artists,
-    color
+    color,
+    hasliked
   };
 };
