@@ -206,6 +206,28 @@ declare global {
       Partial<AlbumSearchResponse>,
       Partial<TrackSearchResponse>,
       Partial<PlaylistSearchResponse> {}
+  interface RecommendationsObject {
+    seeds: RecommendationsSeedObject[];
+    tracks: RecommendationTrackObject[];
+  }
+  interface RecommendationsSeedObject {
+    afterFilteringSize: number;
+    afterRelinkingSize: number;
+    href: string;
+    id: string;
+    initialPoolSize: number;
+    type: 'artist' | 'track' | 'genre';
+  }
+  interface RecommendationTrackObject extends Omit<TrackObjectFull, 'album'> {
+    album: RecommendationAlbumObject;
+  }
+  interface RecommendationAlbumObject extends Omit<AlbumObjectSimplified, 'album_type'> {
+    /**
+     * The type of the album: one of “ALBUM”, “SINGLE”, or “COMPILATION”.
+     * Note that this differs from the types returned by all other spotify APIs by being in all caps.
+     */
+    album_type: 'ALBUM' | 'SINGLE' | 'COMPILATION';
+  }
 
   interface SaavnApiAlbumResponse {
     status: string;
