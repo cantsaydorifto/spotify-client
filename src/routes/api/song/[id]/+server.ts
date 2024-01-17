@@ -48,13 +48,11 @@ export async function GET({ url, fetch, params }) {
       break;
     }
   }
-  console.log('---------------------------');
-  // console.log(results);
   if (results.length === 0) throw error(400, { message: 'Not Found' });
   const albumUrl = results[0].url;
   const res = await fetch(`${SAAVN_API_URL}/albums?link=${albumUrl}`);
   const data = (await res.json()) as SaavnApiAlbumResponse;
-  if (!res.ok) {
+  if (!res.ok || !data.data.name) {
     throw error(400, { message: data.message || 'Internal Error' });
   }
   const song = data.data.songs[Number(params.id) - 1];
