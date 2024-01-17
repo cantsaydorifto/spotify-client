@@ -6,6 +6,7 @@
   import Play from './icons/Play.svelte';
   import Volume from './icons/Volume.svelte';
   import tippy from '$lib/actions/tippy';
+  import { currentSong } from './store/currentPlaying';
 
   export let track: {
     link: string;
@@ -26,6 +27,16 @@
       // console.log('done');
       durationTimeElement.textContent = msToTime(audio.duration * 1000);
       durationTimeElement2.textContent = msToTime(audio.duration * 1000);
+    });
+    audio.addEventListener('play', function () {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: $currentSong.trackLink ? $currentSong.trackLink.name : 'No Song Playing',
+        artist: $currentSong.trackLink ? $currentSong.trackLink.artist.name : 'No Artist Playing',
+        album: $currentSong.trackLink ? $currentSong.trackLink.album.name : 'No Album Playing',
+        artwork: $currentSong.trackLink
+          ? [{ src: $currentSong.trackLink.img, sizes: '96x96', type: 'image/png' }]
+          : []
+      });
     });
   });
 
