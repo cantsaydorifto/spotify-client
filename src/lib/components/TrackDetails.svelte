@@ -74,7 +74,7 @@
           {:else}
             <span class="number">{idx + 1}</span>
             <button
-              on:click={async () => {
+              on:click={() => {
                 clearQueue();
                 if (!trackLinks && track.album && !track.link) {
                   const tracksToQueue = tracks
