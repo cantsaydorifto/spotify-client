@@ -28,6 +28,12 @@
       }% + 12px - ${Number(inp.value) / (audio!.duration / 12)}px)`;
       audio!.currentTime = Number(inp.value);
     });
+
+    navigator.mediaSession.setPositionState({
+      duration: audio.duration,
+      playbackRate: audio.playbackRate,
+      position: audio.currentTime
+    });
   });
 </script>
 
