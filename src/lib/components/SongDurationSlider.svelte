@@ -18,6 +18,11 @@
           100 - (Number(volumeSlider.value) / audio!.duration) * 100
         }% + 12px - ${Number(volumeSlider.value) / (audio!.duration / 12)}px)`;
       }
+      navigator.mediaSession.setPositionState({
+        duration: audio!.duration,
+        playbackRate: audio!.playbackRate,
+        position: audio!.currentTime
+      });
     });
     audio.addEventListener('ended', () => playSong());
 
@@ -27,12 +32,6 @@
         100 - (Number(inp.value) / audio!.duration) * 100
       }% + 12px - ${Number(inp.value) / (audio!.duration / 12)}px)`;
       audio!.currentTime = Number(inp.value);
-    });
-
-    navigator.mediaSession.setPositionState({
-      duration: audio.duration,
-      playbackRate: audio.playbackRate,
-      position: audio.currentTime
     });
   });
 </script>
