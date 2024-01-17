@@ -34,9 +34,18 @@
         artist: $currentSong.trackLink ? $currentSong.trackLink.artist.name : 'No Artist Playing',
         album: $currentSong.trackLink ? $currentSong.trackLink.album.name : 'No Album Playing',
         artwork: $currentSong.trackLink
-          ? [{ src: $currentSong.trackLink.img, sizes: '96x96', type: 'image/png' }]
+          ? [{ src: $currentSong.trackLink.img, sizes: '640x640', type: 'image/png' }]
           : []
       });
+      navigator.mediaSession.setActionHandler('play', () => {
+        audio.play();
+        paused = false;
+      });
+      navigator.mediaSession.setActionHandler('pause', () => {
+        audio.pause();
+        paused = true;
+      });
+      console.log(navigator.mediaSession.metadata);
     });
   });
 
