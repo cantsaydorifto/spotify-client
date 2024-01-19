@@ -4,13 +4,10 @@
   import TrackDetails from '$lib/components/TrackDetails.svelte';
   import PlayBtn from '$lib/components/PlayBtn.svelte';
   import { currentSong } from '$lib/components/store/currentPlaying';
-  import { error } from '@sveltejs/kit';
 
-  function getTrackDuration(items: PlaylistTrackObject[]) {
+  function getTrackDuration(item: TrackObjectFull) {
     let duration = 0;
-    items.forEach((el) => {
-      duration += el.track?.duration_ms || 0;
-    });
+    duration = item.duration_ms;
     const minutes = Math.floor(duration / 60000);
     const seconds = Math.floor((duration / 1000) % 60);
     return {
@@ -20,37 +17,15 @@
   }
 
   export let data;
-  $: playlist = data.playlist;
+  $: track = data.track;
   $: color = data.color;
-  $: pagination = data.pagination;
-  $: hasLiked = data.hasliked;
-  $: tracks = data.playlist.tracks.items.map((item) => item.track!);
   $: pageTitle = $currentSong.trackLink
     ? $currentSong.trackLink.name
-    : `${playlist.name} - Playlist by ${playlist.owner.display_name}`;
-  async function loadMoreTracks() {
-    if (!pagination.hasMoreTracks) return;
-    const res = await fetch(
-      `/api/spotify/playlists/${playlist.id}/tracks?offset=${pagination.trackOffset}&limit=50`
-    );
-    const playlistTracks = (await res.json()) as PlaylistTrackResponse;
-    pagination.trackOffset += 50;
-    pagination.hasMoreTracks = playlistTracks.total > pagination.trackOffset;
-    playlistTracks.items = playlistTracks.items.filter(
-      (el) => !!el.track && el.track.type === 'track'
-    );
-
-    const playlistSongIds = playlistTracks.items.map((el) => el.track!.id);
-    const likedByUserRes = await fetch(
-      `/api/spotify/me/tracks/contains?ids=${playlistSongIds.filter((el) => !!el).join(',')}`
-    );
-    const likedByUser = (await likedByUserRes.json()) as boolean[];
-
-    if (likedByUser.length !== playlistTracks.items.length)
-      throw error(500, 'Playlist Songs and Liked Songs Length Dont match');
-    tracks = [...tracks, ...playlistTracks.items.map((item) => item.track)] as TrackObjectFull[];
-    hasLiked = [...hasLiked, ...likedByUser];
-  }
+    : `${track.name} - Track by ${track.artists[0].name}`;
+  $: hasLiked = data.hasliked;
+  $: recommendations = data.recommendedTracks;
+  $: trackLink = data.trackLink;
+  $: lyrics = data.lyrics;
 </script>
 
 <svelte:head>
@@ -62,42 +37,58 @@
     class="color-gradient"
     style:background-image="linear-gradient(0deg,transparent,{color || 'var(--light-gray)'})"
   />
-  <img src={playlist.images.length > 0 ? playlist.images[0].url : ''} alt="" />
+  <img src={track.album.images.length > 0 ? track.album.images[0].url : ''} alt="" />
   <div class="details">
-    <span>{playlist.type[0].toUpperCase() + playlist.type.slice(1)}</span>
-    <h1 title={playlist.name}>{@html playlist.name}</h1>
+    <span>{track.type[0].toUpperCase() + track.type.slice(1)}</span>
+    <h1 title={track.name}>{@html track.name}</h1>
     <div class="albumInfo">
-      <!-- {#if playlist.owner.images && playlist.owner.images.length > 0}
-        <img src={playlist.owner.images[0].url} alt="" />
-      {/if} -->
-      <p title={playlist.description} class="description">{@html playlist.description}</p>
-      <a href={'/user/' + playlist.owner.display_name}>{@html playlist.owner.display_name}</a>
-      <span>&middot; {playlist.tracks.total} songs &middot;</span>
+      <!-- <img src={track.artists[0].} alt=""> -->
+      <a href={'/artist/' + track.artists[0].id}>{track.artists[0].name}</a>
+      <span>&middot; {new Date(track.album.release_date).getFullYear()} &middot;</span>
       <span class="duration"
-        >{getTrackDuration(playlist.tracks.items).minutes}
-        {getTrackDuration(playlist.tracks.items).seconds}</span
+        >{getTrackDuration(track).minutes}
+        {getTrackDuration(track).seconds}</span
       >
     </div>
   </div>
 </div>
-
 <div class="content">
   <div class="play">
     <PlayBtn innerSize={25} />
     <button class="heart"><Heart width="36px" height="36px" /></button>
     <button class="heart"><ThreeHorizontalDots /></button>
   </div>
-  <TrackDetails {hasLiked} {tracks} trackLinks={null} />
-  {#if pagination.hasMoreTracks}
-    <div class="showMoreBtn">
-      <button on:click={() => loadMoreTracks()}>Show More</button>
-    </div>
+  <TrackDetails
+    noRowHeader
+    {hasLiked}
+    tracks={[track]}
+    trackLinks={trackLink.link === '' ? null : [trackLink]}
+  />
+  <p>
+    Release Date : {new Date(track.album.release_date).toLocaleDateString('en', {
+      dateStyle: 'long'
+    })}
+  </p>
+  {#if lyrics.data}
+    <h2>Music Video</h2>
+    <iframe
+      src={`https://www.youtube.com/embed/${lyrics.data.videoId}`}
+      frameborder="0"
+      title={track.name}
+    />
+    <h2>Lyrics</h2>
+    <p class="lyrics">{@html lyrics.data.lyrics.join('<br>')}</p>
+  {:else}
+    <p class="lyrics">Lyrics Unavailable</p>
   {/if}
+  <h2>Recommendations Based On {track.name}</h2>
+  <TrackDetails noRowHeader tracks={recommendations || []} trackLinks={null} />
 </div>
 
 <style>
   .container {
     position: relative;
+    /* z-index: -1; */
     margin: calc(-1 * var(--navbar-height)) -30px 0 -30px;
     padding: 80px 30px 30px 30px;
     display: flex;
@@ -130,7 +121,7 @@
     font-size: 0.875rem;
   }
   .details > h1 {
-    font-size: 2rem;
+    font-size: 3rem;
     max-height: 150px;
     max-width: 500px;
     display: -webkit-box;
@@ -153,18 +144,24 @@
     text-decoration: underline;
   }
   .duration,
-  .description {
-    font-size: 0.875rem;
+  .content > p {
     color: var(--light-gray);
   }
-  .description {
-    margin-bottom: 10px;
+  .content > p {
+    font-size: 1rem;
+    margin: 20px 0 40px 0;
+  }
+  .content > .lyrics {
+    margin: 20px 0 60px 0;
+  }
+  .content > h2 {
+    color: var(--light-gray);
   }
   .content {
     min-height: 300px;
     background-image: linear-gradient(0deg, var(--bg-color), rgba(0, 0, 0, 0.2));
     margin: 0 -30px;
-    padding: 0 30px;
+    padding: 0 30px 50px 30px;
   }
   .play {
     padding: 20px 0;
@@ -184,38 +181,31 @@
   .heart:hover {
     transform: scale(1.05);
   }
-  .showMoreBtn {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
-  }
-  .showMoreBtn > button {
-    border: none;
-    font-weight: 600;
-    font-size: 1rem;
-    border-radius: 20px;
-    cursor: pointer;
-    text-decoration: none;
-    padding: 7px 15px;
-    background: none;
-    color: var(--text-color);
-    border: 2px solid;
+  iframe {
+    width: 100%;
+    max-width: 800px;
+    height: auto;
+    aspect-ratio: 16/9;
+    margin: 16px 0;
   }
   @media only screen and (max-width: 800px) {
     .container {
       /* gap: 20px; */
       margin: calc(-1 * var(--navbar-height)) -15px 0 -15px;
     }
+    .details > h1 {
+      font-size: 2rem;
+    }
     .content {
       margin: 0 -15px;
-      padding: 0 8px;
+      padding: 0 8px 50px 8px;
     }
   }
   @media only screen and (max-width: 600px) {
     .container {
       flex-direction: column;
       align-items: center;
-      gap: 30px;
+      gap: 10px;
     }
   }
 </style>

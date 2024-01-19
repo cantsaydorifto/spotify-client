@@ -135,7 +135,7 @@
                   : 'white'}
                 title={track.name}
               >
-                {@html track.name}
+                <a href={`/track/${track.id}`}>{@html track.name}</a>
               </h4>
               {#if track.explicit}
                 <span class="explicit">E</span>
@@ -291,6 +291,11 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
     -webkit-line-clamp: 1;
+  }
+
+  .track-title > h4 > a {
+    color: inherit;
+    text-decoration: none;
   }
 
   .explicit {

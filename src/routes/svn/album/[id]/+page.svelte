@@ -32,9 +32,6 @@
   $: tracks = data.tracks;
   $: color = data.color;
   $: commaSeparatedArtists = data.commaSeparatedArtists;
-  $: {
-    console.log(album.image);
-  }
 </script>
 
 <div class="container">

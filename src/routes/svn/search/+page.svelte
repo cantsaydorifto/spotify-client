@@ -42,7 +42,6 @@
       albumSearchResults = resJson.data.albums.results;
       artistSearchResults = resJson.data.artists.results;
       trackSearchResults = resJson.data.songs.results;
-      console.log(resJson);
       loading = false;
     } catch (err) {
       console.log(err);

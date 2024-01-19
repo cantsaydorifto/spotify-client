@@ -22,8 +22,6 @@ export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, params }) 
   );
   const hasliked = (await hasLikedRes.json()) as boolean[];
 
-  console.log(hasliked.length, playlist.tracks.items.length, trackOffset);
-
   if (hasliked.length !== playlist.tracks.items.length)
     throw error(500, 'Playlist Songs and Liked Songs Length Dont match');
 
@@ -31,7 +29,6 @@ export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, params }) 
     const colorRes = await fetch('/api/color?image=' + playlist.images[0].url);
     if (colorRes.ok) {
       const { dominantColor } = (await colorRes.json()) as { dominantColor: string };
-      console.log(dominantColor);
       color = dominantColor;
     }
   }
