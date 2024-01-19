@@ -248,6 +248,14 @@ declare global {
     message: string | null;
     data: SaavnPlaylistData;
   }
+  interface SaavnApiLyricsResponse {
+    status: string;
+    message: string | null;
+    data: {
+      lyrics: string[];
+      videoId: string;
+    } | null;
+  }
   interface SaavnApiArtistInfoResponse {
     status: string;
     message: string | null;
