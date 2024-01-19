@@ -158,7 +158,7 @@
             <div class="playlist">
               {#if track.album.images.length > 1}
                 <div class="playlistImgContainer track">
-                  <a href={`/track/${track.id}`}>
+                  <a data-sveltekit-preload-data="tap" href={`/track/${track.id}`}>
                     <img src={track.album.images[1].url} alt="" />
                   </a>
                   <PlayBtn innerSize={25} outerSize={40} onclick={() => playSong(track)} />

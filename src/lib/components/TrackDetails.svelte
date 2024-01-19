@@ -135,7 +135,9 @@
                   : 'white'}
                 title={track.name}
               >
-                <a href={`/track/${track.id}`}>{@html track.name}</a>
+                <a data-sveltekit-preload-data="tap" href={`/track/${track.id}`}
+                  >{@html track.name}</a
+                >
               </h4>
               {#if track.explicit}
                 <span class="explicit">E</span>
