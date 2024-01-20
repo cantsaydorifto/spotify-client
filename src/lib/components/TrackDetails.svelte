@@ -152,7 +152,7 @@
             {#if !$currentSong.isPaused}
               <img width="15" height="15" src={greenEqualiser} alt="equaliser" />
             {:else}
-              <span style:color="var(--accent-color)" class="number">{idx + 1}</span>
+              <span style:color="var(--accent-color)" style:font-size="0.875rem">{idx + 1}</span>
             {/if}
           {:else}
             <span class="number">{idx + 1}</span>
