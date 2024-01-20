@@ -8,16 +8,21 @@
     addFetchedSongsToQueue,
     clearQueue,
     currentSong,
-    playSong
+    playSong,
+    setCurrentlyPlaying
   } from './store/currentPlaying';
   export let tracks:
     | (TrackObjectSimplified & { album?: AlbumObjectSimplified; link?: string })[]
     | (TrackObjectFull & { link?: string })[];
   tracks = tracks.filter((track) => !!track);
+  export let playlist: {
+    name: string;
+    id: string;
+  } | null = null;
   export let trackLinks:
     | {
         name: string;
-        album: string;
+        album: { name: string; id: string };
         img: string;
         link: string;
       }[]
@@ -43,6 +48,71 @@
     const paddedSeconds = seconds < 10 ? '0' + seconds : seconds;
 
     return `${hours > 0 ? `${hours}:` : ''}${paddedMinutes}:${paddedSeconds}`;
+  }
+  function getTracksToQueue(idx: number): Song[] | null {
+    if (!trackLinks && tracks[idx].album && !tracks[idx].link) {
+      const tracksToQueue = tracks
+        ? tracks.slice(idx).map((el) => ({
+            name: el.name,
+            id: el.id,
+            artist: { name: el.artists[0].name, id: el.artists[0].id },
+            img: el.album ? el.album.images[0].url : '',
+            link: '',
+            album: {
+              name: el.album ? el.album.name : '',
+              totalTracks: el.album ? el.album.total_tracks : 0,
+              id: el.album ? el.album.id : ''
+            },
+            trackNumber: el.track_number,
+            preview_url: el.preview_url || '',
+            needsFetch: true
+          }))
+        : null;
+      if (playlist) {
+        setCurrentlyPlaying({
+          name: playlist.name,
+          id: playlist.id,
+          type: 'PLAYLIST'
+        });
+      } else {
+        setCurrentlyPlaying(
+          tracksToQueue
+            ? {
+                name: tracksToQueue[0].album.name,
+                id: tracksToQueue[0].id,
+                type: 'SINGLE'
+              }
+            : null
+        );
+      }
+      return tracksToQueue;
+    }
+    setCurrentlyPlaying({
+      id: trackLinks ? trackLinks[0].album.id : '',
+      type: 'ALBUM',
+      name: trackLinks ? trackLinks[0].album.name : ''
+    });
+    return trackLinks
+      ? tracks.slice(idx).map((trackLink) => ({
+          name: trackLink.name,
+          id: trackLink.id,
+          artist: { name: trackLink.artists[0].name, id: trackLink.artists[0].id },
+          img:
+            svn && trackLink.album
+              ? trackLink.album.images[1].url
+              : trackLinks
+              ? trackLinks[0].img
+              : '',
+          link: trackLink.link || '',
+          album: {
+            name: trackLinks ? trackLinks[0].album.name : '',
+            id: trackLinks ? trackLinks[0].album.id : '',
+            totalTracks: trackLink.album ? trackLink.album.total_tracks : 0
+          },
+          trackNumber: tracks[idx].track_number,
+          preview_url: tracks[idx].preview_url || ''
+        }))
+      : null;
   }
   $: user = $page.data.user;
 </script>
@@ -70,53 +140,17 @@
       >
         <div class="number-column">
           {#if $currentSong.trackLink && $currentSong.trackLink.id === track.id}
-            <img width="15" height="15" src={greenEqualiser} alt="equaliser" />
+            {#if !$currentSong.isPaused}
+              <img width="15" height="15" src={greenEqualiser} alt="equaliser" />
+            {:else}
+              <span style:color="var(--accent-color)" class="number">{idx + 1}</span>
+            {/if}
           {:else}
             <span class="number">{idx + 1}</span>
             <button
               on:click={() => {
                 clearQueue();
-                if (!trackLinks && track.album && !track.link) {
-                  const tracksToQueue = tracks
-                    ? tracks.slice(idx).map((el) => ({
-                        name: el.name,
-                        id: el.id,
-                        artist: { name: el.artists[0].name, id: el.artists[0].id },
-                        img: el.album ? el.album.images[0].url : '',
-                        link: '',
-                        album: {
-                          name: el.album ? el.album.name : '',
-                          totalTracks: el.album ? el.album.total_tracks : 0
-                        },
-                        trackNumber: el.track_number,
-                        preview_url: el.preview_url || '',
-                        needsFetch: true
-                      }))
-                    : null;
-                  addFetchedSongsToQueue(tracksToQueue);
-                  playSong();
-                  return;
-                }
-                const tracksToQueue = trackLinks
-                  ? tracks.slice(idx).map((trackLink) => ({
-                      name: trackLink.name,
-                      id: trackLink.id,
-                      artist: { name: trackLink.artists[0].name, id: trackLink.artists[0].id },
-                      img:
-                        svn && trackLink.album
-                          ? trackLink.album.images[1].url
-                          : trackLinks
-                          ? trackLinks[0].img
-                          : '',
-                      link: trackLink.link || '',
-                      album: {
-                        name: track.album ? track.album.name : '',
-                        totalTracks: track.album ? track.album.total_tracks : 0
-                      },
-                      trackNumber: track.track_number,
-                      preview_url: track.preview_url || ''
-                    }))
-                  : null;
+                const tracksToQueue = getTracksToQueue(idx);
                 addFetchedSongsToQueue(tracksToQueue);
                 playSong();
               }}><Play width="20px" height="20px" stroke="white" /></button

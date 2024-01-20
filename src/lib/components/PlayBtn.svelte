@@ -1,5 +1,7 @@
 <script lang="ts">
   import Play from './icons/Play.svelte';
+  import Pause from './icons/Pause.svelte';
+  export let type: 'play' | 'pause' = 'play';
   export let innerSize: number;
   export let outerSize: number = 56;
   export let onclick: () => void = () => {};
@@ -10,8 +12,13 @@
   class="playBtn"
   style:width={outerSize + 'px'}
   style:height={outerSize + 'px'}
-  ><Play width={innerSize + 'px'} height={innerSize + 'px'} /></button
 >
+  {#if type === 'play'}
+    <Play width={innerSize + 'px'} height={innerSize + 'px'} />
+  {:else}
+    <Pause width={innerSize + 'px'} height={innerSize + 'px'} />
+  {/if}
+</button>
 
 <style>
   .playBtn {

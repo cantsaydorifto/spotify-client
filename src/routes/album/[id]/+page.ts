@@ -12,7 +12,6 @@ export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, params }) 
   const res = await fetch('/api/spotify/albums/' + params.id);
   if (!res.ok) throw error(res.status, 'Album not found');
   const album = (await res.json()) as SingleAlbumResponse;
-
   let color: string | null = null;
   const albumSongIds = album.tracks.items.map((el) => el.id);
   const [colorRes, res2, hasLikedRes, recommendedObjectRes] = await Promise.all([
@@ -64,7 +63,13 @@ export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, params }) 
   return {
     album,
     color,
-    tracks: saavnAlbumTracks,
+    tracks: saavnAlbumTracks.map((el) => ({
+      ...el,
+      album: {
+        name: album.name,
+        id: album.id
+      }
+    })),
     hasliked,
     recommendedTracks: convertRecommendedTracksToTrackObjectFull(recommendedObject)
   };

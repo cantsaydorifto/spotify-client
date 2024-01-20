@@ -3,8 +3,43 @@
   import ThreeHorizontalDots from '$lib/components/icons/ThreeHorizontalDots.svelte';
   import TrackDetails from '$lib/components/TrackDetails.svelte';
   import PlayBtn from '$lib/components/PlayBtn.svelte';
-  import { currentSong } from '$lib/components/store/currentPlaying';
+  import {
+    addFetchedSongsToQueue,
+    clearQueue,
+    currentSong,
+    playSong,
+    setCurrentlyPlaying,
+    togglePlay
+  } from '$lib/components/store/currentPlaying';
   import { error } from '@sveltejs/kit';
+
+  function startPlaylistPlayback() {
+    const tracksToQueue: Song[] | null = tracks
+      ? tracks.map((el) => ({
+          name: el.name,
+          id: el.id,
+          artist: { name: el.artists[0].name, id: el.artists[0].id },
+          img: el.album ? el.album.images[0].url : '',
+          link: '',
+          album: {
+            name: el.album ? el.album.name : '',
+            totalTracks: el.album ? el.album.total_tracks : 0,
+            id: el.album ? el.album.id : ''
+          },
+          trackNumber: el.track_number,
+          preview_url: el.preview_url || '',
+          needsFetch: true
+        }))
+      : null;
+    clearQueue();
+    setCurrentlyPlaying({
+      name: playlist.name,
+      id: playlist.id,
+      type: 'PLAYLIST'
+    });
+    addFetchedSongsToQueue(tracksToQueue);
+    playSong();
+  }
 
   function getTrackDuration(items: PlaylistTrackObject[]) {
     let duration = 0;
@@ -83,11 +118,22 @@
 
 <div class="content">
   <div class="play">
-    <PlayBtn innerSize={25} />
+    {#if !$currentSong.trackLink || !$currentSong.currentlyPlaying || $currentSong.currentlyPlaying.id !== playlist.id}
+      <PlayBtn onclick={() => startPlaylistPlayback()} type="play" innerSize={25} />
+    {:else if $currentSong.currentlyPlaying.type === 'PLAYLIST' && $currentSong.isPaused}
+      <PlayBtn onclick={() => togglePlay()} type="play" innerSize={25} />
+    {:else}
+      <PlayBtn onclick={() => togglePlay()} type="pause" innerSize={25} />
+    {/if}
     <button class="heart"><Heart width="36px" height="36px" /></button>
     <button class="heart"><ThreeHorizontalDots /></button>
   </div>
-  <TrackDetails {hasLiked} {tracks} trackLinks={null} />
+  <TrackDetails
+    playlist={{ name: playlist.name, id: playlist.id }}
+    {hasLiked}
+    {tracks}
+    trackLinks={null}
+  />
   {#if pagination.hasMoreTracks}
     <div class="showMoreBtn">
       <button on:click={() => loadMoreTracks()}>Show More</button>

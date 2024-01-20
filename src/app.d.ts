@@ -474,6 +474,24 @@ declare global {
     lastUpdated: string;
     explicitContent: string;
   }
+  interface Song {
+    name: string;
+    id: string;
+    artist: {
+      name: string;
+      id: string;
+    };
+    img: string;
+    link: string;
+    album: {
+      name: string;
+      id: string;
+      totalTracks: number;
+    };
+    trackNumber: number;
+    preview_url: string;
+    needsFetch?: boolean;
+  }
 }
 
 export {};

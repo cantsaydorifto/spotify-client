@@ -7,7 +7,6 @@
   import Volume from './icons/Volume.svelte';
   import tippy from '$lib/actions/tippy';
   import { currentSong } from './store/currentPlaying';
-
   export let track: {
     link: string;
   } | null;
@@ -19,6 +18,7 @@
   let paused = true;
 
   onMount(() => {
+    $currentSong.audio = audio;
     audio.addEventListener('timeupdate', () => {
       currentTimeElement.textContent = msToTime(audio.currentTime * 1000);
       currentTimeElement2.textContent = msToTime(audio.currentTime * 1000);
@@ -40,10 +40,12 @@
       navigator.mediaSession.setActionHandler('play', () => {
         audio.play();
         paused = false;
+        $currentSong.isPaused = paused;
       });
       navigator.mediaSession.setActionHandler('pause', () => {
         audio.pause();
         paused = true;
+        $currentSong.isPaused = paused;
       });
       console.log(navigator.mediaSession.metadata);
     });
@@ -56,6 +58,7 @@
       audio.pause();
     }
     paused = !paused;
+    $currentSong.isPaused = paused;
   }
   function msToTime(duration: number) {
     const seconds = Math.floor((duration / 1000) % 60);

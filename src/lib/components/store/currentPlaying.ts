@@ -3,9 +3,19 @@ import { get, writable } from 'svelte/store';
 export const currentSong = writable<{
   trackLink: Song | null;
   songQueue: Song[];
+  audio: HTMLAudioElement | null;
+  isPaused: boolean;
+  currentlyPlaying: {
+    type: 'PLAYLIST' | 'ALBUM' | 'SINGLE';
+    id: string;
+    name: string;
+  } | null;
 }>({
   trackLink: null,
-  songQueue: []
+  songQueue: [],
+  audio: null,
+  isPaused: false,
+  currentlyPlaying: null
 });
 
 export const getCurrentPlayingSong = () => {
@@ -15,16 +25,39 @@ export const getCurrentPlayingSong = () => {
 
 export const clearQueue = () => {
   currentSong.update((current) => {
-    current.songQueue = [];
-    return current;
+    return { ...current, songQueue: [], isPaused: true, currentlyPlaying: null, trackLink: null };
+  });
+};
+
+export const setCurrentlyPlaying = (
+  track: {
+    name: string;
+    id: string;
+    type: 'ALBUM' | 'PLAYLIST' | 'SINGLE';
+  } | null
+) => {
+  currentSong.update((current) => {
+    if (!track) return { ...current, currentlyPlaying: null };
+    return { ...current, currentlyPlaying: { ...track } };
+  });
+};
+
+export const togglePlay = () => {
+  currentSong.update((current) => {
+    if (!current.audio) return current;
+    if (current.isPaused) {
+      current.audio.play();
+    } else {
+      current.audio.pause();
+    }
+    return { ...current, isPaused: current.isPaused };
   });
 };
 
 export const addFetchedSongsToQueue = (trackLink: Song[] | null) => {
   if (!trackLink) return;
   currentSong.update((current) => {
-    current.songQueue.unshift(...trackLink);
-    return current;
+    return { ...current, songQueue: [...trackLink, ...current.songQueue] };
   });
 };
 
@@ -52,7 +85,8 @@ export const addSongToQueue = async (track: Song | null) => {
     return false;
   }
   currentSong.update((current) => {
-    current.songQueue.unshift({
+    const cur = [...current.songQueue];
+    cur.unshift({
       name: songName,
       id: songId,
       artist: {
@@ -63,32 +97,32 @@ export const addSongToQueue = async (track: Song | null) => {
       link: songLink,
       album: {
         name: track.album.name,
-        totalTracks: track.album.totalTracks
+        totalTracks: track.album.totalTracks,
+        id: track.album.id
       },
       trackNumber: track.trackNumber,
       preview_url: track.preview_url || ''
     });
-    return current;
+    return { ...current, songQueue: [...cur] };
   });
   return true;
 };
 
 export const playSong = () => {
   currentSong.update((current) => {
-    // console.log([...current.songQueue]);
-    if (current.songQueue.length <= 0) {
+    const curQueue = [...current.songQueue];
+    if (curQueue.length <= 0) {
       return current;
     }
-    const curTrack = current.songQueue.shift() || null;
+    const curTrack = curQueue.shift() || null;
     if (!curTrack || !curTrack.needsFetch) {
       // console.log(curTrack);
-      current.trackLink = curTrack || null;
-      return current;
+      return { ...current, trackLink: curTrack || null, isPaused: false, songQueue: [...curQueue] };
     }
     const song = curTrack;
     // console.log(curTrack);
     playNextSong(song);
-    return current;
+    return { ...current, songQueue: [...curQueue] };
   });
 };
 
@@ -97,35 +131,23 @@ const playNextSong = async (track: Song | null) => {
   if (!res) {
     const t = get(currentSong).songQueue[0] || null;
     currentSong.update((el) => {
-      el.songQueue.shift();
-      return el;
+      const curQueue = [...el.songQueue];
+      curQueue.shift();
+      return { ...el, songQueue: [...curQueue] };
     });
     playNextSong(t);
     return;
   }
   currentSong.update((current) => {
-    if (current.songQueue.length > 0 && current.songQueue[0].link === '') {
-      current.songQueue[0].link = current.songQueue[0].preview_url;
+    const curQueue = [...current.songQueue];
+    if (curQueue.length > 0 && curQueue[0].link === '') {
+      curQueue[0].link = curQueue[0].preview_url;
     }
-    current.trackLink = current.songQueue.shift() || null;
-    return current;
+    return {
+      ...current,
+      trackLink: curQueue.shift() || null,
+      isPaused: false,
+      songQueue: [...curQueue]
+    };
   });
 };
-
-interface Song {
-  name: string;
-  id: string;
-  artist: {
-    name: string;
-    id: string;
-  };
-  img: string;
-  link: string;
-  album: {
-    name: string;
-    totalTracks: number;
-  };
-  trackNumber: number;
-  preview_url: string;
-  needsFetch?: boolean;
-}
