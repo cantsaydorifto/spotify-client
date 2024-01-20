@@ -50,7 +50,7 @@ export const togglePlay = () => {
     } else {
       current.audio.pause();
     }
-    return { ...current, isPaused: current.isPaused };
+    return { ...current, isPaused: !current.isPaused };
   });
 };
 
