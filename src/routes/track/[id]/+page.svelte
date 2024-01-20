@@ -3,7 +3,40 @@
   import ThreeHorizontalDots from '$lib/components/icons/ThreeHorizontalDots.svelte';
   import TrackDetails from '$lib/components/TrackDetails.svelte';
   import PlayBtn from '$lib/components/PlayBtn.svelte';
-  import { currentSong } from '$lib/components/store/currentPlaying';
+  import {
+    addFetchedSongsToQueue,
+    clearQueue,
+    currentSong,
+    playSong,
+    setCurrentlyPlaying,
+    togglePlay
+  } from '$lib/components/store/currentPlaying';
+
+  function startTrackPlayback() {
+    clearQueue();
+    const trackToQueue = {
+      name: track.name,
+      id: track.id,
+      artist: { name: track.artists[0].name, id: track.artists[0].id },
+      img: track.album.images[0].url,
+      link: trackLink.link,
+      album: {
+        name: track.album.name,
+        totalTracks: track.album.total_tracks,
+        id: track.album.id
+      },
+      trackNumber: track.track_number,
+      preview_url: track.preview_url || '',
+      needsFetch: false
+    };
+    setCurrentlyPlaying({
+      name: track.name,
+      id: track.id,
+      type: 'SINGLE'
+    });
+    addFetchedSongsToQueue([trackToQueue]);
+    playSong();
+  }
 
   function getTrackDuration(item: TrackObjectFull) {
     let duration = 0;
@@ -24,7 +57,7 @@
     : `${track.name} - Track by ${track.artists[0].name}`;
   $: hasLiked = data.hasliked;
   $: recommendations = data.recommendedTracks;
-  $: trackLink = data.trackLink;
+  $: trackLink = { ...data.trackLink, album: { id: track.album.id, name: track.album.name } };
   $: lyrics = data.lyrics;
 </script>
 
@@ -54,16 +87,17 @@
 </div>
 <div class="content">
   <div class="play">
-    <PlayBtn innerSize={25} />
+    {#if !$currentSong.trackLink || !$currentSong.currentlyPlaying || $currentSong.currentlyPlaying.id !== track.id}
+      <PlayBtn onclick={() => startTrackPlayback()} type="play" innerSize={25} />
+    {:else if $currentSong.currentlyPlaying.type === 'SINGLE' && $currentSong.isPaused}
+      <PlayBtn onclick={() => togglePlay()} type="play" innerSize={25} />
+    {:else}
+      <PlayBtn onclick={() => togglePlay()} type="pause" innerSize={25} />
+    {/if}
     <button class="heart"><Heart width="36px" height="36px" /></button>
     <button class="heart"><ThreeHorizontalDots /></button>
   </div>
-  <TrackDetails
-    noRowHeader
-    {hasLiked}
-    tracks={[track]}
-    trackLinks={trackLink.link === '' ? null : [trackLink]}
-  />
+  <TrackDetails noRowHeader {hasLiked} tracks={[track]} trackLinks={[trackLink]} single />
   <p>
     Release Date : {new Date(track.album.release_date).toLocaleDateString('en', {
       dateStyle: 'long'

@@ -19,6 +19,7 @@
     name: string;
     id: string;
   } | null = null;
+  export let single = false;
   export let trackLinks:
     | {
         name: string;
@@ -87,11 +88,19 @@
       }
       return tracksToQueue;
     }
-    setCurrentlyPlaying({
-      id: trackLinks ? trackLinks[0].album.id : '',
-      type: 'ALBUM',
-      name: trackLinks ? trackLinks[0].album.name : ''
-    });
+    if (single) {
+      setCurrentlyPlaying({
+        id: trackLinks ? trackLinks[0].album.id : '',
+        type: 'ALBUM',
+        name: trackLinks ? trackLinks[0].album.name : ''
+      });
+    } else {
+      setCurrentlyPlaying({
+        id: tracks[0].id,
+        type: 'SINGLE',
+        name: tracks[0].name
+      });
+    }
     return trackLinks
       ? tracks.slice(idx).map((trackLink) => ({
           name: trackLink.name,
