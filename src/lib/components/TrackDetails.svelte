@@ -88,7 +88,7 @@
       }
       return tracksToQueue;
     }
-    if (single) {
+    if (!single) {
       setCurrentlyPlaying({
         id: trackLinks ? trackLinks[0].album.id : '',
         type: 'ALBUM',

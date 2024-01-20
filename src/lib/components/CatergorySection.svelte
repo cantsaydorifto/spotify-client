@@ -2,7 +2,14 @@
   import MusicIcon from '$lib/components/icons/Music.svelte';
   import Frame from './Frame.svelte';
   import PlayBtn from './PlayBtn.svelte';
-  import { currentSong } from './store/currentPlaying';
+  import {
+    addFetchedSongsToQueue,
+    addSongToQueue,
+    clearQueue,
+    currentSong,
+    playSong,
+    setCurrentlyPlaying
+  } from './store/currentPlaying';
 
   export let section: {
     title: string;
@@ -30,43 +37,29 @@
     searchResults?: boolean;
   } | null = null;
 
-  async function playSong(track: TrackObjectFull) {
-    // console.log(track.album.name + ' ' + track.album.artists[0].name);
-    const songRes = await fetch(
-      `/api/song/${track.track_number}?query=${encodeURIComponent(
-        `${track.album.name} ${track.album.artists[0].name}`
-      )}&count=${track.album.total_tracks}`
-    );
-    let [songLink, songName] = ['', ''];
-    if (!songRes.ok) {
-      // console.log('not ok');
-      songLink = track.preview_url || '';
-      songName = track.name || '';
-      console.log(songLink);
-    } else {
-      const song = await songRes.json();
-      songLink = song.song.downloadUrl[song.song.downloadUrl.length - 1].link;
-      songName = song.song.name;
-    }
-    // console.log({
-    //   name: songName,
-    //   link: songLink,
-    //   artist: track.album.artists[0].name,
-    //   img: track.album.images[0].url
-    // });
-    $currentSong.trackLink = {
+  async function playTrackHandler(track: TrackObjectFull) {
+    const trackToQueue: Song = {
       id: track.id,
-      album: { name: track.album.name, totalTracks: track.album.total_tracks },
+      album: { name: track.album.name, id: track.album.id, totalTracks: track.album.total_tracks },
       trackNumber: track.track_number,
       preview_url: track.preview_url || '',
-      name: songName,
-      link: songLink,
+      name: track.name,
+      link: '',
       artist: {
         id: track.album.artists[0].id,
         name: track.album.artists[0].name
       },
+      needsFetch: true,
       img: track.album.images[0].url
     };
+    clearQueue();
+    setCurrentlyPlaying({
+      name: track.name,
+      id: track.id,
+      type: 'SINGLE'
+    });
+    addFetchedSongsToQueue([trackToQueue]);
+    playSong();
   }
 </script>
 
@@ -161,7 +154,7 @@
                   <a data-sveltekit-preload-data="tap" href={`/track/${track.id}`}>
                     <img src={track.album.images[1].url} alt="" />
                   </a>
-                  <PlayBtn innerSize={25} outerSize={40} onclick={() => playSong(track)} />
+                  <PlayBtn innerSize={25} outerSize={40} onclick={() => playTrackHandler(track)} />
                 </div>
               {:else if track.album.images.length > 0}
                 <div class="playlistImg artistImg">
