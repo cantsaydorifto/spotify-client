@@ -108,9 +108,6 @@
     .current-song {
       flex: 1;
     }
-    .song-details > span {
-      max-width: 400px;
-    }
   }
   @media only screen and (max-width: 700px) {
     .song-details > span {

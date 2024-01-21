@@ -37,7 +37,7 @@
       id: playlist.id,
       type: 'PLAYLIST'
     });
-    addFetchedSongsToQueue(tracksToQueue);
+    addFetchedSongsToQueue(tracksToQueue, 0);
     playSong();
   }
 

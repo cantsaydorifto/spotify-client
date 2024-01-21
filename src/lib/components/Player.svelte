@@ -6,7 +6,9 @@
   import Play from './icons/Play.svelte';
   import Volume from './icons/Volume.svelte';
   import tippy from '$lib/actions/tippy';
-  import { currentSong } from './store/currentPlaying';
+  import { currentSong, playSong, playSongPrevious } from './store/currentPlaying';
+  import SkipForward from './icons/SkipForward.svelte';
+  import SkipBack from './icons/SkipBack.svelte';
   export let track: {
     link: string;
   } | null;
@@ -51,6 +53,17 @@
     });
   });
 
+  function skipTrackForward(frwd: boolean) {
+    if (frwd && $currentSong.curTrackPtr < $currentSong.songQueue.length) {
+      playSong();
+      return;
+    }
+    if (!frwd && $currentSong.curTrackPtr > 0) {
+      playSongPrevious();
+      return;
+    }
+  }
+
   function togglePlay() {
     if (paused) {
       audio.play();
@@ -80,13 +93,21 @@
       <span>/</span>
       <span bind:this={durationTimeElement2}>0:00</span>
     </div>
-    <button disabled={!track} class="play-song" on:click={togglePlay}>
-      {#if !paused}
-        <Pause width="18" height="18" />
-      {:else}
-        <Play width="18" height="18" />
-      {/if}
-    </button>
+    <div class="player-controls">
+      <button on:click={() => skipTrackForward(false)} class="skip-song"
+        ><SkipBack width="20" height="20" stroke="white" /></button
+      >
+      <button disabled={!track} class="play-song" on:click={togglePlay}>
+        {#if !paused}
+          <Pause stroke="white" stroke-width="1" width="27" height="27" />
+        {:else}
+          <Play stroke="white" stroke-width="1" width="27" height="27" />
+        {/if}
+      </button>
+      <button on:click={() => skipTrackForward(true)} class="skip-song"
+        ><SkipForward width="20" height="20" stroke="white" /></button
+      >
+    </div>
     <button
       class="volume-tippy-btn"
       use:tippy={{
@@ -147,8 +168,15 @@
     cursor: pointer;
     outline: none;
     border-radius: 50%;
-    padding: 8px;
-    background-color: var(--text-color);
+    /* padding: 8px 0; */
+  }
+  .skip-song {
+    background: none;
+    border: none;
+    cursor: pointer;
+    outline: none;
+    display: flex;
+    align-items: center;
   }
   .volume-controls {
     flex: 3;
@@ -167,10 +195,17 @@
   }
   .button-container {
     width: 100%;
+    height: 35px;
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
+  }
+  .player-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
   }
   .time {
     font-size: 0.75rem;
@@ -211,16 +246,8 @@
     .volume-tippy-btn {
       display: block;
     }
-    .play-song > :global(svg) {
-      fill: var(--text-color);
-    }
     .volume-tippy-btn > :global(svg) {
       stroke: var(--text-color);
-    }
-    .play-song {
-      background-color: var(--sidebar-color);
-      scale: 1.5;
-      padding: 0;
     }
     .timeContainer {
       display: block;
@@ -228,6 +255,11 @@
     .button-container {
       display: flex;
       gap: 20px;
+    }
+  }
+  @media only screen and (max-width: 600px) {
+    .timeContainer {
+      display: none;
     }
   }
 </style>

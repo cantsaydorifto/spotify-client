@@ -58,7 +58,7 @@
       id: track.id,
       type: 'SINGLE'
     });
-    addFetchedSongsToQueue([trackToQueue]);
+    addFetchedSongsToQueue([trackToQueue], 0);
     playSong();
   }
 </script>

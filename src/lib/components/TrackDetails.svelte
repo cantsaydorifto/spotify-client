@@ -53,7 +53,7 @@
   function getTracksToQueue(idx: number): Song[] | null {
     if (!trackLinks && tracks[idx].album && !tracks[idx].link) {
       const tracksToQueue = tracks
-        ? tracks.slice(idx).map((el) => ({
+        ? tracks.map((el) => ({
             name: el.name,
             id: el.id,
             artist: { name: el.artists[0].name, id: el.artists[0].id },
@@ -102,7 +102,7 @@
       });
     }
     return trackLinks
-      ? tracks.slice(idx).map((trackLink) => ({
+      ? tracks.map((trackLink) => ({
           name: trackLink.name,
           id: trackLink.id,
           artist: { name: trackLink.artists[0].name, id: trackLink.artists[0].id },
@@ -160,7 +160,7 @@
               on:click={() => {
                 clearQueue();
                 const tracksToQueue = getTracksToQueue(idx);
-                addFetchedSongsToQueue(tracksToQueue);
+                addFetchedSongsToQueue(tracksToQueue, idx);
                 playSong();
               }}><Play width="20px" height="20px" stroke="white" /></button
             >

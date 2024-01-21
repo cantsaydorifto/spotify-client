@@ -48,7 +48,7 @@
       id: album.id,
       type: 'ALBUM'
     });
-    addFetchedSongsToQueue(tracksToQueue);
+    addFetchedSongsToQueue(tracksToQueue, 0);
     playSong();
   }
 

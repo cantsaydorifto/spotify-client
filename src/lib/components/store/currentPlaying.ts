@@ -5,6 +5,7 @@ export const currentSong = writable<{
   songQueue: Song[];
   audio: HTMLAudioElement | null;
   isPaused: boolean;
+  curTrackPtr: number;
   currentlyPlaying: {
     type: 'PLAYLIST' | 'ALBUM' | 'SINGLE';
     id: string;
@@ -15,7 +16,8 @@ export const currentSong = writable<{
   songQueue: [],
   audio: null,
   isPaused: false,
-  currentlyPlaying: null
+  currentlyPlaying: null,
+  curTrackPtr: -1
 });
 
 export const getCurrentPlayingSong = () => {
@@ -25,7 +27,14 @@ export const getCurrentPlayingSong = () => {
 
 export const clearQueue = () => {
   currentSong.update((current) => {
-    return { ...current, songQueue: [], isPaused: true, currentlyPlaying: null, trackLink: null };
+    return {
+      ...current,
+      songQueue: [],
+      isPaused: true,
+      currentlyPlaying: null,
+      trackLink: null,
+      curTrackPtr: -1
+    };
   });
 };
 
@@ -54,14 +63,14 @@ export const togglePlay = () => {
   });
 };
 
-export const addFetchedSongsToQueue = (trackLink: Song[] | null) => {
+export const addFetchedSongsToQueue = (trackLink: Song[] | null, idx: number) => {
   if (!trackLink) return;
   currentSong.update((current) => {
-    return { ...current, songQueue: [...trackLink, ...current.songQueue] };
+    return { ...current, songQueue: [...current.songQueue, ...trackLink], curTrackPtr: idx - 1 };
   });
 };
 
-export const addSongToQueue = async (track: Song | null) => {
+export const addSongToQueue = async (track: Song | null, ptr: number) => {
   if (!track) {
     return false;
   }
@@ -86,7 +95,7 @@ export const addSongToQueue = async (track: Song | null) => {
   }
   currentSong.update((current) => {
     const cur = [...current.songQueue];
-    cur.unshift({
+    cur[ptr] = {
       name: songName,
       id: songId,
       artist: {
@@ -102,7 +111,7 @@ export const addSongToQueue = async (track: Song | null) => {
       },
       trackNumber: track.trackNumber,
       preview_url: track.preview_url || ''
-    });
+    };
     return { ...current, songQueue: [...cur] };
   });
   return true;
@@ -110,44 +119,106 @@ export const addSongToQueue = async (track: Song | null) => {
 
 export const playSong = () => {
   currentSong.update((current) => {
+    const ptr = [current.curTrackPtr + 1];
     const curQueue = [...current.songQueue];
-    if (curQueue.length <= 0) {
+    if (ptr[0] >= curQueue.length) {
       return current;
     }
-    const curTrack = curQueue.shift() || null;
-    if (!curTrack || !curTrack.needsFetch) {
-      // console.log(curTrack);
-      return { ...current, trackLink: curTrack || null, isPaused: false, songQueue: [...curQueue] };
+    const curTrack = curQueue[ptr[0]];
+    if (!curTrack.needsFetch) {
+      return {
+        ...current,
+        trackLink: curTrack || null,
+        isPaused: false,
+        songQueue: [...curQueue],
+        curTrackPtr: ptr[0]
+      };
     }
     const song = curTrack;
     // console.log(curTrack);
-    playNextSong(song);
+    playNextSong(song, ptr);
     return { ...current, songQueue: [...curQueue] };
   });
 };
 
-const playNextSong = async (track: Song | null) => {
-  const res = await addSongToQueue(track);
+export const playSongPrevious = () => {
+  currentSong.update((current) => {
+    const ptr = [current.curTrackPtr - 1];
+    const curQueue = [...current.songQueue];
+    if (ptr[0] <= 0) {
+      return current;
+    }
+    const curTrack = curQueue[ptr[0]];
+    // console.log(curTrack);
+    if (!curTrack.needsFetch) {
+      return {
+        ...current,
+        trackLink: curTrack || null,
+        isPaused: false,
+        songQueue: [...curQueue],
+        curTrackPtr: ptr[0]
+      };
+    }
+    const song = curTrack;
+    // console.log(curTrack);
+    playPrevSong(song, ptr);
+    return { ...current, songQueue: [...curQueue] };
+  });
+};
+
+const playPrevSong = async (track: Song | null, ptr: number[]) => {
+  const curState = get(currentSong);
+  if (!track && ptr[0] < 0) return;
+  // console.log({ track, ptr: ptr[0] });
+  console.log({ curPtr: ptr[0], queue: curState.songQueue });
+  const res = await addSongToQueue(track, ptr[0]);
   if (!res) {
-    const t = get(currentSong).songQueue[0] || null;
-    currentSong.update((el) => {
-      const curQueue = [...el.songQueue];
-      curQueue.shift();
-      return { ...el, songQueue: [...curQueue] };
-    });
-    playNextSong(t);
+    ptr[0] -= 1;
+    // console.log(ptr);
+    const t = ptr[0] >= 0 ? curState.songQueue[ptr[0]] : null;
+    console.log('T==>', t);
+    playPrevSong(t, ptr);
     return;
   }
   currentSong.update((current) => {
     const curQueue = [...current.songQueue];
-    if (curQueue.length > 0 && curQueue[0].link === '') {
-      curQueue[0].link = curQueue[0].preview_url;
+    if (ptr[0] >= 0 && curQueue[ptr[0]].link === '') {
+      curQueue[ptr[0]].link = curQueue[ptr[0]].preview_url;
     }
     return {
       ...current,
-      trackLink: curQueue.shift() || null,
+      trackLink: curQueue[ptr[0]],
       isPaused: false,
-      songQueue: [...curQueue]
+      songQueue: [...curQueue],
+      curTrackPtr: ptr[0]
+    };
+  });
+};
+
+const playNextSong = async (track: Song | null, ptr: number[]) => {
+  const curState = get(currentSong);
+  if (!track && ptr[0] >= curState.songQueue.length) return;
+  // console.log({ track, ptr: ptr[0] });
+  console.log({ curPtr: ptr[0], queue: curState.songQueue });
+  const res = await addSongToQueue(track, ptr[0]);
+  if (!res) {
+    ptr[0] += 1;
+    // console.log(ptr);
+    const t = ptr[0] < curState.songQueue.length ? curState.songQueue[ptr[0]] : null;
+    playNextSong(t, ptr);
+    return;
+  }
+  currentSong.update((current) => {
+    const curQueue = [...current.songQueue];
+    if (ptr[0] < curQueue.length && curQueue[ptr[0]].link === '') {
+      curQueue[ptr[0]].link = curQueue[ptr[0]].preview_url;
+    }
+    return {
+      ...current,
+      trackLink: curQueue[ptr[0]],
+      isPaused: false,
+      songQueue: [...curQueue],
+      curTrackPtr: ptr[0]
     };
   });
 };
