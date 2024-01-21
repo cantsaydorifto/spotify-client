@@ -24,6 +24,12 @@
     audio.addEventListener('timeupdate', () => {
       currentTimeElement.textContent = msToTime(audio.currentTime * 1000);
       currentTimeElement2.textContent = msToTime(audio.currentTime * 1000);
+      if (isFinite(audio.duration))
+        navigator.mediaSession.setPositionState({
+          duration: audio.duration,
+          playbackRate: audio.playbackRate,
+          position: audio.currentTime
+        });
     });
     audio.addEventListener('loadedmetadata', () => {
       // console.log('done');
@@ -31,6 +37,11 @@
       durationTimeElement2.textContent = msToTime(audio.duration * 1000);
     });
     audio.addEventListener('play', function () {
+      navigator.mediaSession.setPositionState({
+        duration: audio.duration,
+        playbackRate: audio.playbackRate,
+        position: audio.currentTime
+      });
       navigator.mediaSession.metadata = new MediaMetadata({
         title: $currentSong.trackLink ? $currentSong.trackLink.name : 'No Song Playing',
         artist: $currentSong.trackLink ? $currentSong.trackLink.artist.name : 'No Artist Playing',
@@ -48,6 +59,12 @@
         audio.pause();
         paused = true;
         $currentSong.isPaused = paused;
+      });
+      navigator.mediaSession.setActionHandler('nexttrack', () => {
+        skipTrackForward(true);
+      });
+      navigator.mediaSession.setActionHandler('previoustrack', () => {
+        skipTrackForward(false);
       });
       console.log(navigator.mediaSession.metadata);
     });
