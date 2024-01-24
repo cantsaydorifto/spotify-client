@@ -36,22 +36,38 @@ export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, parent }) 
     }
   })();
 
-  const [res1, res2, res3, res5, res6] = await Promise.all([
+  const [res1, res2, res3, res5, res6, res7] = await Promise.all([
     fetch('/api/spotify/browse/new-releases?country=US&limit=50'),
     fetch('/api/spotify/browse/featured-playlists?country=US'),
     fetch(`/api/spotify/users/${parentData.user?.id}/playlists`),
-    fetch(`/api/spotify/search?q=${encodeURIComponent('Daily Mix')}&type=playlist}`),
-    fetch(`/api/spotify/search?q=${encodeURIComponent('Discover Weekly')}&type=playlist}`)
+    fetch(`/api/spotify/search?q=${encodeURIComponent('Daily Mix')}&type=playlist`),
+    fetch(`/api/spotify/search?q=${encodeURIComponent('Discover Weekly')}&type=playlist`),
+    fetch(`/api/spotify/search?q=${encodeURIComponent('for you')}&type=playlist`)
   ]);
   const forYouPlaylists: PlaylistObjectSimplified[] = [];
-  const dailyMix = (await res5.json()) as SearchResponse;
-  const discoverWeekly = (await res6.json()) as SearchResponse;
+
+  const [dailyMix, discoverWeekly, forYouReults] = await Promise.all([
+    res5.json() as SearchResponse,
+    res6.json() as SearchResponse,
+    res7.json() as SearchResponse
+  ]);
   console.log('RESPONSE', dailyMix);
   if (dailyMix.playlists) {
     dailyMix.playlists.items.forEach((el) => {
       if (el.owner.id === 'spotify' && el.name.startsWith('Daily Mix')) forYouPlaylists.push(el);
     });
     forYouPlaylists.sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  if (forYouReults.playlists && forYouReults.playlists.items.length > 0) {
+    forYouReults.playlists.items.forEach((el) => {
+      if (
+        el.owner.id === 'spotify' &&
+        (el.name !== 'Discover Weekly' || el.name.startsWith('Daily Mix'))
+      ) {
+        forYouPlaylists.unshift(el);
+      }
+    });
   }
 
   if (
