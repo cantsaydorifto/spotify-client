@@ -82,6 +82,8 @@ export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, parent }) 
     forYouPlaylists.unshift(discoverWeekly.playlists.items[0]);
   }
 
+  forYouPlaylists.unshift(getEmptyLikesPlaylist());
+
   return {
     newReleases: res1.ok ? (res1.json() as Promise<ListOfNewReleasesResponse>) : null,
     featuredPlaylists: res2.ok ? (res2.json() as Promise<ListOfFeaturedPlaylistsResponse>) : null,
@@ -90,3 +92,34 @@ export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, parent }) 
     forYouPlaylists
   };
 };
+
+const getEmptyLikesPlaylist = (): PlaylistObjectSimplified => ({
+  collaborative: false,
+  description: null,
+  external_urls: { spotify: '' },
+  href: '',
+  id: 'likes',
+  images: [
+    {
+      height: 640,
+      url: 'https://misc.scdn.co/liked-songs/liked-songs-640.png',
+      width: 640
+    }
+  ],
+  name: 'Liked Songs',
+  owner: {
+    display_name: 'Spotify',
+    external_urls: {
+      spotify: 'https://open.spotify.com/user/spotify'
+    },
+    href: 'https://api.spotify.com/v1/users/spotify',
+    id: 'spotify',
+    type: 'user',
+    uri: 'spotify:user:spotify'
+  },
+  public: null,
+  snapshot_id: '',
+  tracks: { href: '', total: 0 },
+  type: 'playlist',
+  uri: ''
+});
