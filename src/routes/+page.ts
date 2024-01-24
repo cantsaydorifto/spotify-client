@@ -63,7 +63,11 @@ export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, parent }) 
     forYouReults.playlists.items.forEach((el) => {
       if (
         el.owner.id === 'spotify' &&
-        (el.name !== 'Discover Weekly' || el.name.startsWith('Daily Mix'))
+        !(
+          el.name === 'Discover Weekly' ||
+          el.name.startsWith('Daily Mix') ||
+          el.name.endsWith('Radio')
+        )
       ) {
         forYouPlaylists.unshift(el);
       }
