@@ -12,6 +12,13 @@
     items: (AlbumObjectSimplified | PlaylistObjectSimplified)[];
   }[] = [];
   $: {
+    if (data.forYouPlaylists) {
+      sections.push({
+        title: 'For You',
+        path: '/playlist',
+        items: data.forYouPlaylists
+      });
+    }
     if (data.newReleases) {
       sections.push({
         title: 'New Releases',

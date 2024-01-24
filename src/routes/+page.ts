@@ -9,9 +9,6 @@ export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, parent }) 
   if (!parentData.user) {
     throw redirect(307, '/svn');
   }
-  const res1 = await fetch('/api/spotify/browse/new-releases?country=US&limit=50');
-  const res2 = await fetch('/api/spotify/browse/featured-playlists?country=US');
-  const res3 = await fetch(`/api/spotify/users/${parentData.user?.id}/playlists`);
   const res4 = await fetch('/api/spotify/browse/categories?country=US');
   const categoryJson = res4.ok ? ((await res4.json()) as MultipleCategoriesResponse) : null;
   const randomCategories = (
@@ -19,15 +16,14 @@ export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, parent }) 
       ? categoryJson.categories.items.sort(() => Math.random() - Math.random()).slice(6)
       : []
   ).filter((el) => !problemIds.includes(el.id));
-  // console.log(categoryJson);
-  // console.log(randomCategories);
-  // console.log(randomCategories.map((el) => el.id));
-  const randomCategoriesPromises = randomCategories.map((el) =>
-    fetch(`/api/spotify/browse/categories/${el.id}/playlists?country=US`)
-  );
+
   const a = await (async () => {
     try {
-      const res = await Promise.all(randomCategoriesPromises);
+      const res = await Promise.all(
+        randomCategories.map((el) =>
+          fetch(`/api/spotify/browse/categories/${el.id}/playlists?country=US`)
+        )
+      );
       const res_1 = (await Promise.all(res.map((el) => el.json()))) as CategoryPlaylistsResponse[];
       return res_1.map((el, i) => {
         return {
@@ -39,21 +35,38 @@ export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, parent }) 
       return [];
     }
   })();
-  // console.log(a);
-  const [newReleases, featuredPlaylists, userCreatedPlaylists] = await Promise.all([
-    res1,
-    res2,
-    res3
+
+  const [res1, res2, res3, res5, res6] = await Promise.all([
+    fetch('/api/spotify/browse/new-releases?country=US&limit=50'),
+    fetch('/api/spotify/browse/featured-playlists?country=US'),
+    fetch(`/api/spotify/users/${parentData.user?.id}/playlists`),
+    fetch(`/api/spotify/search?q=${encodeURIComponent('Daily Mix')}&type=playlist}`),
+    fetch(`/api/spotify/search?q=${encodeURIComponent('Discover Weekly')}&type=playlist}`)
   ]);
+  const forYouPlaylists: PlaylistObjectSimplified[] = [];
+  const dailyMix = (await res5.json()) as SearchResponse;
+  const discoverWeekly = (await res6.json()) as SearchResponse;
+  console.log('RESPONSE', dailyMix);
+  if (dailyMix.playlists) {
+    dailyMix.playlists.items.forEach((el) => {
+      if (el.owner.id === 'spotify' && el.name.startsWith('Daily Mix')) forYouPlaylists.push(el);
+    });
+    forYouPlaylists.sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  if (
+    discoverWeekly.playlists &&
+    discoverWeekly.playlists.items.length > 0 &&
+    discoverWeekly.playlists.items[0].owner.id === 'spotify'
+  ) {
+    forYouPlaylists.unshift(discoverWeekly.playlists.items[0]);
+  }
 
   return {
-    newReleases: res1.ok ? (newReleases.json() as Promise<ListOfNewReleasesResponse>) : null,
-    featuredPlaylists: res2.ok
-      ? (featuredPlaylists.json() as Promise<ListOfFeaturedPlaylistsResponse>)
-      : null,
-    userCreatedPlaylists: res3.ok
-      ? (userCreatedPlaylists.json() as Promise<ListOfUsersPlaylistsResponse>)
-      : null,
-    randomCategories: a
+    newReleases: res1.ok ? (res1.json() as Promise<ListOfNewReleasesResponse>) : null,
+    featuredPlaylists: res2.ok ? (res2.json() as Promise<ListOfFeaturedPlaylistsResponse>) : null,
+    userCreatedPlaylists: res3.ok ? (res3.json() as Promise<ListOfUsersPlaylistsResponse>) : null,
+    randomCategories: a,
+    forYouPlaylists
   };
 };
