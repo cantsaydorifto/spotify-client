@@ -22,7 +22,7 @@
   const trackLinks = data.tracks.map((el) => {
     return {
       name: el.name,
-      album: el.album.name,
+      album: { name: el.album.name, id: el.album.id },
       img: el.album.images[el.album.images.length - 1].url,
       link: el.link || ''
     };
