@@ -409,9 +409,19 @@
       gap: 10px;
     }
   }
-  @media only screen and (max-width: 520px) {
-    /* .track-title h4 {
+  @media only screen and (max-width: 450px) {
+    .track-title h4 {
       max-width: 200px;
-    } */
+    }
+  }
+  @media only screen and (max-width: 370px) {
+    .track-title h4 {
+      max-width: 150px;
+    }
+  }
+  @media only screen and (max-width: 300px) {
+    .track-title h4 {
+      max-width: 70px;
+    }
   }
 </style>

@@ -3,6 +3,7 @@
   import Button from '$lib/components/Button.svelte';
   import CatergorySection from '$lib/components/CatergorySection.svelte';
   import { currentSong } from '$lib/components/store/currentPlaying';
+  import QuickPicks from '$lib/components/QuickPicks.svelte';
 
   export let data;
   const sections: {
@@ -52,9 +53,9 @@
 <h4>{data.user ? data.user.display_name : 'Not signed in'}</h4>
 <LogoutButton />
 <Button element="a" style="solid" href="/api/auth/login">Login</Button>
+
+<QuickPicks />
+
 {#each sections as section}
   <CatergorySection {section} />
 {/each}
-
-<style>
-</style>
