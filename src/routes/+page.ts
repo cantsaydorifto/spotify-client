@@ -13,7 +13,7 @@ export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, parent }) 
   const categoryJson = res4.ok ? ((await res4.json()) as MultipleCategoriesResponse) : null;
   const randomCategories = (
     categoryJson
-      ? categoryJson.categories.items.sort(() => Math.random() - Math.random()).slice(6)
+      ? categoryJson.categories.items.sort(() => Math.random() - Math.random()).slice(0, 4)
       : []
   ).filter((el) => !problemIds.includes(el.id));
 
