@@ -2,7 +2,7 @@ import interceptFetch from '$lib/interceptor/interceptFetch';
 import { redirect } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
 
-export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, parent }) => {
+export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, parent, setHeaders }) => {
   const fetch = (path: string) => interceptFetch(fetchWithNoInterceptor, path);
   const problemIds = ['0JQ5DAqbMKFIRybaNTYXXy', '0JQ5DAqbMKFy0OenPG51Av', '0JQ5DAqbMKFDTEtSaS4R92'];
   const parentData = await parent();
@@ -36,10 +36,9 @@ export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, parent }) 
     }
   })();
 
-  const [res1, res2, res3, res5, res6, res7] = await Promise.all([
+  const [res1, res2, res5, res6, res7] = await Promise.all([
     fetch('/api/spotify/browse/new-releases?country=US&limit=50'),
     fetch('/api/spotify/browse/featured-playlists?country=US'),
-    fetch(`/api/spotify/users/${parentData.user?.id}/playlists`),
     fetch(`/api/spotify/search?q=${encodeURIComponent('Daily Mix')}&type=playlist`),
     fetch(`/api/spotify/search?q=${encodeURIComponent('Discover Weekly')}&type=playlist`),
     fetch(`/api/spotify/search?q=${encodeURIComponent('for you')}&type=playlist`)
@@ -51,7 +50,6 @@ export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, parent }) 
     res6.json() as SearchResponse,
     res7.json() as SearchResponse
   ]);
-  console.log('RESPONSE', dailyMix);
   if (dailyMix.playlists) {
     dailyMix.playlists.items.forEach((el) => {
       if (el.owner.id === 'spotify' && el.name.startsWith('Daily Mix')) forYouPlaylists.push(el);
@@ -83,11 +81,15 @@ export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, parent }) 
   }
 
   forYouPlaylists.unshift(getEmptyLikesPlaylist());
+  // console.log(res5.headers.get('cache-control'));
+  // setHeaders({
+  //   age: '3600',
+  //   'cache-control'
+  // })
 
   return {
     newReleases: res1.ok ? (res1.json() as Promise<ListOfNewReleasesResponse>) : null,
     featuredPlaylists: res2.ok ? (res2.json() as Promise<ListOfFeaturedPlaylistsResponse>) : null,
-    userCreatedPlaylists: res3.ok ? (res3.json() as Promise<ListOfUsersPlaylistsResponse>) : null,
     randomCategories: a,
     forYouPlaylists
   };

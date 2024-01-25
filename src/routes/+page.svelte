@@ -33,13 +33,6 @@
         items: data.featuredPlaylists.playlists.items
       });
     }
-    if (data.userCreatedPlaylists) {
-      sections.push({
-        title: 'Created Playlists',
-        path: '/playlist',
-        items: data.userCreatedPlaylists.items
-      });
-    }
     data.randomCategories.forEach((el) => {
       sections.push({
         title: el.name,

@@ -2,7 +2,7 @@ import type { RequestHandler } from './$types';
 import { BASE_SPOTIFY_API_URL } from '$env/static/private';
 import { error, json } from '@sveltejs/kit';
 
-export const GET: RequestHandler = async ({ fetch, cookies, params, url }) => {
+export const GET: RequestHandler = async ({ fetch, cookies, params, url, setHeaders }) => {
   const accessToken = cookies.get('spotify_access_token');
 
   const response = await fetch(`${BASE_SPOTIFY_API_URL}/${params.path}${url.search}`, {
@@ -11,8 +11,16 @@ export const GET: RequestHandler = async ({ fetch, cookies, params, url }) => {
     }
   });
   const responseJSON = await response.json();
+
   if (!response.ok) {
     throw error(responseJSON.error.status, responseJSON.error.message);
+  }
+
+  const cacheControl = response.headers.get('cache-control');
+  if (cacheControl) {
+    setHeaders({
+      'cache-control': cacheControl
+    });
   }
   return json(responseJSON);
 };
