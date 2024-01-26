@@ -4,9 +4,7 @@
   import PlayBtn from './PlayBtn.svelte';
   import {
     addFetchedSongsToQueue,
-    addSongToQueue,
     clearQueue,
-    currentSong,
     playSong,
     setCurrentlyPlaying
   } from './store/currentPlaying';
@@ -425,6 +423,7 @@
   .info > h2 {
     font-size: 1.5rem;
     padding-left: 20px;
+    color: var(--light-gray);
   }
   section {
     display: flex;
@@ -434,6 +433,15 @@
     width: calc(100vw - var(--sidebar-width) - 70px);
     overflow: hidden;
     margin: 30px 0;
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
   .grid-container {
     display: flex;
