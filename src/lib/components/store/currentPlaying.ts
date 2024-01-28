@@ -118,6 +118,12 @@ export const addSongToQueue = async (track: Song | null, ptr: number) => {
 };
 
 export const playSong = () => {
+  const curState = get(currentSong);
+  if (curState.curTrackPtr + 1 >= curState.songQueue.length) {
+    clearQueue();
+    return curState;
+  }
+  setLoading();
   currentSong.update((current) => {
     const ptr = [current.curTrackPtr + 1];
     const curQueue = [...current.songQueue];
@@ -142,10 +148,15 @@ export const playSong = () => {
 };
 
 export const playSongPrevious = () => {
+  const curState = get(currentSong);
+  if (curState.curTrackPtr - 1 < 0) {
+    return curState;
+  }
+  setLoading();
   currentSong.update((current) => {
     const ptr = [current.curTrackPtr - 1];
     const curQueue = [...current.songQueue];
-    if (ptr[0] <= 0) {
+    if (ptr[0] < 0) {
       return current;
     }
     const curTrack = curQueue[ptr[0]];
@@ -168,7 +179,10 @@ export const playSongPrevious = () => {
 
 const playPrevSong = async (track: Song | null, ptr: number[]) => {
   const curState = get(currentSong);
-  if (!track && ptr[0] < 0) return;
+  if (!track && ptr[0] < 0) {
+    clearQueue();
+    return;
+  }
   // console.log({ track, ptr: ptr[0] });
   // console.log({ curPtr: ptr[0], queue: curState.songQueue });
   const res = await addSongToQueue(track, ptr[0]);
@@ -197,7 +211,10 @@ const playPrevSong = async (track: Song | null, ptr: number[]) => {
 
 const playNextSong = async (track: Song | null, ptr: number[]) => {
   const curState = get(currentSong);
-  if (!track && ptr[0] >= curState.songQueue.length) return;
+  if (!track && ptr[0] >= curState.songQueue.length) {
+    clearQueue();
+    return;
+  }
   // console.log({ track, ptr: ptr[0] });
   // console.log({ curPtr: ptr[0], queue: curState.songQueue });
   const res = await addSongToQueue(track, ptr[0]);
@@ -222,3 +239,22 @@ const playNextSong = async (track: Song | null, ptr: number[]) => {
     };
   });
 };
+
+function setLoading() {
+  currentSong.update((current) => {
+    return {
+      ...current,
+      trackLink: {
+        album: { id: 'LOADING-ALBUM', name: 'Loading Album...', totalTracks: -1 },
+        artist: { id: 'LAODING-ARTIST', name: 'Loading Artist...' },
+        id: 'LOADING',
+        img: '',
+        link: '',
+        name: 'Loading Track...',
+        preview_url: '',
+        trackNumber: -1,
+        needsFetch: false
+      }
+    };
+  });
+}

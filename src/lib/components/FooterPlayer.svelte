@@ -6,18 +6,26 @@
 {#if !!$currentSong.trackLink}
   <footer>
     <div class="footerContainer">
-      <div class="current-song">
-        <img src={$currentSong.trackLink.img} alt="" />
-        <div class="song-details">
-          <span title={$currentSong.trackLink.name}>{@html $currentSong.trackLink.name}</span>
-          <span
-            ><a href={`/artist/${$currentSong.trackLink.artist.id}`}
-              >{@html $currentSong.trackLink.artist.name}</a
-            ></span
-          >
+      {#key $currentSong.trackLink.id}
+        <div class="current-song">
+          {#if $currentSong.trackLink.id === 'LOADING'}
+            <span class="loadingImageContainer">
+              <span class="loader" />
+            </span>
+          {:else}
+            <img src={$currentSong.trackLink.img} alt="" />
+          {/if}
+          <div class="song-details">
+            <span title={$currentSong.trackLink.name}>{@html $currentSong.trackLink.name}</span>
+            <span
+              ><a href={`/artist/${$currentSong.trackLink.artist.id}`}
+                >{@html $currentSong.trackLink.artist.name}</a
+              ></span
+            >
+          </div>
+          <!-- <Heart width="18px" height="18px" /> -->
         </div>
-        <!-- <Heart width="18px" height="18px" /> -->
-      </div>
+      {/key}
       <div class="player-controls">
         <Player track={$currentSong.trackLink} />
       </div>
@@ -57,6 +65,15 @@
     height: 100%;
     min-width: 220px;
     padding: 10px 0 10px 16px;
+    animation: fadeIn 0.35s ease-in-out;
+  }
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
   }
   .song-details {
     display: flex;
@@ -84,8 +101,7 @@
   .song-details > span:nth-child(2) > a:hover {
     text-decoration: underline;
   }
-  .current-song > img,
-  .albumArtContainer {
+  .current-song > img {
     width: 56px;
     height: 56px;
     border-radius: 4px;
@@ -94,6 +110,34 @@
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+  .loadingImageContainer {
+    width: 56px;
+    height: 56px;
+    opacity: 0.6;
+    border-radius: 4px;
+    flex-shrink: 0;
+    background-color: rgba(66, 66, 66, 0.588);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .loader {
+    width: 25px;
+    height: 25px;
+    border: 2px solid #7b7b7b;
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    animation: rotation 1s linear infinite;
+  }
+
+  @keyframes rotation {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
   }
   .player-controls {
     flex: 7;

@@ -66,12 +66,12 @@
       navigator.mediaSession.setActionHandler('previoustrack', () => {
         skipTrackForward(false);
       });
-      console.log(navigator.mediaSession.metadata);
+      // console.log(navigator.mediaSession.metadata);
     });
   });
 
   function skipTrackForward(frwd: boolean) {
-    if (frwd && $currentSong.curTrackPtr < $currentSong.songQueue.length) {
+    if (frwd && $currentSong.curTrackPtr < $currentSong.songQueue.length - 1) {
       playSong();
       return;
     }
