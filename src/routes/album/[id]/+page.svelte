@@ -111,7 +111,6 @@
     <button class="heart"><Heart width="36px" height="36px" /></button>
     <button class="heart"><ThreeHorizontalDots /></button>
   </div>
-  {console.log(tracks)}
   {#if tracks && tracks.length > 0}
     <TrackDetails {hasLiked} tracks={album.tracks.items} trackLinks={tracks} />
   {:else}

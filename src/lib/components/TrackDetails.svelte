@@ -209,7 +209,7 @@
                   throw new Error(err);
                 }
               } catch (err) {
-                console.log(err);
+                // console.log(err);
                 hasLiked[idx] = curState;
               }
             }}

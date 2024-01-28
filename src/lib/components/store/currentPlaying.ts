@@ -170,13 +170,13 @@ const playPrevSong = async (track: Song | null, ptr: number[]) => {
   const curState = get(currentSong);
   if (!track && ptr[0] < 0) return;
   // console.log({ track, ptr: ptr[0] });
-  console.log({ curPtr: ptr[0], queue: curState.songQueue });
+  // console.log({ curPtr: ptr[0], queue: curState.songQueue });
   const res = await addSongToQueue(track, ptr[0]);
   if (!res) {
     ptr[0] -= 1;
     // console.log(ptr);
     const t = ptr[0] >= 0 ? curState.songQueue[ptr[0]] : null;
-    console.log('T==>', t);
+    // console.log('T==>', t);
     playPrevSong(t, ptr);
     return;
   }
@@ -199,7 +199,7 @@ const playNextSong = async (track: Song | null, ptr: number[]) => {
   const curState = get(currentSong);
   if (!track && ptr[0] >= curState.songQueue.length) return;
   // console.log({ track, ptr: ptr[0] });
-  console.log({ curPtr: ptr[0], queue: curState.songQueue });
+  // console.log({ curPtr: ptr[0], queue: curState.songQueue });
   const res = await addSongToQueue(track, ptr[0]);
   if (!res) {
     ptr[0] += 1;

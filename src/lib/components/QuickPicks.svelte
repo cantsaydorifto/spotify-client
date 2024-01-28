@@ -18,7 +18,7 @@
     if (recommendedObjectRes.ok) {
       recommendedObject = (await recommendedObjectRes.json()) as RecommendationsObject;
     }
-    console.log(recommendedObject.tracks.length);
+    // console.log(recommendedObject.tracks.length);
     return recommendedObject;
   }
 </script>
