@@ -1,41 +1,15 @@
 <script lang="ts">
   import Clock3 from './icons/Clock3.svelte';
   import Play from './icons/Play.svelte';
-  import { page } from '$app/stores';
   import Heart from './icons/Heart.svelte';
-  import greenEqualiser from '../../assets/equaliser-animated-green.gif';
-  import {
-    addFetchedSongsToQueue,
-    clearQueue,
-    currentSong,
-    playSong,
-    setCurrentlyPlaying
-  } from './store/currentPlaying';
+
   export let tracks:
     | (TrackObjectSimplified & { album?: AlbumObjectSimplified; link?: string })[]
     | (TrackObjectFull & { link?: string })[];
   tracks = tracks.filter((track) => !!track);
-  export let playlist: {
-    name: string;
-    id: string;
-  } | null = null;
-  export let single = false;
-  export let trackLinks:
-    | {
-        name: string;
-        album: { name: string; id: string };
-        img: string;
-        link: string;
-      }[]
-    | null;
-  export let svn: boolean = false;
+
   export let hasLiked: boolean[] = [];
-  if (trackLinks && trackLinks.length === tracks.length) {
-    let t = trackLinks; // typescript error
-    tracks.forEach((track, idx) => {
-      track.link = t[idx].link;
-    });
-  }
+
   if (hasLiked.length === 0) {
     hasLiked = new Array(tracks.length).fill(false);
   }
@@ -50,80 +24,6 @@
 
     return `${hours > 0 ? `${hours}:` : ''}${paddedMinutes}:${paddedSeconds}`;
   }
-  function getTracksToQueue(idx: number): Song[] | null {
-    if (!trackLinks) {
-      const tracksToQueue = tracks
-        ? tracks.map((el) => ({
-            name: el.name,
-            id: el.id,
-            artist: { name: el.artists[0].name, id: el.artists[0].id },
-            img: el.album ? el.album.images[0].url : '',
-            link: '',
-            album: {
-              name: el.album ? el.album.name : '',
-              totalTracks: el.album ? el.album.total_tracks : 0,
-              id: el.album ? el.album.id : ''
-            },
-            trackNumber: el.track_number,
-            preview_url: el.preview_url || '',
-            needsFetch: true
-          }))
-        : null;
-      if (playlist) {
-        setCurrentlyPlaying({
-          name: playlist.name,
-          id: playlist.id,
-          type: 'PLAYLIST'
-        });
-      } else {
-        setCurrentlyPlaying(
-          tracksToQueue
-            ? {
-                name: tracksToQueue[0].album.name,
-                id: tracksToQueue[0].id,
-                type: 'SINGLE'
-              }
-            : null
-        );
-      }
-      return tracksToQueue;
-    }
-    if (!single) {
-      setCurrentlyPlaying({
-        id: trackLinks ? trackLinks[0].album.id : '',
-        type: 'ALBUM',
-        name: trackLinks ? trackLinks[0].album.name : ''
-      });
-    } else {
-      setCurrentlyPlaying({
-        id: tracks[0].id,
-        type: 'SINGLE',
-        name: tracks[0].name
-      });
-    }
-    return trackLinks
-      ? tracks.map((trackLink) => ({
-          name: trackLink.name,
-          id: trackLink.id,
-          artist: { name: trackLink.artists[0].name, id: trackLink.artists[0].id },
-          img:
-            svn && trackLink.album
-              ? trackLink.album.images[1].url
-              : trackLinks
-              ? trackLinks[0].img
-              : '',
-          link: trackLink.link || '',
-          album: {
-            name: trackLinks ? trackLinks[0].album.name : '',
-            id: trackLinks ? trackLinks[0].album.id : '',
-            totalTracks: trackLink.album ? trackLink.album.total_tracks : 0
-          },
-          trackNumber: tracks[idx].track_number,
-          preview_url: tracks[idx].preview_url || ''
-        }))
-      : null;
-  }
-  $: user = $page.data.user;
 </script>
 
 <div class="tracks">
@@ -143,28 +43,10 @@
   {/if}
   <div class="tracks-container">
     {#each tracks as track, idx}
-      <div
-        class="row"
-        class:playing={$currentSong.trackLink ? $currentSong.trackLink.id === track.id : false}
-      >
+      <div class="row">
         <div class="number-column">
-          {#if $currentSong.trackLink && $currentSong.trackLink.id === track.id}
-            {#if !$currentSong.isPaused}
-              <img width="15" height="15" src={greenEqualiser} alt="equaliser" />
-            {:else}
-              <span style:color="var(--accent-color)" style:font-size="0.875rem">{idx + 1}</span>
-            {/if}
-          {:else}
-            <span class="number">{idx + 1}</span>
-            <button
-              on:click={() => {
-                clearQueue();
-                const tracksToQueue = getTracksToQueue(idx);
-                addFetchedSongsToQueue(tracksToQueue, idx);
-                playSong();
-              }}><Play width="20px" height="20px" stroke="white" /></button
-            >
-          {/if}
+          <span class="number">{idx + 1}</span>
+          <button disabled><Play width="20px" height="20px" stroke="white" /></button>
         </div>
         <div class="trackInfoContainer">
           {#if track.album && track.album.images.length > 0}
@@ -172,12 +54,7 @@
           {/if}
           <div class="info-column">
             <div class="track-title">
-              <h4
-                style:color={$currentSong.trackLink && $currentSong.trackLink.id === track.id
-                  ? 'var(--accent-color)'
-                  : 'white'}
-                title={track.name}
-              >
+              <h4 title={track.name}>
                 <a data-sveltekit-preload-data="tap" href={`/track/${track.id}`}
                   >{@html track.name}</a
                 >
@@ -188,40 +65,20 @@
             </div>
             <p class="artists">
               {#each track.artists as artist, artistIndex}
-                <a href={`/${svn ? 'svn/' : ''}artist/${artist.id}`}>{@html artist.name}</a
+                <a href={`/artist/${artist.id}`}>{@html artist.name}</a
                 >{#if artistIndex < track.artists.length - 1}{', '}{/if}
               {/each}
             </p>
           </div>
         </div>
         <div class="duration-column">
-          <button
-            disabled={!user}
-            on:click={async () => {
-              const curState = hasLiked[idx];
-              hasLiked[idx] = !hasLiked[idx];
-              try {
-                const res = await fetch(`/api/spotify/me/tracks?id=${track.id}`, {
-                  method: !curState ? 'PUT' : 'DELETE'
-                });
-                if (!res.ok) {
-                  const err = await res.json();
-                  throw new Error(err);
-                }
-              } catch (err) {
-                console.log(err);
-                hasLiked[idx] = curState;
-              }
-            }}
-          >
-            {#key hasLiked[idx]}
-              <Heart
-                width="16"
-                height="16"
-                stroke={!hasLiked[idx] ? 'var(--light-gray)' : 'var(--accent-color)'}
-                fill={hasLiked[idx] ? 'var(--accent-color)' : 'none'}
-              />
-            {/key}
+          <button disabled>
+            <Heart
+              width="16"
+              height="16"
+              stroke={!hasLiked[idx] ? 'var(--light-gray)' : 'var(--accent-color)'}
+              fill={hasLiked[idx] ? 'var(--accent-color)' : 'none'}
+            />
           </button>
           <span class="duration">{msToTime(track.duration_ms)}</span>
         </div>
@@ -231,12 +88,12 @@
 </div>
 
 <style>
-  /* .tracks {
+  .tracks {
     animation: fadeIn 0.5s ease-in-out;
-  } */
+  }
   @keyframes fadeIn {
     from {
-      opacity: 0.5;
+      opacity: 0;
     }
     to {
       opacity: 1;
@@ -247,9 +104,6 @@
     align-items: center;
     padding: 7px 5px;
     border-radius: 4px;
-  }
-  .row:not(.header) {
-    animation: fadeIn 0.5s ease-in-out;
   }
 
   .header {
@@ -270,10 +124,14 @@
     font-size: 0.875rem;
   }
 
-  .row:not(.header):hover,
-  .playing {
+  .row:not(.header) {
+    opacity: 0.5;
+  }
+
+  .row:not(.header):hover {
     background-color: rgba(255, 255, 255, 0.05);
   }
+
   .number-column {
     width: 55px;
     display: flex;

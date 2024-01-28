@@ -11,28 +11,19 @@
     setCurrentlyPlaying,
     togglePlay
   } from '$lib/components/store/currentPlaying';
-
-  function getTrackDuration(items: TrackObjectSimplified[]) {
-    let duration = 0;
-    items.forEach((el) => {
-      duration += el.duration_ms;
-    });
-    const minutes = Math.floor(duration / 60000);
-    const seconds = Math.floor((duration / 1000) % 60);
-    return {
-      minutes: minutes !== 0 ? `${minutes} min` : '',
-      seconds: seconds !== 0 ? `${seconds} sec` : ''
-    };
-  }
+  import { getAlbumRecommendedTracks, getSaavnAlbumTracks, getTrackDuration } from './helpers.js';
+  import { onMount } from 'svelte';
+  import UnavailableTracks from '$lib/components/UnavailableTracks.svelte';
 
   function startAlbumPlayback() {
+    if (!tracks) return;
     const tracksToQueue: Song[] | null = tracks
       ? album.tracks.items.map((el, idx) => ({
           name: el.name,
           id: el.id,
           artist: { name: el.artists[0].name, id: el.artists[0].id },
           img: album.images.length > 0 ? album.images[1].url : album.images[0].url,
-          link: tracks[idx].link,
+          link: tracks![idx].link,
           album: {
             name: album.name,
             id: album.id,
@@ -52,15 +43,35 @@
     playSong();
   }
 
+  onMount(() => {
+    getSaavnAlbumTracks({
+      artist: album.artists[0].name,
+      id: album.id,
+      name: album.name,
+      totalTracks: album.total_tracks
+    }).then((res) => {
+      tracks = res.map((el) => ({ ...el, img: album.images[0].url }));
+    });
+  });
+
   export let data;
   $: album = data.album;
   $: color = data.color;
-  $: tracks = data.tracks.map((el) => ({ ...el, img: album.images[0].url }));
+  $: tracks = null as
+    | {
+        img: string;
+        album: {
+          name: string;
+          id: string;
+        };
+        name: string;
+        link: string;
+      }[]
+    | null;
   $: pageTitle = $currentSong.trackLink
     ? $currentSong.trackLink.name
     : `${album.name} - Album by ${album.artists[0].name}`;
   $: hasLiked = data.hasliked;
-  $: recommendations = data.recommendedTracks;
 </script>
 
 <svelte:head>
@@ -100,14 +111,30 @@
     <button class="heart"><Heart width="36px" height="36px" /></button>
     <button class="heart"><ThreeHorizontalDots /></button>
   </div>
-  <TrackDetails {hasLiked} tracks={[...album.tracks.items]} trackLinks={tracks} />
+  {console.log(tracks)}
+  {#if tracks && tracks.length > 0}
+    <TrackDetails {hasLiked} tracks={album.tracks.items} trackLinks={tracks} />
+  {:else}
+    <UnavailableTracks {hasLiked} tracks={album.tracks.items} />
+  {/if}
   <p>
     Release Date : {new Date(album.release_date).toLocaleDateString('en', {
       dateStyle: 'long'
     })}
   </p>
-  <h2>Recommendations Based On {album.name}</h2>
-  <TrackDetails noRowHeader tracks={recommendations || []} trackLinks={null} />
+  {#await getAlbumRecommendedTracks( album.artists[0].id, album.tracks.items.map((el) => el.id) )}
+    <h2>Loading Recommendations...</h2>
+  {:then { hasLikedRecommendations, recommendedTracks }}
+    <h2>Recommendations Based On {album.name}</h2>
+    <TrackDetails
+      hasLiked={hasLikedRecommendations}
+      noRowHeader
+      tracks={recommendedTracks || []}
+      trackLinks={null}
+    />
+  {:catch error}
+    <h2>Error Fetching Recommendations</h2>
+  {/await}
 </div>
 
 <style>

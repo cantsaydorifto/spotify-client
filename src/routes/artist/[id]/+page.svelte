@@ -1,30 +1,22 @@
 <script lang="ts">
   import ThreeHorizontalDots from '$lib/components/icons/ThreeHorizontalDots.svelte';
-  import TrackDetails from '$lib/components/TrackDetails.svelte';
   import PlayBtn from '$lib/components/PlayBtn.svelte';
   import Button from '$lib/components/Button.svelte';
-  import CatergorySection from '$lib/components/CatergorySection.svelte';
   import { currentSong } from '$lib/components/store/currentPlaying.js';
   import Radio from '$lib/components/icons/Radio.svelte';
-
-  function numberToCommaString(num: number) {
-    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-  }
+  import { numberToCommaString } from './helper';
+  import ArtistAlbums from './ArtistAlbums.svelte';
+  import ArtistSearchPlaylists from './ArtistSearchPlaylists.svelte';
+  import RelatedArtists from './RelatedArtists.svelte';
+  import ArtistTracks from './ArtistTracks.svelte';
 
   export let data;
   $: artist = data.artist;
   $: color = data.color;
   $: tracks = data.artistTracks;
   $: hasLiked = data.hasliked;
-  $: recommendedTracks = data.recommendedTracks;
-  $: albums = data.artistAlbums;
-  $: singles = data.artistSingles;
-  $: appearsOn = data.artistAppearsOn;
-  $: playlistSearches = data.artistPlaylists;
-  $: relatedArtists = data.relatedArtists;
   $: curTrack = $currentSong.trackLink ? $currentSong.trackLink.name : artist.name;
   $: showRecommendations = false;
-  $: hasLikedRecommendations = data.hasLikedRecommendations;
 </script>
 
 <svelte:head>
@@ -70,27 +62,12 @@
     </button>
     <button class="heart"><ThreeHorizontalDots /></button>
   </div>
-  {#key showRecommendations}
-    <h2>{!showRecommendations ? 'Popular' : 'Songs You Might Like'}</h2>
-  {/key}
-  {#if !showRecommendations}
-    <TrackDetails {hasLiked} noRowHeader {tracks} trackLinks={null} />
-  {:else}
-    <TrackDetails
-      hasLiked={hasLikedRecommendations}
-      noRowHeader
-      tracks={recommendedTracks}
-      trackLinks={null}
-    />
-  {/if}
+  <ArtistTracks {showRecommendations} artistId={artist.id} {hasLiked} {tracks} />
   <!-- <h2>Discography</h2> -->
-  <CatergorySection section={{ items: albums, title: 'Albums', path: '/album' }} />
-  <CatergorySection section={{ items: singles, title: 'Singles', path: '/album' }} />
-  <CatergorySection section={{ items: appearsOn, title: 'Appears On', path: '/album' }} />
-  <CatergorySection
-    section={{ items: playlistSearches, title: 'Playlist Searches', path: '/playlist' }}
-  />
-  <CatergorySection artistSearchResults={{ title: 'Related Artists', items: relatedArtists }} />
+
+  <ArtistAlbums artistId={artist.id} />
+  <ArtistSearchPlaylists artistName={artist.name} />
+  <RelatedArtists artistId={artist.id} />
 </div>
 
 <style>

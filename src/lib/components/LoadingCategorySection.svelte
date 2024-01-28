@@ -1,10 +1,15 @@
-<script>
+<script lang="ts">
   import Frame from './Frame.svelte';
+  export let error: string | null = null;
 </script>
 
 <section>
   <div class="info">
-    <h2>Loading ...</h2>
+    {#if error}
+      <h2>{error}</h2>
+    {:else}
+      <h2>Loading ...</h2>
+    {/if}
   </div>
   <div class="grid-container">
     <Frame>
