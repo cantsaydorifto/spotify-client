@@ -30,7 +30,8 @@
             totalTracks: album.total_tracks
           },
           trackNumber: el.track_number,
-          preview_url: el.preview_url || ''
+          preview_url: el.preview_url || '',
+          duration_ms: el.duration_ms
         }))
       : null;
     clearQueue();
@@ -56,7 +57,7 @@
 
   export let data;
   $: album = data.album;
-  $: color = data.color;
+  $: color = data.color ? data.color.dominantColor : null;
   $: tracks = null as
     | {
         img: string;

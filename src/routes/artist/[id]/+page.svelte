@@ -12,7 +12,7 @@
 
   export let data;
   $: artist = data.artist;
-  $: color = data.color;
+  $: color = data.color ? data.color.dominantColor : null;
   $: tracks = data.artistTracks;
   $: hasLiked = data.hasliked;
   $: curTrack = $currentSong.trackLink ? $currentSong.trackLink.name : artist.name;
@@ -121,11 +121,6 @@
     margin: 8px 0;
     line-height: normal;
     font-weight: 700;
-  }
-  h2 {
-    font-size: 1.5rem;
-    padding-left: 20px;
-    animation: fadeIn 0.5s ease-in-out;
   }
   @keyframes fadeIn {
     from {

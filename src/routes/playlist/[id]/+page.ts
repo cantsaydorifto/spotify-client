@@ -7,7 +7,6 @@ export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, params }) 
   const res = await fetch('/api/spotify/playlists/' + params.id);
   if (!res.ok) throw error(res.status, 'Playlist not found');
   const playlist = (await res.json()) as SinglePlaylistResponse;
-  let color: string | null = null;
 
   const trackOffset = playlist.tracks.items.length < 50 ? playlist.tracks.items.length : 50;
   const hasMoreTracks = playlist.tracks.total > trackOffset;
@@ -20,25 +19,18 @@ export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, params }) 
   const hasLikedRes = await fetch(
     `/api/spotify/me/tracks/contains?ids=${playlistSongIds.filter((el) => !!el).join(',')}`
   );
-  const hasliked = (await hasLikedRes.json()) as boolean[];
 
-  if (hasliked.length !== playlist.tracks.items.length)
-    throw error(500, 'Playlist Songs and Liked Songs Length Dont match');
+  // if (hasliked.length !== playlist.tracks.items.length)
+  //   throw error(500, 'Playlist Songs and Liked Songs Length Dont match');
 
-  if (playlist.images.length > 0) {
-    const colorRes = await fetch('/api/color?image=' + playlist.images[0].url);
-    if (colorRes.ok) {
-      const { dominantColor } = (await colorRes.json()) as { dominantColor: string };
-      color = dominantColor;
-    }
-  }
   return {
     playlist,
     pagination: {
       trackOffset,
       hasMoreTracks
     },
-    color,
-    hasliked
+    hasliked: hasLikedRes.ok
+      ? (hasLikedRes.json() as Promise<boolean[]>)
+      : Promise.resolve(new Array<boolean>(playlist.tracks.items.length).fill(false))
   };
 };

@@ -8,6 +8,7 @@
   import DownArrow from './icons/DownArrow.svelte';
   import ExternalLink from './icons/ExternalLink.svelte';
   import UserProfileIcon from './icons/UserProfileIcon.svelte';
+  import { currentSong } from './store/currentPlaying';
 
   let yScroll: number;
   let navbar: HTMLDivElement;
@@ -92,7 +93,11 @@
     </div>
   </div>
   <div
-    style:background-color={$page.data.color ? $page.data.color : 'var(--header-color)'}
+    style:background-color={$page.data.color
+      ? $page.data.color.dominantColor
+      : $currentSong.color
+      ? $currentSong.color
+      : 'var(--sidebar-color)'}
     style:opacity={`${opacity}`}
     class="navbar-color"
   >

@@ -12,11 +12,8 @@
 }
 
 .tippy-box[data-theme~='vol-menu'] .tippy-content {
-  padding: 5px 10px;
-  width: fit-content;
-  max-width: 100%;
+  background-color: var(--sidebar-color);
 }
-
 .tippy-box[data-theme~='menu'][data-placement^='top'] > .tippy-arrow::before {
   border-top-color: var(--menu-background-color);
 }
@@ -28,4 +25,7 @@
 }
 .tippy-box[data-theme~='menu'][data-placement^='right'] > .tippy-arrow::before {
   border-right-color: var(--menu-background-color);
+}
+.tippy-box[data-theme~='vol-menu'][data-placement^='left'] > .tippy-arrow::before {
+  border-left-color: var(--sidebar-color);
 }

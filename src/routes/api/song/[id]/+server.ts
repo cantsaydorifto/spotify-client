@@ -19,13 +19,18 @@ interface Results {
   language: string;
   explicitContent: string;
   songCount: string;
+  primaryArtists: {
+    id: string;
+    name: string;
+    url: string;
+    image: string;
+    type: string;
+    role: string;
+  }[];
 }
 
 export async function GET({ url, fetch, params }) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  if (isNaN(params.id as any)) {
-    throw { status: 400, message: 'Id Is A Number' };
-  }
   let searchQuery = url.searchParams.get('query');
   const trackCount = url.searchParams.get('count');
   if (!trackCount) throw error(400, { message: 'Invalid Track Count' });
@@ -43,9 +48,19 @@ export async function GET({ url, fetch, params }) {
   }
   const results: Results[] = [];
   for (let i = 0; i < res1Json.data.results.length; i++) {
-    if (Number(res1Json.data.results[i].songCount) === Number(trackCount)) {
+    if (results.length > 0) {
+      if (Number(results[0].explicitContent) === 1) break;
+      if (
+        res1Json.data.results[i].primaryArtists[0].id === results[0].primaryArtists[0].id &&
+        res1Json.data.results[i].name === results[0].name &&
+        Number(res1Json.data.results[i].explicitContent) === 1
+      ) {
+        results.unshift(res1Json.data.results[i]);
+        break;
+      }
+    }
+    if (Number(res1Json.data.results[i].songCount) === Number(trackCount) && results.length === 0) {
       results.push(res1Json.data.results[i]);
-      break;
     }
   }
   if (results.length === 0) throw error(400, { message: 'Not Found' });

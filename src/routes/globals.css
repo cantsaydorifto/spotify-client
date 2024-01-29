@@ -1,5 +1,6 @@
 :root {
   --bg-color: #121212;
+  --navbar-color: #000;
   --sidebar-color: #000;
   --header-color: #000;
   --text-color: #fff;
@@ -120,7 +121,7 @@ a:focus-visible {
 
 /* Track */
 ::-webkit-scrollbar-track {
-  background: var(--bg-color);
+  background: var(--sidebar-color);
 }
 
 /* Handle */

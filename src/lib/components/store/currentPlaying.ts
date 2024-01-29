@@ -11,14 +11,20 @@ export const currentSong = writable<{
     id: string;
     name: string;
   } | null;
+  color: string | null;
 }>({
   trackLink: null,
   songQueue: [],
   audio: null,
   isPaused: false,
   currentlyPlaying: null,
-  curTrackPtr: -1
+  curTrackPtr: -1,
+  color: null
 });
+
+export function setColor(color: string) {
+  currentSong.update((cur) => ({ ...cur, color }));
+}
 
 export const getCurrentPlayingSong = () => {
   const track = get(currentSong).trackLink;
@@ -110,7 +116,8 @@ export const addSongToQueue = async (track: Song | null, ptr: number) => {
         id: track.album.id
       },
       trackNumber: track.trackNumber,
-      preview_url: track.preview_url || ''
+      preview_url: track.preview_url || '',
+      duration_ms: track.duration_ms
     };
     return { ...current, songQueue: [...cur] };
   });
@@ -253,7 +260,8 @@ function setLoading() {
         name: 'Loading Track...',
         preview_url: '',
         trackNumber: -1,
-        needsFetch: false
+        needsFetch: false,
+        duration_ms: 0
       }
     };
   });

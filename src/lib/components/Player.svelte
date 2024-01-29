@@ -9,6 +9,8 @@
   import { currentSong, playSong, playSongPrevious } from './store/currentPlaying';
   import SkipForward from './icons/SkipForward.svelte';
   import SkipBack from './icons/SkipBack.svelte';
+  import LeftArrow from './icons/LeftArrow.svelte';
+  import Queue from './icons/Queue.svelte';
   export let track: {
     link: string;
   } | null;
@@ -17,6 +19,9 @@
   let currentTimeElement2: HTMLSpanElement;
   let durationTimeElement: HTMLSpanElement;
   let durationTimeElement2: HTMLSpanElement;
+  let volumeMenu: HTMLDivElement;
+  let volTippyBtn: HTMLButtonElement;
+  let volTippyBtn2: HTMLButtonElement;
   let paused = true;
 
   onMount(() => {
@@ -125,28 +130,12 @@
         ><SkipForward width="20" height="20" stroke="white" /></button
       >
     </div>
-    <button
-      class="volume-tippy-btn"
-      use:tippy={{
-        content: document.getElementById('volume-menu') || undefined,
-        onMount: () => {
-          const template = document.getElementById('volume-menu');
-          if (template) {
-            template.style.display = 'block';
-          }
-        },
-        trigger: 'mouseenter click',
-        placement: 'top-end',
-        interactive: true,
-        theme: 'vol-menu'
-      }}
-    >
-      <Volume width="20" />
-    </button>
     <span bind:this={currentTimeElement} class="time time-l">0:00</span>
     <span bind:this={durationTimeElement} class="time time-r">0:00</span>
-    <div id="volume-menu" style="display: none;">
+    <div bind:this={volumeMenu} id="volume-menu" style="display: none;">
       <div class="volume-controls-tippy">
+        <a href="/queue"><Queue width="20" height="20" /></a>
+        <Volume width="20" height="20" />
         {#if audio}
           <VolumeSlider {audio} />
         {:else}
@@ -163,14 +152,36 @@
 </div>
 
 <div class="volume-controls">
-  {#if audio}
-    <VolumeSlider {audio} />
-  {:else}
-    <VolumeSlider audio={null} />
-  {/if}
+  <button
+    class="volume-tippy-btn-outside"
+    bind:this={volTippyBtn2}
+    use:tippy={{
+      content: volumeMenu,
+      onMount: () => {
+        volumeMenu.style.display = 'flex';
+        volTippyBtn2.style.transform = 'rotate(180deg)';
+      },
+      onHide: () => {
+        volTippyBtn2.style.transform = 'rotate(0)';
+      },
+      trigger: 'click mouseenter',
+      placement: 'left',
+      interactive: true,
+      theme: 'vol-menu',
+      animation: 'shift-away'
+    }}
+  >
+    <LeftArrow width="25" height="25" />
+  </button>
 </div>
 
 <style>
+  #volume-menu {
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
   .player {
     flex: 4;
     display: flex;
@@ -200,15 +211,29 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    padding-right: 30px;
+    padding-right: 10px;
   }
-  .volume-tippy-btn {
+  .volume-tippy-btn-outside {
     background: none;
+    cursor: pointer;
+    height: 25px;
     border: none;
-    display: none;
+    transition: all 0.2s ease-in-out;
+  }
+  .volume-tippy-btn-outside > :global(svg) {
+    stroke: var(--text-color);
   }
   .volume-controls-tippy {
-    width: 100px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .volume-controls-tippy > a {
+    color: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 12px;
   }
   .button-container {
     width: 100%;
@@ -252,19 +277,9 @@
     .time {
       display: none;
     }
-    .volume-controls {
-      flex: none;
-      display: none;
-    }
     .player {
       flex: none;
       justify-content: center;
-    }
-    .volume-tippy-btn {
-      display: block;
-    }
-    .volume-tippy-btn > :global(svg) {
-      stroke: var(--text-color);
     }
     .timeContainer {
       display: block;
@@ -272,6 +287,9 @@
     .button-container {
       display: flex;
       gap: 20px;
+    }
+    .volume-controls {
+      padding: 0 0 0 15px;
     }
   }
   @media only screen and (max-width: 600px) {

@@ -48,7 +48,8 @@
         name: track.album.artists[0].name
       },
       needsFetch: true,
-      img: track.album.images[0].url
+      img: track.album.images[0].url,
+      duration_ms: track.duration_ms
     };
     clearQueue();
     setCurrentlyPlaying({

@@ -490,6 +490,7 @@ declare global {
     };
     trackNumber: number;
     preview_url: string;
+    duration_ms: number;
     needsFetch?: boolean;
   }
 }

@@ -17,11 +17,10 @@ export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, params }) 
     ArtistsTopTracksResponse
   ];
 
-  let color: string | null = null;
   const artistTopSongIds = artistTracks.tracks.map((el) => el.id);
   const [colorRes, hasLikedRes] = await Promise.all([
     artist.images.length > 0
-      ? fetch('/api/color?image=' + artist.images[0].url)
+      ? fetch('/api/color?image=' + artist.images[2].url)
       : Promise.resolve(null),
     fetch(`/api/spotify/me/tracks/contains?ids=${artistTopSongIds.join(',')}`)
   ]);
@@ -29,25 +28,21 @@ export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, params }) 
   // if (!hasLikedRes.ok) {
   // throw error(hasLikedRes.status, 'Could not find liked songs');
   // }
+  // if (hasliked.length !== artistTracks.tracks.length)
+  //   throw error(500, 'Artist Songs and Liked Songs Length Dont match');
 
-  const [colorData, hasliked] = await Promise.all([
-    colorRes ? (colorRes.json() as Promise<{ dominantColor: string }>) : Promise.resolve(null),
-    hasLikedRes.ok
-      ? (hasLikedRes.json() as Promise<boolean[]>)
-      : Promise.resolve(new Array(artistTracks.tracks.length).fill(false))
-  ]);
-
-  if (hasliked.length !== artistTracks.tracks.length)
-    throw error(500, 'Artist Songs and Liked Songs Length Dont match');
-
-  if (colorData && colorRes && colorRes.ok) {
-    color = colorData.dominantColor;
-  }
+  // if (colorData && colorRes && colorRes.ok) {
+  //   color = colorData.dominantColor;
+  // }
 
   return {
     artist,
     artistTracks: artistTracks.tracks,
-    color,
-    hasliked
+    color: colorRes
+      ? (colorRes.json() as Promise<{ dominantColor: string }>)
+      : Promise.resolve(null),
+    hasliked: hasLikedRes.ok
+      ? (hasLikedRes.json() as Promise<boolean[]>)
+      : Promise.resolve(new Array<boolean>(artistTracks.tracks.length).fill(false))
   };
 };

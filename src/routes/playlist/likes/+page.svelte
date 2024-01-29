@@ -22,7 +22,7 @@
   export let data;
   $: user = $page.data.user;
   $: userSavedTracks = data.userSavedTrackRes;
-  $: color = data.color;
+  $: color = data.color.dominantColor;
   $: pagination = data.pagination;
   $: tracks = data.userSavedTrackRes.items.map((item) => item.track!);
   $: pageTitle = $currentSong.trackLink ? $currentSong.trackLink.name : 'Saved Tracks';

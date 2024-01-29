@@ -27,14 +27,15 @@
       },
       trackNumber: track.track_number,
       preview_url: track.preview_url || '',
-      needsFetch: false
+      needsFetch: false,
+      duration_ms: track.duration_ms
     };
     setCurrentlyPlaying({
       name: track.name,
       id: track.id,
       type: 'SINGLE'
     });
-    addFetchedSongsToQueue([trackToQueue]);
+    addFetchedSongsToQueue([trackToQueue], 0);
     playSong();
   }
 

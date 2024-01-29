@@ -91,7 +91,10 @@ export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, parent, se
     newReleases: res1.ok ? (res1.json() as Promise<ListOfNewReleasesResponse>) : null,
     featuredPlaylists: res2.ok ? (res2.json() as Promise<ListOfFeaturedPlaylistsResponse>) : null,
     randomCategories: a,
-    forYouPlaylists
+    forYouPlaylists,
+    color: {
+      dominantColor: 'var(--sidebar-color)'
+    }
   };
 };
 

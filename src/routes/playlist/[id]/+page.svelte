@@ -3,99 +3,46 @@
   import ThreeHorizontalDots from '$lib/components/icons/ThreeHorizontalDots.svelte';
   import TrackDetails from '$lib/components/TrackDetails.svelte';
   import PlayBtn from '$lib/components/PlayBtn.svelte';
-  import {
-    addFetchedSongsToQueue,
-    clearQueue,
-    currentSong,
-    playSong,
-    setCurrentlyPlaying,
-    togglePlay
-  } from '$lib/components/store/currentPlaying';
-  import { error } from '@sveltejs/kit';
+  import { currentSong, setColor, togglePlay } from '$lib/components/store/currentPlaying';
+  import { getColor, getTrackDuration, loadMoreTracks, startPlaylistPlayback } from './helpers.js';
+  import { onMount } from 'svelte';
 
-  function startPlaylistPlayback() {
-    const tracksToQueue: Song[] | null = tracks
-      ? tracks.map((el) => ({
-          name: el.name,
-          id: el.id,
-          artist: { name: el.artists[0].name, id: el.artists[0].id },
-          img: el.album ? el.album.images[0].url : '',
-          link: '',
-          album: {
-            name: el.album ? el.album.name : '',
-            totalTracks: el.album ? el.album.total_tracks : 0,
-            id: el.album ? el.album.id : ''
-          },
-          trackNumber: el.track_number,
-          preview_url: el.preview_url || '',
-          needsFetch: true
-        }))
-      : null;
-    clearQueue();
-    setCurrentlyPlaying({
-      name: playlist.name,
-      id: playlist.id,
-      type: 'PLAYLIST'
-    });
-    addFetchedSongsToQueue(tracksToQueue, 0);
-    playSong();
-  }
-
-  function getTrackDuration(items: PlaylistTrackObject[]) {
-    let duration = 0;
-    items.forEach((el) => {
-      duration += el.track?.duration_ms || 0;
-    });
-    const minutes = Math.floor(duration / 60000);
-    const seconds = Math.floor((duration / 1000) % 60);
-    return {
-      minutes: minutes !== 0 ? `${minutes} min` : '',
-      seconds: seconds !== 0 ? `${seconds} sec` : ''
-    };
+  async function loadMoreHandler() {
+    const res = await loadMoreTracks(pagination, playlist.id);
+    if (!res) return;
+    const { playlistTracks, likedByUser } = res;
+    tracks = [...tracks, ...playlistTracks.items.map((item) => item.track!)];
+    hasLiked = [...hasLiked, ...likedByUser];
   }
 
   export let data;
   $: playlist = data.playlist;
-  $: color = data.color;
+  $: color = null as string | null;
   $: pagination = data.pagination;
   $: hasLiked = data.hasliked;
   $: tracks = data.playlist.tracks.items.map((item) => item.track!);
   $: pageTitle = $currentSong.trackLink
     ? $currentSong.trackLink.name
     : `${playlist.name} - Playlist by ${playlist.owner.display_name}`;
-  async function loadMoreTracks() {
-    if (!pagination.hasMoreTracks) return;
-    const res = await fetch(
-      `/api/spotify/playlists/${playlist.id}/tracks?offset=${pagination.trackOffset}&limit=50`
-    );
-    const playlistTracks = (await res.json()) as PlaylistTrackResponse;
-    pagination.trackOffset += 50;
-    pagination.hasMoreTracks = playlistTracks.total > pagination.trackOffset;
-    playlistTracks.items = playlistTracks.items.filter(
-      (el) => !!el.track && el.track.type === 'track'
-    );
 
-    const playlistSongIds = playlistTracks.items.map((el) => el.track!.id);
-    const likedByUserRes = await fetch(
-      `/api/spotify/me/tracks/contains?ids=${playlistSongIds.filter((el) => !!el).join(',')}`
-    );
-    const likedByUser = (await likedByUserRes.json()) as boolean[];
-
-    if (likedByUser.length !== playlistTracks.items.length)
-      throw error(500, 'Playlist Songs and Liked Songs Length Dont match');
-    tracks = [...tracks, ...playlistTracks.items.map((item) => item.track)] as TrackObjectFull[];
-    hasLiked = [...hasLiked, ...likedByUser];
-  }
+  onMount(() => {
+    getColor(playlist.images[0].url).then((res) => {
+      if (!res) return;
+      color = res.dominantColor;
+      setColor(res.dominantColor);
+    });
+  });
 </script>
 
 <svelte:head>
   <title>{pageTitle}</title>
 </svelte:head>
 
-<div class="container">
+<div class={'container'}>
   <div
-    class="color-gradient"
-    style:background-image="linear-gradient(0deg,transparent,{color || 'var(--light-gray)'})"
+    class={'color-gradient'}
+    style:background="linear-gradient(0deg,transparent,{color || 'var(--light-gray)'})"
+    style:opacity={color ? 1 : 0}
   />
   <img src={playlist.images.length > 0 ? playlist.images[0].url : ''} alt="" />
   <div class="details">
@@ -119,7 +66,11 @@
 <div class="content">
   <div class="play">
     {#if !$currentSong.trackLink || !$currentSong.currentlyPlaying || $currentSong.currentlyPlaying.id !== playlist.id}
-      <PlayBtn onclick={() => startPlaylistPlayback()} type="play" innerSize={25} />
+      <PlayBtn
+        onclick={() => startPlaylistPlayback(tracks, { name: playlist.name, id: playlist.id })}
+        type="play"
+        innerSize={25}
+      />
     {:else if $currentSong.currentlyPlaying.type === 'PLAYLIST' && $currentSong.isPaused}
       <PlayBtn onclick={() => togglePlay()} type="play" innerSize={25} />
     {:else}
@@ -136,7 +87,7 @@
   />
   {#if pagination.hasMoreTracks}
     <div class="showMoreBtn">
-      <button on:click={() => loadMoreTracks()}>Show More</button>
+      <button on:click={() => loadMoreHandler()}>Show More</button>
     </div>
   {/if}
 </div>
@@ -165,7 +116,10 @@
     left: 0;
     width: 100%;
     height: 150%;
+    opacity: 0;
+    transition: all 1.5s;
   }
+
   .details {
     display: flex;
     justify-content: center;

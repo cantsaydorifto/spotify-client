@@ -147,7 +147,7 @@
   @media only screen and (max-width: 900px) {
     .player-controls {
       flex: none;
-      padding-right: 16px;
+      padding-right: 5px;
     }
     .current-song {
       flex: 1;

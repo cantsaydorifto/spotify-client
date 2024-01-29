@@ -21,6 +21,6 @@ export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor }) => {
       trackOffset,
       hasMoreTracks
     },
-    color: 'rgb(80, 56, 160)'
+    color: { dominantColor: 'rgb(80, 56, 160)' }
   };
 };

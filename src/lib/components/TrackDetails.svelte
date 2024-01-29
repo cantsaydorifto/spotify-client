@@ -66,6 +66,7 @@
             },
             trackNumber: el.track_number,
             preview_url: el.preview_url || '',
+            duration_ms: el.duration_ms,
             needsFetch: true
           }))
         : null;
@@ -119,6 +120,7 @@
             totalTracks: trackLink.album ? trackLink.album.total_tracks : 0
           },
           trackNumber: tracks[idx].track_number,
+          duration_ms: trackLink.duration_ms,
           preview_url: tracks[idx].preview_url || ''
         }))
       : null;
