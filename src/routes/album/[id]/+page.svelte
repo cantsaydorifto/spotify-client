@@ -113,7 +113,11 @@
     <button class="heart"><ThreeHorizontalDots /></button>
   </div>
   {#if tracks && tracks.length > 0}
-    <TrackDetails {hasLiked} tracks={album.tracks.items} trackLinks={tracks} />
+    <TrackDetails
+      {hasLiked}
+      tracks={album.tracks.items.map((el) => ({ ...el, album, external_ids: -1, popularity: -1 }))}
+      trackLinks={tracks}
+    />
   {:else}
     <UnavailableTracks {hasLiked} tracks={album.tracks.items} />
   {/if}

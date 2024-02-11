@@ -11,9 +11,8 @@
     playSong,
     setCurrentlyPlaying
   } from './store/currentPlaying';
-  export let tracks:
-    | (TrackObjectSimplified & { album?: AlbumObjectSimplified; link?: string })[]
-    | (TrackObjectFull & { link?: string })[];
+  import TrackOptions from './TrackOptions.svelte';
+  export let tracks: (TrackObjectFull & { link?: string })[];
   tracks = tracks.filter((track) => !!track);
   export let playlist: {
     name: string;
@@ -57,12 +56,12 @@
             name: el.name,
             id: el.id,
             artist: { name: el.artists[0].name, id: el.artists[0].id },
-            img: el.album ? el.album.images[0].url : '',
+            img: el.album.images[0].url,
             link: '',
             album: {
-              name: el.album ? el.album.name : '',
-              totalTracks: el.album ? el.album.total_tracks : 0,
-              id: el.album ? el.album.id : ''
+              name: el.album.name,
+              totalTracks: el.album.total_tracks,
+              id: el.album.id
             },
             trackNumber: el.track_number,
             preview_url: el.preview_url || '',
@@ -107,17 +106,12 @@
           name: trackLink.name,
           id: trackLink.id,
           artist: { name: trackLink.artists[0].name, id: trackLink.artists[0].id },
-          img:
-            svn && trackLink.album
-              ? trackLink.album.images[1].url
-              : trackLinks
-              ? trackLinks[0].img
-              : '',
+          img: svn ? trackLink.album.images[1].url : trackLinks ? trackLinks[0].img : '',
           link: trackLink.link || '',
           album: {
             name: trackLinks ? trackLinks[0].album.name : '',
             id: trackLinks ? trackLinks[0].album.id : '',
-            totalTracks: trackLink.album ? trackLink.album.total_tracks : 0
+            totalTracks: trackLink.album.total_tracks
           },
           trackNumber: tracks[idx].track_number,
           duration_ms: trackLink.duration_ms,
@@ -169,7 +163,7 @@
           {/if}
         </div>
         <div class="trackInfoContainer">
-          {#if track.album && track.album.images.length > 0}
+          {#if !trackLinks}
             <img src={track.album.images[track.album.images.length - 1].url} alt="" />
           {/if}
           <div class="info-column">
@@ -225,6 +219,7 @@
               />
             {/key}
           </button>
+          <TrackOptions {track} />
           <span class="duration">{msToTime(track.duration_ms)}</span>
         </div>
       </div>
@@ -296,6 +291,9 @@
     cursor: pointer;
   }
   .row:not(.header):hover > .number-column > button {
+    display: block;
+  }
+  .row:hover .duration-column > :global(.options) {
     display: block;
   }
   .number {
@@ -384,13 +382,17 @@
   .duration {
     display: inline-block;
     color: var(--light-gray);
-    /* background-color: red; */
+    text-align: right;
     width: 30px;
     margin: 0 auto;
     font-size: 0.875rem;
   }
+  .row:hover .duration {
+    display: none;
+  }
+
   .duration-column {
-    padding-right: 30px;
+    padding-right: 10px;
     display: flex;
     align-items: center;
     gap: 30px;
@@ -404,6 +406,10 @@
       margin-right: 10px;
     }
     .duration {
+      display: none;
+    }
+
+    .duration-column > button:nth-child(1) {
       display: none;
     }
     .duration-column {

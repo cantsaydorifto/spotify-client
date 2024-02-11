@@ -91,6 +91,9 @@
 </section>
 
 <style>
+  .info > h2 {
+    color: var(--light-gray);
+  }
   .trackContainer {
     display: flex;
     flex-direction: column;

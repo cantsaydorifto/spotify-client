@@ -2,14 +2,14 @@ import interceptFetch from '$lib/interceptor/interceptFetch';
 import { redirect } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
 
-export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, parent, setHeaders }) => {
+export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, parent }) => {
   const fetch = (path: string) => interceptFetch(fetchWithNoInterceptor, path);
   const problemIds = ['0JQ5DAqbMKFIRybaNTYXXy', '0JQ5DAqbMKFy0OenPG51Av', '0JQ5DAqbMKFDTEtSaS4R92'];
   const parentData = await parent();
   if (!parentData.user) {
     throw redirect(307, '/svn');
   }
-  const res4 = await fetch('/api/spotify/browse/categories?country=US');
+  const res4 = await fetch('/api/spotify/browse/categories?locale=en_US');
   const categoryJson = res4.ok ? ((await res4.json()) as MultipleCategoriesResponse) : null;
   const randomCategories = (
     categoryJson
@@ -37,8 +37,8 @@ export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, parent, se
   })();
 
   const [res1, res2, res5, res6, res7] = await Promise.all([
-    fetch('/api/spotify/browse/new-releases?country=US&limit=50'),
-    fetch('/api/spotify/browse/featured-playlists?country=US'),
+    fetch('/api/spotify/browse/new-releases?limit=50&country=US'),
+    fetch('/api/spotify/browse/featured-playlists?locale=en_US'),
     fetch(`/api/spotify/search?q=${encodeURIComponent('Daily Mix')}&type=playlist`),
     fetch(`/api/spotify/search?q=${encodeURIComponent('Discover Weekly')}&type=playlist`),
     fetch(`/api/spotify/search?q=${encodeURIComponent('for you')}&type=playlist`)

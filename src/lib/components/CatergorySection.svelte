@@ -2,12 +2,7 @@
   import MusicIcon from '$lib/components/icons/Music.svelte';
   import Frame from './Frame.svelte';
   import PlayBtn from './PlayBtn.svelte';
-  import {
-    addFetchedSongsToQueue,
-    clearQueue,
-    playSong,
-    setCurrentlyPlaying
-  } from './store/currentPlaying';
+  import { startRadio } from './store/currentPlaying';
 
   export let section: {
     title: string;
@@ -34,32 +29,6 @@
     artistSearchResults?: SaavnSearchArtists[];
     searchResults?: boolean;
   } | null = null;
-
-  async function playTrackHandler(track: TrackObjectFull) {
-    const trackToQueue: Song = {
-      id: track.id,
-      album: { name: track.album.name, id: track.album.id, totalTracks: track.album.total_tracks },
-      trackNumber: track.track_number,
-      preview_url: track.preview_url || '',
-      name: track.name,
-      link: '',
-      artist: {
-        id: track.album.artists[0].id,
-        name: track.album.artists[0].name
-      },
-      needsFetch: true,
-      img: track.album.images[0].url,
-      duration_ms: track.duration_ms
-    };
-    clearQueue();
-    setCurrentlyPlaying({
-      name: track.name,
-      id: track.id,
-      type: 'SINGLE'
-    });
-    addFetchedSongsToQueue([trackToQueue], 0);
-    playSong();
-  }
 </script>
 
 {#if section.items.length !== 0}
@@ -153,7 +122,7 @@
                   <a data-sveltekit-preload-data="tap" href={`/track/${track.id}`}>
                     <img src={track.album.images[1].url} alt="" />
                   </a>
-                  <PlayBtn innerSize={25} outerSize={40} onclick={() => playTrackHandler(track)} />
+                  <PlayBtn innerSize={25} outerSize={40} onclick={() => startRadio(track)} />
                 </div>
               {:else if track.album.images.length > 0}
                 <div class="playlistImg artistImg">
@@ -195,7 +164,7 @@
               <div class="playlist">
                 {#if playlist.image.length > 1}
                   <div class="playlistImg">
-                    <img src={playlist.image[1].link} alt={playlist.name} />
+                    <img src={playlist.image[2].link} alt={playlist.name} />
                   </div>
                 {:else if playlist.image.length > 0}
                   <div class="playlistImg">

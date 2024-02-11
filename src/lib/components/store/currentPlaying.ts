@@ -69,6 +69,32 @@ export const togglePlay = () => {
   });
 };
 
+export const playNext = (trackLink: Song) => {
+  const curState = get(currentSong);
+  if (curState.songQueue.length === 0) {
+    return;
+  }
+  currentSong.update((current) => ({
+    ...current,
+    songQueue: [
+      ...current.songQueue.slice(0, curState.curTrackPtr + 1),
+      trackLink,
+      ...current.songQueue.slice(curState.curTrackPtr + 1)
+    ]
+  }));
+};
+
+export const addToQueueEnd = (trackLink: Song) => {
+  const curState = get(currentSong);
+  if (curState.songQueue.length === 0) {
+    return;
+  }
+  currentSong.update((current) => ({
+    ...current,
+    songQueue: [...current.songQueue, trackLink]
+  }));
+};
+
 export const addFetchedSongsToQueue = (trackLink: Song[] | null, idx: number) => {
   if (!trackLink) return;
   currentSong.update((current) => {
@@ -247,7 +273,7 @@ const playNextSong = async (track: Song | null, ptr: number[]) => {
   });
 };
 
-function setLoading() {
+export function setLoading() {
   currentSong.update((current) => {
     return {
       ...current,
@@ -265,4 +291,61 @@ function setLoading() {
       }
     };
   });
+}
+
+export async function startRadio(track: TrackObjectFull | RecommendationTrackObject) {
+  let recommendedObject: RecommendationsObject = { seeds: [], tracks: [] };
+  setLoading();
+  const recommendedObjectRes = await fetch(`/api/spotify/recommendations?seed_tracks=${track.id}`);
+  if (recommendedObjectRes.ok) {
+    recommendedObject = (await recommendedObjectRes.json()) as RecommendationsObject;
+  }
+  const tracksToQueue: Song[] = [
+    {
+      id: track.id,
+      album: {
+        name: track.album.name,
+        id: track.album.id,
+        totalTracks: track.album.total_tracks
+      },
+      trackNumber: track.track_number,
+      preview_url: track.preview_url || '',
+      name: track.name,
+      link: '',
+      artist: {
+        id: track.album.artists[0].id,
+        name: track.album.artists[0].name
+      },
+      needsFetch: true,
+      img: track.album.images[0].url,
+      duration_ms: track.duration_ms
+    },
+    ...recommendedObject.tracks.map((el) => ({
+      id: el.id,
+      album: {
+        name: el.album.name,
+        id: el.album.id,
+        totalTracks: el.album.total_tracks
+      },
+      trackNumber: el.track_number,
+      preview_url: el.preview_url || '',
+      name: el.name,
+      link: '',
+      artist: {
+        id: el.album.artists[0].id,
+        name: el.album.artists[0].name
+      },
+      needsFetch: true,
+      img: el.album.images[0].url,
+      duration_ms: el.duration_ms
+    }))
+  ];
+  clearQueue();
+  setCurrentlyPlaying({
+    name: track.name,
+    id: track.id,
+    type: 'SINGLE'
+  });
+  addFetchedSongsToQueue(tracksToQueue, 0);
+  playSong();
 }

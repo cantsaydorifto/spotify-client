@@ -14,7 +14,7 @@
 
 <style>
   svg {
-    animation: pulse 0.5s;
+    /* animation: pulse 0.5s; */
   }
   @keyframes pulse {
     0% {

@@ -20,6 +20,9 @@
       });
     }
     if (data.newReleases) {
+      data.newReleases.albums.items.forEach((el) => {
+        el.images.sort((a, b) => (a.height && b.height ? a.height - b.height : -1));
+      });
       sections.push({
         title: 'New Releases',
         path: '/album',
@@ -48,11 +51,6 @@
 <svelte:head>
   <title>{pageTitle}</title>
 </svelte:head>
-
-<h1>Welcome to SvelteKit</h1>
-<h4>{data.user ? data.user.display_name : 'Not signed in'}</h4>
-<LogoutButton />
-<Button element="a" style="solid" href="/api/auth/login">Login</Button>
 
 <QuickPicks />
 

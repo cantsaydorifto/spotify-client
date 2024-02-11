@@ -9,6 +9,8 @@
     currentSong,
     playSong,
     setCurrentlyPlaying,
+    setLoading,
+    startRadio,
     togglePlay
   } from './store/currentPlaying';
   export let track: RecommendationTrackObject;
@@ -25,31 +27,7 @@
 
     return `${hours > 0 ? `${hours}:` : ''}${paddedMinutes}:${paddedSeconds}`;
   }
-  async function playTrackHandler() {
-    const trackToQueue: Song = {
-      id: track.id,
-      album: { name: track.album.name, id: track.album.id, totalTracks: track.album.total_tracks },
-      trackNumber: track.track_number,
-      preview_url: track.preview_url || '',
-      name: track.name,
-      link: '',
-      artist: {
-        id: track.album.artists[0].id,
-        name: track.album.artists[0].name
-      },
-      needsFetch: true,
-      img: track.album.images[0].url,
-      duration_ms: track.duration_ms
-    };
-    clearQueue();
-    setCurrentlyPlaying({
-      name: track.name,
-      id: track.id,
-      type: 'SINGLE'
-    });
-    addFetchedSongsToQueue([trackToQueue], 0);
-    playSong();
-  }
+
   $: user = $page.data.user;
 </script>
 
@@ -80,7 +58,7 @@
             style="background-image: url({track.album.images[track.album.images.length - 2].url})"
           >
             <div class="overlay" />
-            <button class="playBtn" on:click={() => playTrackHandler()}
+            <button class="playBtn" on:click={() => startRadio(track)}
               ><Play width="20px" height="20px" stroke="white" /></button
             >
           </div>
