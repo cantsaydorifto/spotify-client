@@ -349,3 +349,35 @@ export async function startRadio(track: TrackObjectFull | RecommendationTrackObj
   addFetchedSongsToQueue(tracksToQueue, 0);
   playSong();
 }
+
+export function playSvnSong(track: SaavnSong) {
+  const tracksToQueue: Song[] = [
+    {
+      id: track.id,
+      album: {
+        name: track.album.name,
+        id: track.album.id,
+        totalTracks: 1
+      },
+      trackNumber: 1,
+      preview_url: '',
+      name: track.name,
+      link: track.downloadUrl[track.downloadUrl.length - 1].link,
+      artist: {
+        id: track.primaryArtistsId,
+        name: track.primaryArtists
+      },
+      needsFetch: false,
+      img: track.image[track.image.length - 1].link,
+      duration_ms: Number(track.duration) * 1000
+    }
+  ];
+  clearQueue();
+  setCurrentlyPlaying({
+    name: track.name,
+    id: track.id,
+    type: 'SINGLE'
+  });
+  addFetchedSongsToQueue(tracksToQueue, 0);
+  playSong();
+}
