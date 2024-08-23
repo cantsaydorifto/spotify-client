@@ -287,6 +287,7 @@ declare global {
       albums: { results: SaavnSearchAlbums[] };
       artists: { results: SaavnSearchArtists[] };
       playlists: { results: SaavnSearchPlaylists[] };
+      topQuery: { position: number; results: { type: string }[] };
     };
   }
   interface SaavnSearchPlaylists {

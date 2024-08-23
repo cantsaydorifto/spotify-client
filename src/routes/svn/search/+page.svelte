@@ -42,6 +42,12 @@
       albumSearchResults = resJson.data.albums.results;
       artistSearchResults = resJson.data.artists.results;
       trackSearchResults = resJson.data.songs.results;
+      if (
+        resJson.data.topQuery.results.length > 0 &&
+        resJson.data.topQuery.results[0].type === 'artist'
+      ) {
+        artistSearchResults.unshift(resJson.data.topQuery.results[0] as SaavnSearchArtists);
+      }
       loading = false;
     } catch (err) {
       console.log(err);
@@ -56,7 +62,7 @@
 </div>
 
 {#if !loading}
-  {#if playlistSeachResults.length === 0 && albumSearchResults.length === 0}
+  {#if playlistSeachResults.length === 0 && albumSearchResults.length === 0 && artistSearchResults.length === 0 && trackSearchResults.length === 0}
     <h2 class="loading">No Results</h2>
   {:else}
     <CatergorySection

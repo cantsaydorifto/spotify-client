@@ -2,7 +2,7 @@
   import MusicIcon from '$lib/components/icons/Music.svelte';
   import Frame from './Frame.svelte';
   import PlayBtn from './PlayBtn.svelte';
-  import { startRadio } from './store/currentPlaying';
+  import { playSvnSong, startRadio } from './store/currentPlaying';
 
   export let section: {
     title: string;
@@ -29,6 +29,17 @@
     artistSearchResults?: SaavnSearchArtists[];
     searchResults?: boolean;
   } | null = null;
+
+  async function getSvnSong(track: SaavnSong) {
+    try {
+      const res = await fetch('/api/saavn/songs?id=' + track.id);
+      if (!res.ok) throw { status: res.status, message: 'Song not found' };
+      const resJson = (await res.json()) as SaavnApiSongResponse;
+      return resJson.data.length > 0 ? resJson.data[0] : null;
+    } catch (err) {
+      console.log(err);
+    }
+  }
 </script>
 
 {#if section.items.length !== 0}
@@ -160,11 +171,22 @@
       <div class="grid-container">
         <Frame>
           {#each saavnHomepageData.trendingSongs as playlist}
-            <a href={`/svn/song/${playlist.id}`} class="playlistContainer">
+            <div class="playlistContainer">
               <div class="playlist">
                 {#if playlist.image.length > 1}
-                  <div class="playlistImg">
-                    <img src={playlist.image[2].link} alt={playlist.name} />
+                  <div class="playlistImgContainer track">
+                    <a data-sveltekit-preload-data="tap" href={`/svn/song/${playlist.id}`}>
+                      <img src={playlist.image[2].link} alt={playlist.name} />
+                    </a>
+                    <PlayBtn
+                      onclick={() => {
+                        getSvnSong(playlist).then((res) => {
+                          if (res) playSvnSong(res);
+                        });
+                      }}
+                      innerSize={25}
+                      outerSize={40}
+                    />
                   </div>
                 {:else if playlist.image.length > 0}
                   <div class="playlistImg">
@@ -180,7 +202,7 @@
                   <a href={`/svn/song/${playlist.id}`}>{@html playlist.primaryArtists}</a>
                 </div>
               </div>
-            </a>
+            </div>
           {/each}
         </Frame>
       </div>
