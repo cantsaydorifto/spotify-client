@@ -75,7 +75,15 @@
     });
   });
 
+  function resetSliderDisplay() {
+    const currentVolumeBar = document.getElementById('cur_slider');
+    if (currentVolumeBar) {
+      currentVolumeBar.style.left = `calc(-100% + 12px)`;
+    }
+  }
+
   function skipTrackForward(frwd: boolean) {
+    resetSliderDisplay();
     if (frwd && $currentSong.curTrackPtr < $currentSong.songQueue.length - 1) {
       playSong();
       return;

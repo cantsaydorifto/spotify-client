@@ -3,39 +3,56 @@
   import { playSong } from '$lib/store/currentPlaying';
 
   let volumeSlider: HTMLInputElement;
-  let currentVolumeBar: HTMLDivElement;
   export let audio: HTMLAudioElement | null;
   onMount(() => {
     if (!audio) return;
-    audio.addEventListener('timeupdate', (event) => {
-      const el = event.target as HTMLAudioElement;
+    const currentVolumeBar = document.getElementById('cur_slider');
+
+    audio.addEventListener('loadedmetadata', () => {
+      // console.log('MAX AUDIO SET', audio);
       volumeSlider.max = `${audio!.duration}`;
+    });
+    audio.addEventListener('timeupdate', (event) => {
+      // console.log('TIME UPDATE SETTING....', audio);
+      const el = event.target as HTMLAudioElement;
       volumeSlider.value = `${el.currentTime}`;
+      // console.log('t==> ', el.currentTime);
       // currentTimeElement.innerText = msToTime(el.currentTime * 1000);
       // durationTimeElement.innerText = msToTime(el.duration * 1000);
       if (currentVolumeBar) {
         currentVolumeBar.style.left = `calc(-${
-          100 - (Number(volumeSlider.value) / audio!.duration) * 100
-        }% + 12px - ${Number(volumeSlider.value) / (audio!.duration / 12)}px)`;
+          100 - (Number(volumeSlider.value) / el.duration) * 100
+        }% + 12px - ${Number(volumeSlider.value) / (el.duration / 12)}px)`;
       }
     });
-    audio.addEventListener('ended', () => playSong());
+
+    function resetSliderDisplay() {
+      const currentVolumeBar = document.getElementById('cur_slider');
+      if (currentVolumeBar) {
+        currentVolumeBar.style.left = `calc(-100% + 12px)`;
+      }
+    }
+
+    audio.addEventListener('ended', () => {
+      resetSliderDisplay();
+      playSong();
+    });
 
     volumeSlider.addEventListener('input', (event) => {
+      // console.log('INPUT....', audio);
       const inp = event.target as HTMLInputElement;
-      currentVolumeBar.style.left = `calc(-${
-        100 - (Number(inp.value) / audio!.duration) * 100
-      }% + 12px - ${Number(inp.value) / (audio!.duration / 12)}px)`;
+      if (currentVolumeBar) {
+        currentVolumeBar.style.left = `calc(-${
+          100 - (Number(inp.value) / audio!.duration) * 100
+        }% + 12px - ${Number(inp.value) / (audio!.duration / 12)}px)`;
+      }
       audio!.currentTime = Number(inp.value);
     });
   });
 </script>
 
 <div class="sliderContainer">
-  {#if audio && audio.currentTime > 0}<div
-      bind:this={currentVolumeBar}
-      class="current-volume-bar"
-    />{/if}
+  <div id="cur_slider" class="current-volume-bar"></div>
   <input
     class="volume-slider"
     bind:this={volumeSlider}

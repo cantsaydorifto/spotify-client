@@ -51,7 +51,11 @@
       <Frame>
         {#each section.items as playlist}
           {#if playlist}
-            <a href={`${section.path}/${playlist.id}`} class="playlistContainer">
+            <a
+              data-sveltekit-preload-data="off"
+              href={`${section.path}/${playlist.id}`}
+              class="playlistContainer"
+            >
               <div class="playlist">
                 {#if playlist.images.length > 1}
                   <div class="playlistImg">
@@ -93,7 +97,11 @@
     <div class="grid-container">
       <Frame>
         {#each artistSearchResults.items as artist}
-          <a href={`/artist/${artist.uri.slice(15)}`} class="playlistContainer">
+          <a
+            data-sveltekit-preload-data="off"
+            href={`/artist/${artist.uri.slice(15)}`}
+            class="playlistContainer"
+          >
             <div class="playlist">
               {#if artist.images.length > 1}
                 <div class="playlistImg artistImg">
@@ -130,7 +138,7 @@
             <div class="playlist">
               {#if track.album.images.length > 1}
                 <div class="playlistImgContainer track">
-                  <a data-sveltekit-preload-data="tap" href={`/track/${track.id}`}>
+                  <a data-sveltekit-preload-data="off" href={`/track/${track.id}`}>
                     <img src={track.album.images[1].url} alt="" />
                   </a>
                   <PlayBtn innerSize={25} outerSize={40} onclick={() => startRadio(track)} />
@@ -141,18 +149,22 @@
                 </div>
               {:else}
                 <div class="no-image-container track">
-                  <a href={`/album/${track.album.uri.slice(14)}`}>
+                  <a data-sveltekit-preload-data="off" href={`/album/${track.album.uri.slice(14)}`}>
                     <MusicIcon width="100" height="100" color="white" />
                   </a>
                   <PlayBtn innerSize={25} outerSize={40} />
                 </div>
               {/if}
               <div class="playlistInfo">
-                <a href={`/album/${track.album.uri.slice(14)}`} title={track.name}
-                  >{@html track.name}</a
+                <a
+                  data-sveltekit-preload-data="off"
+                  href={`/album/${track.album.uri.slice(14)}`}
+                  title={track.name}>{@html track.name}</a
                 >
-                <a href={`/artist/${track.artists[0].id}`} title={track.artists[0].name}
-                  >{@html track.artists[0].name}</a
+                <a
+                  data-sveltekit-preload-data="off"
+                  href={`/artist/${track.artists[0].id}`}
+                  title={track.artists[0].name}>{@html track.artists[0].name}</a
                 >
               </div>
             </div>
@@ -175,7 +187,7 @@
               <div class="playlist">
                 {#if playlist.image.length > 1}
                   <div class="playlistImgContainer track">
-                    <a data-sveltekit-preload-data="tap" href={`/svn/song/${playlist.id}`}>
+                    <a data-sveltekit-preload-data="off" href={`/svn/song/${playlist.id}`}>
                       <img src={playlist.image[2].link} alt={playlist.name} />
                     </a>
                     <PlayBtn
@@ -199,7 +211,9 @@
                 {/if}
                 <div class="playlistInfo">
                   <p title={playlist.name}>{@html playlist.name}</p>
-                  <a href={`/svn/song/${playlist.id}`}>{@html playlist.primaryArtists}</a>
+                  <a data-sveltekit-preload-data="off" href={`/svn/song/${playlist.id}`}
+                    >{@html playlist.primaryArtists}</a
+                  >
                 </div>
               </div>
             </div>
@@ -216,7 +230,11 @@
       <div class="grid-container">
         <Frame>
           {#each saavnHomepageData.artistSearchResults as artist}
-            <a href={`/svn/artist/${artist.id}`} class="playlistContainer">
+            <a
+              data-sveltekit-preload-data="off"
+              href={`/svn/artist/${artist.id}`}
+              class="playlistContainer"
+            >
               <div class="playlist">
                 {#if artist.image.length > 1}
                   <div class="playlistImg artistImg">
@@ -249,7 +267,7 @@
       <div class="grid-container">
         <Frame>
           {#each saavnHomepageData.albums as album}
-            <a
+            <a data-sveltekit-preload-data="off"
               href={album.type === 'album' ? `/svn/album/${album.id}` : `/svn/song/${album.id}`}
               class="playlistContainer"
             >
@@ -269,7 +287,7 @@
                 {/if}
                 <div class="playlistInfo">
                   <p title={album.name}>{@html album.name}</p>
-                  <a
+                  <a data-sveltekit-preload-data="off"
                     href="/svn/album/{album.id}"
                     title={album.primaryArtists.length > 0
                       ? album.primaryArtists[0].name
@@ -298,7 +316,11 @@
       <div class="grid-container">
         <Frame>
           {#each saavnHomepageData.playlists as playlist}
-            <a href={`/svn/playlist/${playlist.id}`} class="playlistContainer">
+            <a
+              data-sveltekit-preload-data="off"
+              href={`/svn/playlist/${playlist.id}`}
+              class="playlistContainer"
+            >
               <div class="playlist">
                 {#if playlist.image.length > 1}
                   <div class="playlistImg">
@@ -331,7 +353,7 @@
       <div class="grid-container">
         <Frame>
           {#each saavnHomepageData.charts as playlist}
-            <a href={`/svn/playlist/${playlist.id}`} class="playlistContainer">
+            <a data-sveltekit-preload-data="off" href={`/svn/playlist/${playlist.id}`} class="playlistContainer">
               <div class="playlist">
                 {#if playlist.image.length > 1}
                   <div class="playlistImg">
@@ -364,7 +386,7 @@
       <div class="grid-container">
         <Frame>
           {#each saavnHomepageData.trendingAlbums as playlist}
-            <a href={`/svn/album/${playlist.id}`} class="playlistContainer">
+            <a data-sveltekit-preload-data="off" href={`/svn/album/${playlist.id}`} class="playlistContainer">
               <div class="playlist">
                 {#if playlist.image.length > 1}
                   <div class="playlistImg">
@@ -381,7 +403,7 @@
                 {/if}
                 <div class="playlistInfo">
                   <p title={playlist.name}>{@html playlist.name}</p>
-                  <a
+                  <a data-sveltekit-preload-data="off"
                     href={`/svn/artist/${
                       playlist.primaryArtists.length > 0
                         ? playlist.primaryArtists[0].id

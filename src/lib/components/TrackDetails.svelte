@@ -174,7 +174,7 @@
                   : 'white'}
                 title={track.name}
               >
-                <a data-sveltekit-preload-data="tap" href={`/track/${track.id}`}
+                <a data-sveltekit-preload-data="off" href={`/track/${track.id}`}
                   >{@html track.name}</a
                 >
               </h4>
@@ -184,7 +184,9 @@
             </div>
             <p class="artists">
               {#each track.artists as artist, artistIndex}
-                <a href={`/${svn ? 'svn/' : ''}artist/${artist.id}`}>{@html artist.name}</a
+                <a
+                  data-sveltekit-preload-data="off"
+                  href={`/${svn ? 'svn/' : ''}artist/${artist.id}`}>{@html artist.name}</a
                 >{#if artistIndex < track.artists.length - 1}{', '}{/if}
               {/each}
             </p>

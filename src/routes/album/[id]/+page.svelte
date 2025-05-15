@@ -16,45 +16,45 @@
   import { onMount } from 'svelte';
   import UnavailableTracks from '$lib/components/UnavailableTracks.svelte';
 
-  // function startAlbumPlayback() {
-  //   if (!tracks) return;
-  //   const tracksToQueue: Song[] | null = tracks
-  //     ? album.tracks.items.map((el, idx) => ({
-  //         name: el.name,
-  //         id: el.id,
-  //         artist: { name: el.artists[0].name, id: el.artists[0].id },
-  //         img: album.images.length > 0 ? album.images[1].url : album.images[0].url,
-  //         link: tracks![idx].link,
-  //         album: {
-  //           name: album.name,
-  //           id: album.id,
-  //           totalTracks: album.total_tracks
-  //         },
-  //         trackNumber: el.track_number,
-  //         preview_url: el.preview_url || '',
-  //         duration_ms: el.duration_ms
-  //       }))
-  //     : null;
-  //   clearQueue();
-  //   setCurrentlyPlaying({
-  //     name: album.name,
-  //     id: album.id,
-  //     type: 'ALBUM'
-  //   });
-  //   addFetchedSongsToQueue(tracksToQueue, 0);
-  //   playSong();
-  // }
+  function startAlbumPlayback() {
+    if (!tracks) return;
+    const tracksToQueue: Song[] | null = tracks
+      ? album.tracks.items.map((el, idx) => ({
+          name: el.name,
+          id: el.id,
+          artist: { name: el.artists[0].name, id: el.artists[0].id },
+          img: album.images.length > 0 ? album.images[1].url : album.images[0].url,
+          link: tracks![idx].link,
+          album: {
+            name: album.name,
+            id: album.id,
+            totalTracks: album.total_tracks
+          },
+          trackNumber: el.track_number,
+          preview_url: el.preview_url || '',
+          duration_ms: el.duration_ms
+        }))
+      : null;
+    clearQueue();
+    setCurrentlyPlaying({
+      name: album.name,
+      id: album.id,
+      type: 'ALBUM'
+    });
+    addFetchedSongsToQueue(tracksToQueue, 0);
+    playSong();
+  }
 
-  // onMount(() => {
-  //   getSaavnAlbumTracks({
-  //     artist: album.artists[0].name,
-  //     id: album.id,
-  //     name: album.name,
-  //     totalTracks: album.total_tracks
-  //   }).then((res) => {
-  //     tracks = res.map((el) => ({ ...el, img: album.images[0].url }));
-  //   });
-  // });
+  onMount(() => {
+    getSaavnAlbumTracks({
+      artist: album.artists[0].name,
+      id: album.id,
+      name: album.name,
+      totalTracks: album.total_tracks
+    }).then((res) => {
+      tracks = res.map((el) => ({ ...el, img: album.images[0].url }));
+    });
+  });
 
   let { data }: PageProps = $props();
   const { album, color: clr, hasLiked } = data;
