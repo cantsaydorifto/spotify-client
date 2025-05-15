@@ -1,0 +1,46 @@
+.tippy-box[data-theme~='menu'] {
+  background-color: var(--menu-background-color);
+  color: var(--menu-text-color);
+  border-radius: 3px;
+  box-shadow: 0 13px 20px rgba(0, 0, 0, 0.3);
+}
+
+.tippy-box[data-theme~='track-menu'] {
+  padding: 5px 0;
+  background-color: var(--menu-background-color);
+  color: var(--menu-text-color);
+  border-radius: 8px;
+  box-shadow: 0 13px 20px rgba(0, 0, 0, 0.3);
+}
+
+.tippy-box[data-theme~='track-menu'] .tippy-content {
+  padding: 0;
+}
+
+.tippy-box[data-theme~='menu'] .tippy-content {
+  padding: 0px;
+  width: 170px;
+  max-width: 100%;
+}
+
+.tippy-box[data-theme~='vol-menu'] .tippy-content {
+  background-color: var(--sidebar-color);
+}
+.tippy-box[data-theme~='menu'][data-placement^='top'] > .tippy-arrow::before {
+  border-top-color: var(--menu-background-color);
+}
+.tippy-box[data-theme~='menu'][data-placement^='bottom'] > .tippy-arrow::before {
+  border-bottom-color: var(--menu-background-color);
+}
+.tippy-box[data-theme~='menu'][data-placement^='left'] > .tippy-arrow::before {
+  border-left-color: var(--menu-background-color);
+}
+.tippy-box[data-theme~='menu'][data-placement^='right'] > .tippy-arrow::before {
+  border-right-color: var(--menu-background-color);
+}
+.tippy-box[data-theme~='vol-menu'][data-placement^='left'] > .tippy-arrow::before {
+  border-left-color: var(--sidebar-color);
+}
+.tippy-box[data-theme~='track-menu'][data-placement^='bottom'] > .tippy-arrow::before {
+  display: none;
+}
