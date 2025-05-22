@@ -2,12 +2,16 @@ import { error } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
 import interceptFetch from '$lib/interceptor/interceptFetch';
 
-export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, params }) => {
+export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, params, setHeaders }) => {
   const fetch = (path: string) => interceptFetch(fetchWithNoInterceptor, path);
   const [artistRes, tracksRes] = await Promise.all([
     fetch('/api/spotify/artists/' + params.id),
     fetch('/api/spotify/artists/' + params.id + '/top-tracks?market=US')
   ]);
+
+  setHeaders({
+    'cache-control': 'max-age=600'
+  });
 
   if (!artistRes.ok) throw error(artistRes.status, 'Artist not found');
   if (!tracksRes.ok) throw error(tracksRes.status, 'Artist Tracks not found');

@@ -1,10 +1,13 @@
 import { json } from '@sveltejs/kit';
 import { Vibrant } from 'node-vibrant/node';
 
-export async function GET({ url, fetch }) {
+export async function GET({ url, fetch, setHeaders }) {
   const imageUrl = url.searchParams.get('image');
   if (!imageUrl) return json({ color: null });
   const imageRes = await fetch(imageUrl);
+  setHeaders({
+    'cache-control': 'max-age=600'
+  });
   const image = imageRes.ok ? await imageRes.arrayBuffer() : null;
   if (!image) return json({ color: null });
   const stats = await Vibrant.from(Buffer.from(image))

@@ -15,12 +15,10 @@ export const GET: RequestHandler = async ({ fetch, cookies, params, url, setHead
     throw error(responseJSON.error.status, responseJSON.error.message);
   }
 
-  const cacheControl = response.headers.get('cache-control');
-  if (cacheControl) {
-    setHeaders({
-      'cache-control': cacheControl
-    });
-  }
+  setHeaders({
+    'cache-control': 'max-age=600'
+  });
+
   return json(responseJSON);
 };
 

@@ -2,6 +2,7 @@ import { CLIENT_ID } from '$env/static/private';
 import { error, json } from '@sveltejs/kit';
 
 export async function GET({ cookies, fetch }) {
+  let refreshToken = cookies.get('spotify_refresh_token') ?? '';
   const response = await fetch('https://accounts.spotify.com/api/token', {
     method: 'POST',
     headers: {
@@ -10,7 +11,7 @@ export async function GET({ cookies, fetch }) {
     body: new URLSearchParams({
       grant_type: 'refresh_token',
       client_id: CLIENT_ID,
-      refresh_token: cookies.get('spotify_refresh_token') || ''
+      refresh_token: refreshToken
     })
   });
   // console.log('Inside GET');
@@ -26,9 +27,11 @@ export async function GET({ cookies, fetch }) {
     cookies.delete('spotify_access_token', { path: '/' });
     throw error(401, { message: resJson.error_description || 'Error' });
   }
-
-  if (resJson.refresh_token) {
+  console.log('prev token : ', refreshToken);
+  console.log('new one', resJson.refresh_token);
+  if (resJson.refresh_token && resJson.refresh_token !== refreshToken) {
     console.log('NEW REFRESH TOKEN AS WELL');
+    cookies.delete('spotify_refresh_token', { path: '/' });
     cookies.set('spotify_refresh_token', resJson.refresh_token, {
       path: '/',
       httpOnly: true,
@@ -38,6 +41,7 @@ export async function GET({ cookies, fetch }) {
     });
   }
   console.log('TOKEN REFRESHED!!!');
+  cookies.delete('spotify_access_token', { path: '/' });
   cookies.set('spotify_access_token', resJson.access_token, {
     path: '/',
     httpOnly: true,

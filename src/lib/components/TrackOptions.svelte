@@ -24,7 +24,7 @@
     name: track.name,
     trackNumber: track.track_number,
     duration_ms: track.duration_ms,
-    img: track.album.images[0].url,
+    img: track.album.images.length > 0 ? track.album.images[0].url : '',
     link: track.link || '',
     preview_url: track.preview_url || '',
     needsFetch: track.link ? false : true

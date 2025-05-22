@@ -29,9 +29,12 @@ interface Results {
   }[];
 }
 
-export async function GET({ url, fetch }) {
+export async function GET({ url, fetch, setHeaders }) {
   let searchQuery = url.searchParams.get('query');
   const trackCount = url.searchParams.get('count');
+  setHeaders({
+    'cache-control': 'max-age=600'
+  });
   if (!trackCount) throw error(400, { message: 'Invalid Track Count' });
   if (!searchQuery) throw error(400, { message: 'Invalid Search Parameter' });
   searchQuery = searchQuery.replace('•', '·');

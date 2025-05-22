@@ -8,98 +8,24 @@ export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, parent }) 
   if (!user) {
     throw redirect(307, '/svn');
   }
-  // const res4 = await fetch('/api/spotify/browse/categories?locale=en_US');
-  // const categoryJson = res4.ok ? ((await res4.json()) as MultipleCategoriesResponse) : null;
-  // console.log('categories : ', categoryJson);
-  // const randomCategories = categoryJson
-  //   ? categoryJson.categories.items.sort(() => Math.random() - Math.random()).slice(0, 4)
-  //   : [];
-  // console.log('random : ', randomCategories);
-  // const a = await (async () => {
-  //   try {
-  //     const res = await Promise.all(
-  //       randomCategories.map((el) =>
-  //         fetch(`/api/spotify/browse/categories/${el.id}/playlists?country=US`)
-  //       )
-  //     );
-  //     const res_1 = (await Promise.all(res.map((el) => el.json()))) as CategoryPlaylistsResponse[];
-  //     return res_1.map((el, i) => {
-  //       return {
-  //         ...el,
-  //         name: randomCategories[i].name
-  //       };
-  //     });
-  //   } catch (err) {
-  //     return [];
-  //   }
-  // })();
-
-  // const [res1, res2, res5, res6, res7] = await Promise.all([
-  //   fetch('/api/spotify/browse/new-releases?limit=50&country=US'),
-  //   fetch('/api/spotify/browse/featured-playlists?locale=en_US'),
-  //   fetch(`/api/spotify/search?q=${encodeURIComponent('Daily Mix')}&type=playlist`),
-  //   fetch(`/api/spotify/search?q=${encodeURIComponent('Discover Weekly')}&type=playlist`),
-  //   fetch(`/api/spotify/search?q=${encodeURIComponent('for you')}&type=playlist`)
-  // ]);
-  // const forYouPlaylists: PlaylistObjectSimplified[] = [];
-
-  // const [dailyMix, discoverWeekly, forYouReults] = await Promise.all([
-  //   res5.json() as SearchResponse,
-  //   res6.json() as SearchResponse,
-  //   res7.json() as SearchResponse
-  // ]);
-
-  // console.log(dailyMix);
-
-  // if (dailyMix.playlists) {
-  //   dailyMix.playlists.items.forEach((el) => {
-  //     if (el.owner.id === 'spotify' && el.name.startsWith('Daily Mix')) forYouPlaylists.push(el);
-  //   });
-  //   forYouPlaylists.sort((a, b) => a.name.localeCompare(b.name));
-  // }
-
-  // if (forYouReults.playlists && forYouReults.playlists.items.length > 0) {
-  //   forYouReults.playlists.items.forEach((el) => {
-  //     if (
-  //       el.owner.id === 'spotify' &&
-  //       !(
-  //         el.name === 'Discover Weekly' ||
-  //         el.name.startsWith('Daily Mix') ||
-  //         el.name.endsWith('Radio')
-  //       )
-  //     ) {
-  //       forYouPlaylists.unshift(el);
-  //     }
-  //   });
-  // }
-
-  // if (
-  //   discoverWeekly.playlists &&
-  //   discoverWeekly.playlists.items.length > 0 &&
-  //   discoverWeekly.playlists.items[0].owner.id === 'spotify'
-  // ) {
-  //   forYouPlaylists.unshift(discoverWeekly.playlists.items[0]);
-  // }
-
-  // forYouPlaylists.unshift(getEmptyLikesPlaylist());
-  // console.log(res5.headers.get('cache-control'));
-  // setHeaders({
-  //   age: '3600',
-  //   'cache-control'
-  // })
+  const [res1] = await Promise.all([fetch('/api/spotify/browse/new-releases?limit=50&country=US')]);
 
   return {
-    // newReleases: res1.ok ? await (res1.json() as Promise<ListOfNewReleasesResponse>) : null,
-    // featuredPlaylists: res2.ok
-    //   ? await (res2.json() as Promise<ListOfFeaturedPlaylistsResponse>)
-    //   : null,
-    // randomCategories: a,
-    // forYouPlaylists,
+    newReleases: res1.ok ? await (res1.json() as Promise<ListOfNewReleasesResponse>) : null,
     color: {
       dominantColor: 'var(--sidebar-color)'
     }
   };
 };
+
+function randomizeArray(nums: any[]) {
+  const arr = [...nums];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr.slice(0, 20);
+}
 
 const getEmptyLikesPlaylist = (): PlaylistObjectSimplified => ({
   collaborative: false,

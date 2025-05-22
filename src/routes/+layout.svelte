@@ -3,29 +3,28 @@
   import '../globals.css';
   import '../tippy-styles.css';
   import 'tippy.js/animations/shift-away.css';
-  //   import '@fontsource/metropolis';
-  //   import '@fontsource/metropolis/300.css';
-  //   import '@fontsource/metropolis/400.css';
-  //   import '@fontsource/metropolis/500.css';
-  //   import '@fontsource/metropolis/600.css';
-  //   import '@fontsource/metropolis/700.css';
+  import '@fontsource/metropolis';
+  import '@fontsource/metropolis/300.css';
+  import '@fontsource/metropolis/400.css';
+  import '@fontsource/metropolis/500.css';
+  import '@fontsource/metropolis/600.css';
+  import '@fontsource/metropolis/700.css';
   import Sidebar from '$lib/components/Sidebar.svelte';
   import Navbar from '$lib/components/Navbar.svelte';
   import FooterPlayer from '$lib/components/FooterPlayer.svelte';
-  //   import NProgress from 'nprogress';
-  //   import './nprogress.css';
-  //   import { afterNavigate, beforeNavigate } from '$app/navigation';
+  import { afterNavigate, beforeNavigate } from '$app/navigation';
+  import Progress from '$lib/components/Progress.svelte';
+
+  let loading = $state(false);
+
+  beforeNavigate(() => {
+    loading = true;
+  });
+
+  afterNavigate(() => {
+    loading = false;
+  });
   //   import { currentSong } from '$lib/store/currentPlaying';
-
-  //   NProgress.configure({ showSpinner: false });
-
-  //   afterNavigate(() => {
-  //     NProgress.done();
-  //   });
-  //   beforeNavigate(() => {
-  //     NProgress.start();
-  //   });
-
   //   $: curTrack = $currentSong.trackLink ? $currentSong.trackLink.name : '';
 
   let { children } = $props();
@@ -36,6 +35,7 @@
   <!-- <title>{curTrack}</title> -->
 </svelte:head>
 
+<Progress {loading} />
 <div class="main">
   <div class="sidebar">
     <Sidebar desktop={true} />

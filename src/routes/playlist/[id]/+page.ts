@@ -2,12 +2,15 @@ import { error } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
 import interceptFetch from '$lib/interceptor/interceptFetch';
 
-export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, params }) => {
+export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, params, setHeaders }) => {
   const fetch = (path: string) => interceptFetch(fetchWithNoInterceptor, path);
   const res = await fetch('/api/spotify/playlists/' + params.id);
   if (!res.ok) throw error(res.status, 'Playlist not found');
   const playlist = (await res.json()) as SinglePlaylistResponse;
 
+  setHeaders({
+    'cache-control': 'max-age=600'
+  });
   const trackOffset = playlist.tracks.items.length < 50 ? playlist.tracks.items.length : 50;
   const hasMoreTracks = playlist.tracks.total > trackOffset;
 

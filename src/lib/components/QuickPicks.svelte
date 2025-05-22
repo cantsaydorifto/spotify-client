@@ -2,24 +2,28 @@
   import Frame from './Frame.svelte';
   import IndividualTrackRow from './IndividualTrackRow.svelte';
   import TrackLoadingRow from './TrackLoadingRow.svelte';
+
+  function fisherYatesShuffle<T>(array: T[]): T[] {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  }
+
   async function getQuickPicks() {
-    let recommendedObject: RecommendationsObject = { seeds: [], tracks: [] };
-    const likeRes = await fetch(`/api/spotify/me/tracks?limit=5`);
-    if (!likeRes.ok) {
-      return recommendedObject;
-    }
-    const likes = (await likeRes.json()) as UsersSavedTracksResponse;
-    const recommendedObjectRes = await fetch(
-      `/api/spotify/recommendations?seed_tracks=${likes.items
-        .slice(0, 5)
-        .map((el) => el.track.id)
-        .join(',')}`
-    );
-    if (recommendedObjectRes.ok) {
-      recommendedObject = (await recommendedObjectRes.json()) as RecommendationsObject;
-    }
-    // console.log(recommendedObject.tracks.length);
-    return recommendedObject;
+    const billboardTracks = await fetch('/api/billboard');
+    console.log('GETTING QUICK PICKS!!!');
+    const billboardTracksJson = billboardTracks.ok
+      ? ((await billboardTracks.json()) as SinglePlaylistResponse)
+      : null;
+    return {
+      quickPicks: billboardTracksJson
+        ? fisherYatesShuffle(billboardTracksJson.tracks.items.map((el) => el.track!)).slice(0, 20)
+        : [],
+      billboard: billboardTracksJson ? billboardTracksJson.tracks.items.map((el) => el.track!) : []
+    };
   }
 </script>
 
@@ -28,65 +32,31 @@
     <h2 class="heading">Quick Picks</h2>
   </div>
   <div class="grid-container">
-    {#await getQuickPicks()}
-      <Frame>
-        <div class="trackContainer">
-          <TrackLoadingRow />
-          <TrackLoadingRow />
-          <TrackLoadingRow />
-          <TrackLoadingRow />
-        </div>
-        <div class="trackContainer">
-          <TrackLoadingRow />
-          <TrackLoadingRow />
-          <TrackLoadingRow />
-          <TrackLoadingRow />
-        </div>
-        <div class="trackContainer">
-          <TrackLoadingRow />
-          <TrackLoadingRow />
-          <TrackLoadingRow />
-          <TrackLoadingRow />
-        </div>
-        <div class="trackContainer">
-          <TrackLoadingRow />
-          <TrackLoadingRow />
-          <TrackLoadingRow />
-          <TrackLoadingRow />
-        </div>
-      </Frame>
-    {:then value}
-      <Frame>
-        <div class="trackContainer">
-          {#each value.tracks.slice(0, 4) as track}
-            <IndividualTrackRow hasLiked={false} {track} />
-          {/each}
-        </div>
-        <div class="trackContainer">
-          {#each value.tracks.slice(4, 8) as track}
-            <IndividualTrackRow hasLiked={false} {track} />
-          {/each}
-        </div>
-        <div class="trackContainer">
-          {#each value.tracks.slice(8, 12) as track}
-            <IndividualTrackRow hasLiked={false} {track} />
-          {/each}
-        </div>
-        <div class="trackContainer">
-          {#each value.tracks.slice(12, 16) as track}
-            <IndividualTrackRow hasLiked={false} {track} />
-          {/each}
-        </div>
-        <div class="trackContainer">
-          {#each value.tracks.slice(16, 20) as track}
-            <IndividualTrackRow hasLiked={false} {track} />
-          {/each}
-        </div>
-      </Frame>
-    {:catch error}
-      <!-- promise was rejected -->
-      <p>Something went wrong: {error.message}</p>
-    {/await}
+    <Frame>
+      {#await getQuickPicks()}
+        {#each Array(5)}
+          <div class="trackContainer">
+            {#each Array(4)}
+              <TrackLoadingRow />
+            {/each}
+          </div>
+        {/each}
+      {:then { billboard, quickPicks }}
+        {#each Array(5) as _, rowIndex}
+          <div class="trackContainer">
+            {#each quickPicks.slice(rowIndex * 4, rowIndex * 4 + 4) as track (track.id)}
+              <IndividualTrackRow
+                radioPicks={fisherYatesShuffle(billboard).slice(0, 50)}
+                hasLiked={false}
+                {track}
+              />
+            {/each}
+          </div>
+        {/each}
+      {:catch}
+        <span>ERROR OCCURED!!!!</span>
+      {/await}
+    </Frame>
   </div>
 </section>
 

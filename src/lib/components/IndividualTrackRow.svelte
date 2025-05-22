@@ -1,6 +1,5 @@
 <script lang="ts">
   import Play from '$lib//icons/Play.svelte';
-  import { page } from '$app/stores';
   import Heart from '$lib/icons/Heart.svelte';
   import greenEqualiser from '../../assets/equaliser-animated-green.gif';
   import {
@@ -13,8 +12,15 @@
     startRadio,
     togglePlay
   } from '$lib/store/currentPlaying';
-  export let track: RecommendationTrackObject;
-
+  import { startQuickPicksPlayback } from '$lib/playback/quickPicksRadio';
+  export let track: TrackObjectFull;
+  export let radioPicks: TrackObjectFull[];
+  // console.log({
+  //   name: track.name,
+  //   artists: track.artists,
+  //   album: track.album.name,
+  //   img: track.album.images[0].url
+  // });
   export let hasLiked: boolean = false;
 
   function msToTime(duration: number) {
@@ -43,7 +49,7 @@
             class="imageContainer"
             style="background-image: url({track.album.images[track.album.images.length - 2].url})"
           >
-            <div class="overlay" style:display="block" />
+            <div class="overlay" style:display="block"></div>
             {#if !$currentSong.isPaused}
               <img style:z-index="2" width="15" height="15" src={greenEqualiser} alt="equaliser" />
             {:else}
@@ -57,8 +63,8 @@
             class="imageContainer"
             style="background-image: url({track.album.images[track.album.images.length - 2].url})"
           >
-            <div class="overlay" />
-            <button class="playBtn" on:click={() => startRadio(track)}
+            <div class="overlay"></div>
+            <button class="playBtn" on:click={() => startQuickPicksPlayback([track, ...radioPicks])}
               ><Play width="20px" height="20px" stroke="white" /></button
             >
           </div>

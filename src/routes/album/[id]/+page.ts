@@ -2,9 +2,12 @@ import { error } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
 import { interceptFetch } from '$lib';
 
-export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, params }) => {
+export const load: PageLoad = async ({ fetch: fetchWithNoInterceptor, params, setHeaders }) => {
   const fetch = (path: string) => interceptFetch(fetchWithNoInterceptor, path);
 
+  setHeaders({
+    'cache-control': 'max-age=600'
+  });
   const res = await fetch('/api/spotify/albums/' + params.id);
   if (!res.ok) throw error(res.status, 'Album not found');
   const album = (await res.json()) as SingleAlbumResponse;

@@ -5,7 +5,7 @@
   import { currentSong } from '$lib/store/currentPlaying';
   import QuickPicks from '$lib/components/QuickPicks.svelte';
 
-  // export let data;
+  const { data } = $props();
   const sections: {
     title: string;
     path: string;
@@ -18,30 +18,16 @@
   //     items: data.forYouPlaylists
   //   });
   // }
-  // if (data.newReleases) {
-  //   data.newReleases.albums.items.forEach((el) => {
-  //     el.images.sort((a, b) => (a.height && b.height ? a.height - b.height : -1));
-  //   });
-  //   sections.push({
-  //     title: 'New Releases',
-  //     path: '/album',
-  //     items: data.newReleases.albums.items
-  //   });
-  // }
-  // if (data.featuredPlaylists) {
-  //   sections.push({
-  //     title: 'Featured Playlists',
-  //     path: '/playlist',
-  //     items: data.featuredPlaylists.playlists.items
-  //   });
-  // }
-  // data.randomCategories.forEach((el) => {
-  //   sections.push({
-  //     title: el.name,
-  //     path: `/playlist`,
-  //     items: el.playlists.items
-  //   });
-  // });
+  if (data.newReleases) {
+    data.newReleases.albums.items.forEach((el) => {
+      el.images.sort((a, b) => (a.height && b.height ? a.height - b.height : -1));
+    });
+    sections.push({
+      title: 'New Releases',
+      path: '/album',
+      items: data.newReleases.albums.items
+    });
+  }
   // console.log(data.randomCategories);
   // $: pageTitle = $currentSong.trackLink ? $currentSong.trackLink.name : 'Home';
 </script>
@@ -50,8 +36,8 @@
   <!-- <title>{pageTitle}</title> -->
 </svelte:head>
 
-<!-- <QuickPicks /> -->
+<QuickPicks />
 
-<!-- {#each sections as section}
+{#each sections as section}
   <CatergorySection {section} />
-{/each} -->
+{/each}

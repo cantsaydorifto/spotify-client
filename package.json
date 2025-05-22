@@ -17,6 +17,7 @@
 		"@eslint/compat": "^1.2.5",
 		"@eslint/js": "^9.18.0",
 		"@sveltejs/adapter-auto": "^6.0.0",
+		"@sveltejs/adapter-node": "^5.2.12",
 		"@sveltejs/kit": "^2.16.0",
 		"@sveltejs/vite-plugin-svelte": "^5.0.0",
 		"@tailwindcss/vite": "^4.0.0",
@@ -35,6 +36,7 @@
 		"vite": "^6.2.6"
 	},
 	"dependencies": {
+		"@fontsource/metropolis": "^5.2.5",
 		"node-vibrant": "^4.0.3",
 		"tippy.js": "^6.3.7"
 	}

@@ -103,7 +103,7 @@
 <div class="content">
   <div class="play">
     {#if !$currentSong.trackLink || !$currentSong.currentlyPlaying || $currentSong.currentlyPlaying.id !== album.id}
-      <!-- <PlayBtn onclick={() => startAlbumPlayback()} type="play" innerSize={25} /> -->
+      <PlayBtn onclick={() => startAlbumPlayback()} type="play" innerSize={25} />
     {:else if $currentSong.currentlyPlaying.type === 'ALBUM' && $currentSong.isPaused}
       <PlayBtn onclick={() => togglePlay()} type="play" innerSize={25} />
     {:else}

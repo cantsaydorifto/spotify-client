@@ -163,7 +163,7 @@
           {/if}
         </div>
         <div class="trackInfoContainer">
-          {#if !trackLinks}
+          {#if !trackLinks && track.album.images.length > 0}
             <img src={track.album.images[track.album.images.length - 1].url} alt="" />
           {/if}
           <div class="info-column">

@@ -2,22 +2,22 @@
   import ThreeHorizontalDots from '$lib/icons/ThreeHorizontalDots.svelte';
   import PlayBtn from '$lib/components/PlayBtn.svelte';
   import Button from '$lib/components/Button.svelte';
-  import { currentSong } from '$lib/store/currentPlaying.js';
+  // import { currentSong } from '$lib/store/currentPlaying.js';
   import { numberToCommaString } from './helper';
   import ArtistAlbums from './ArtistAlbums.svelte';
   import ArtistSearchPlaylists from './ArtistSearchPlaylists.svelte';
   import ArtistTracks from './ArtistTracks.svelte';
 
-  export let data;
-  const artist = data.artist;
-  const color = data.color ? data.color.dominantColor : null;
-  const tracks = data.artistTracks;
-  const hasLiked = data.hasliked;
-  const curTrack = $currentSong.trackLink ? $currentSong.trackLink.name : artist.name;
+  const { data } = $props();
+  const artist = $derived(data.artist);
+  const color = $derived(data.color ? data.color.dominantColor : null);
+  const tracks = $derived(data.artistTracks);
+  const hasLiked = $derived(data.hasliked);
+  // const curTrack = $currentSong.trackLink ? $currentSong.trackLink.name : artist.name;
 </script>
 
 <svelte:head>
-  <title>{curTrack}</title>
+  <!-- <title>{curTrack}</title> -->
 </svelte:head>
 
 {#key artist.id}
